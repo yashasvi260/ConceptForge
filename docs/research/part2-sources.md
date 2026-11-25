@@ -46,3 +46,15 @@ Every number shown in these modules is computed by the site's own code, recorded
 - **c-TF-IDF**: Grootendorst 2022, BERTopic (https://arxiv.org/abs/2203.05794), eq. tf(t,c) · log(1 + A / f(t)).
 - **Default result**: 6 clusters matching the 6 themes + 4 outliers; topic names recorded from gemma4:12b
   (temperature 0, 2026-11-25).
+
+## Module 06 · prompt engineering
+
+- **Task**: 8 test tickets with hand-checked answers (category, amount, currency, urgent); 2 few-shot examples.
+- **Experiment**: 16 combinations of role / few-shot / chain-of-thought / JSON schema × 8 tickets × 4 samples
+  (sample 0 at temperature 0 with token log-probabilities, samples 1–3 at 0.8), recorded 2026-11-25 from
+  gemma4:12b and qwen2.5-coder:1.5b via Ollama 0.40.18 (`think: false`, `num_ctx` 32768).
+  Results: gemma4 32/32 fields and valid JSON in every combination; qwen 1.5B 20–31/32, with every schema
+  combination always valid. The statements in the lesson are checked by `claims.test.ts`.
+- **Structured outputs**: Ollama `format` with a JSON schema (https://ollama.com/blog/structured-outputs).
+- **Chain-of-thought**: Wei et al. 2022 (https://arxiv.org/abs/2201.11903).
+- **In-context (few-shot) learning**: Brown et al. 2020 (https://arxiv.org/abs/2005.14165).
