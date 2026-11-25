@@ -5,3 +5,6 @@ coverage/
 .vite/
 .superpowers/
 public/ort/
+
+# Owner's reference books (copyrighted, never committed)
+reference/
