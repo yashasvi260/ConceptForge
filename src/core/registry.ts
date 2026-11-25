@@ -1,4 +1,4 @@
-import tokenization from "../subjects/tokenization";
+import tokensEmbeddings from "../subjects/02-tokens-embeddings";
 // @register-import — add new subject imports above this line
 import type { SubjectModule } from "./types";
 
@@ -8,7 +8,7 @@ import type { SubjectModule } from "./types";
  * and append it to this array.
  */
 export const SUBJECTS: readonly SubjectModule[] = [
-  tokenization,
+  tokensEmbeddings,
   // @register-subject — add new subjects above this line
 ];
 

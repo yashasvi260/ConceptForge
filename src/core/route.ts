@@ -1,3 +1,4 @@
+import { resolveId } from "./track";
 import type { PlayerMode } from "./types";
 
 /** Location inside the app, mirrored in the URL hash: `#/<subject>/<step>` or `#/<subject>/challenge`. */
@@ -9,7 +10,7 @@ export interface Route {
 
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
-  const subjectId = parts[0] ?? null;
+  const subjectId = resolveId(parts[0] ?? null);
   const second = parts[1];
   if (second === "challenge") return { subjectId, stepIndex: null, mode: "challenge" };
   const n = second !== undefined ? Number.parseInt(second, 10) : Number.NaN;

@@ -39,5 +39,6 @@ src/
 │   │   ├── steps.ts
 │   │   ├── challenges.ts
 │   │   └── StageView.tsx
-│   └── tokenization/            # Stage 1 · Text-to-Number Foundations: BPE, WordPiece, SentencePiece, real GPT tokenizers
+│   ├── 01-intro-llms/ … 14-evals-guardrails/   # LLM Mastery modules (ids from docs/curriculum.md; see src/core/track.ts)
+│   └── 02-tokens-embeddings/    # Module 02 (Tokens section = former Tokenization topic)
 └── App.tsx

@@ -1,7 +1,7 @@
 import { BookOpen, ChevronDown, Clock, Flame, Trophy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ACCENTS } from "../core/accent";
-import { groupByCategory } from "../core/registry";
+import { moduleLabel, trackGroups } from "../core/track";
 import type { ProgressMap } from "../core/storage";
 import { getProgress } from "../core/storage";
 import type { PlayerMode, SubjectModule } from "../core/types";
@@ -59,12 +59,12 @@ export function TopNav({ subjects, activeId, mode, progress, onSelectSubject, on
             type="button"
             aria-haspopup="menu"
             aria-expanded={open}
-            aria-label={`Choose a topic (current: ${active.title})`}
+            aria-label={`Choose a module (current: ${moduleLabel(active.moduleNumber)} ${active.title})`}
             onClick={() => setOpen((o) => !o)}
             className={`flex w-full items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition md:w-auto ${accent.border} ${accent.softBg}`}
           >
             <ActiveIcon size={16} className={accent.text} />
-            <span className="truncate text-slate-400">{active.category} ·</span>
+            <span className="truncate text-slate-400">LLM Mastery · {moduleLabel(active.moduleNumber)}</span>
             <span className="font-medium text-white">{active.title}</span>
             <ChevronDown size={15} className={`ml-auto text-slate-400 transition md:ml-1 ${open ? "rotate-180" : ""}`} />
           </button>
@@ -73,41 +73,47 @@ export function TopNav({ subjects, activeId, mode, progress, onSelectSubject, on
             <div
               role="menu"
               aria-label="Topics"
-              className="absolute left-0 top-full z-30 mt-2 w-full max-w-md rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-2xl"
+              className="absolute left-0 top-full z-30 mt-2 max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-2xl"
             >
-              {groupByCategory(subjects).map((g) => (
-                <div key={g.category} role="group" aria-label={g.category} className="py-1">
-                  <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                    {g.category}
-                  </div>
-                  {g.subjects.map((s) => {
-                    const Icon = s.icon;
-                    const a = ACCENTS[s.accent];
+              {trackGroups(subjects).map((g) => (
+                <div key={g.part} role="group" aria-label={g.title} className="py-1">
+                  <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{g.title}</div>
+                  {g.modules.map(({ entry, subject: s }) => {
+                    const Icon = s?.icon;
+                    const built = s !== undefined;
                     return (
                       <button
-                        key={s.id}
+                        key={entry.id}
                         type="button"
                         role="menuitem"
-                        aria-current={s.id === activeId ? "page" : undefined}
+                        aria-disabled={built ? "false" : "true"}
+                        aria-current={entry.id === activeId ? "page" : undefined}
                         onClick={() => {
+                          if (!built) return;
                           setOpen(false);
-                          onSelectSubject(s.id);
+                          onSelectSubject(entry.id);
                         }}
-                        className={`flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-slate-800 ${
-                          s.id === activeId ? "bg-slate-800/70" : ""
-                        }`}
+                        className={`flex w-full items-start gap-3 rounded-lg px-2 py-1.5 text-left transition ${
+                          built ? "hover:bg-slate-800" : "cursor-not-allowed opacity-50"
+                        } ${entry.id === activeId ? "bg-slate-800/70" : ""}`}
                       >
-                        <Icon size={18} className={`mt-0.5 shrink-0 ${a.text}`} />
+                        <span className="mt-0.5 w-6 shrink-0 font-mono text-xs text-slate-500">{String(entry.moduleNumber).padStart(2, "0")}</span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm text-slate-100">{s.title}</span>
-                          <span className="block truncate text-xs text-slate-500">{s.tagline}</span>
-                          <span className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
-                            <span className="capitalize">{s.difficulty}</span>
-                            <span className="flex items-center gap-1">
-                              <Clock size={11} /> {s.estimatedMinutes} min
-                            </span>
-                            <span>{explored(s, progress)}% explored</span>
+                          <span className="flex items-center gap-1.5 text-sm text-slate-100">
+                            {Icon && <Icon size={14} className={ACCENTS[s.accent].text} />}
+                            {entry.title}
                           </span>
+                          {s ? (
+                            <span className="mt-0.5 flex items-center gap-3 text-[11px] text-slate-500">
+                              <span className="capitalize">{s.difficulty}</span>
+                              <span className="flex items-center gap-1">
+                                <Clock size={11} /> {s.estimatedMinutes} min
+                              </span>
+                              <span>{explored(s, progress)}% explored</span>
+                            </span>
+                          ) : (
+                            <span className="mt-0.5 block text-[11px] text-slate-600">Coming soon</span>
+                          )}
                         </span>
                       </button>
                     );

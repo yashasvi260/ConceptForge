@@ -35,6 +35,9 @@ describe("create-subject script", () => {
     expect(index).toMatch(/category: "[^"]+"/);
     expect(index).toMatch(/difficulty: "(beginner|intermediate|advanced)"/);
     expect(index).toMatch(/estimatedMinutes: \d+/);
+    expect(index).toMatch(/part: [1-4]/);
+    expect(index).toMatch(/moduleNumber: \d+/);
+    expect(index).toMatch(/bridge: \{/);
     expect(() => readFileSync(join(dir, "src", "subjects", "linear-algebra", "README.md"))).toThrow();
   });
 

@@ -21,6 +21,10 @@ export interface LessonStep {
   view: string;
   /** One-line "remember this" callout shown under the explanation. */
   keyTakeaway?: string;
+  /** Groups steps in the scrubber (e.g. "Tokens", "Embeddings"). */
+  section?: string;
+  /** Formula or metric shown in a monospace callout (e.g. "softmax(QKᵀ/√d)·V"). */
+  callout?: string;
 }
 
 /** Props every subject Stage receives from the lesson player. */
@@ -52,8 +56,13 @@ export interface SubjectModule {
   /** Compact label for the subject switcher. */
   shortTitle: string;
   tagline: string;
-  /** Curriculum stage this topic belongs to; the subject menu groups by it. */
+  /** Curriculum part title (see PART_TITLES). */
   category: string;
+  /** Curriculum part (I–IV) and module number (1–14); see src/core/track.ts. */
+  part: 1 | 2 | 3 | 4;
+  moduleNumber: number;
+  /** How this module connects to the rest of the track, in plain language. */
+  bridge: { buildsOn: string; leadsTo: string };
   difficulty: Difficulty;
   estimatedMinutes: number;
   icon: LucideIcon;

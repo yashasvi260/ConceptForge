@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import App, { AUTOPLAY_MS } from "./App";
 import { SUBJECTS } from "./core/registry";
 import { LAST_SUBJECT_KEY, PROGRESS_KEY } from "./core/storage";
+import { TRACK } from "./core/track";
 
 const first = SUBJECTS[0]!;
 const total = first.steps.length;
@@ -75,16 +76,38 @@ describe("App shell", () => {
     expect(stepTitle()).toBe(first.steps[0]!.title);
   });
 
-  it("lists subjects under their stage in the subject menu", async () => {
+  it("lists all 14 modules under Parts I–IV, unbuilt ones disabled", async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole("button", { name: /Choose a topic/ }));
-    const group = screen.getByRole("group", { name: first.category });
-    expect(within(group).getByRole("menuitem", { name: new RegExp(first.title) })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Choose a module/ }));
+    const menu = screen.getByRole("menu");
+    expect(within(menu).getAllByRole("group")).toHaveLength(4);
+    const items = within(menu).getAllByRole("menuitem");
+    expect(items).toHaveLength(14);
+    const built = new Set(SUBJECTS.map((s) => s.id));
+    TRACK.forEach((m, i) => expect(items[i]).toHaveAttribute("aria-disabled", built.has(m.id) ? "false" : "true"));
     await userEvent.keyboard("{Escape}");
-    expect(screen.queryByRole("group", { name: first.category })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: /Choose a topic/ }));
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Choose a module/ }));
     await userEvent.click(screen.getByRole("menuitem", { name: new RegExp(first.title) }));
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("opens old Tokenization links in Module 02 and keeps saved progress", () => {
+    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify({ tokenization: { lastStep: 3, visitedSteps: ["why-numbers"], bestScore: null, lastScore: null, attempts: 0 } }));
+    window.location.hash = "#/tokenization/7";
+    render(<App />);
+    const m2 = SUBJECTS.find((s) => s.id === "02-tokens-embeddings")!;
+    expect(stepTitle()).toBe(m2.steps[6]!.title);
+    const saved = JSON.parse(window.localStorage.getItem(PROGRESS_KEY) ?? "{}");
+    expect(saved["02-tokens-embeddings"].visitedSteps).toContain("why-numbers");
+    expect(saved.tokenization).toBeUndefined();
+  });
+
+  it("shows a coming-soon card for an unbuilt module link", () => {
+    window.location.hash = "#/07-agents-tools/1";
+    render(<App />);
+    expect(screen.getByRole("heading", { name: /Coming soon/ })).toBeInTheDocument();
+    expect(screen.getByText(/Advanced Text Generation Techniques & Tools/)).toBeInTheDocument();
   });
 
   it("shows the step's key takeaway when it has one", () => {

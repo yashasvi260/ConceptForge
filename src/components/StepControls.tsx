@@ -15,6 +15,17 @@ interface StepControlsProps {
   onToggleAutoPlay: () => void;
 }
 
+/** Consecutive steps that share a section, in order (one unnamed group when steps have no sections). */
+function sectionsOf(steps: LessonStep[]): { name?: string; indexes: number[] }[] {
+  const groups: { name?: string; indexes: number[] }[] = [];
+  steps.forEach((s, i) => {
+    const last = groups.at(-1);
+    if (last && last.name === s.section) last.indexes.push(i);
+    else groups.push({ name: s.section, indexes: [i] });
+  });
+  return groups;
+}
+
 /** Keep mouse clicks from moving focus onto the button, so Space stays an Auto-Play shortcut. */
 const keepFocus = (e: MouseEvent) => e.preventDefault();
 
@@ -77,27 +88,32 @@ export function StepControls({
           Next <ChevronRight size={16} />
         </button>
 
-        <ol className="hidden flex-1 flex-wrap items-center gap-1.5 sm:flex" aria-label="Lesson steps">
-          {steps.map((s, i) => {
-            const current = i === index;
-            const seen = visited.includes(s.id);
-            return (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  onMouseDown={keepFocus}
-                  onClick={() => onChange(i)}
-                  aria-label={`Go to step ${i + 1}: ${s.title}`}
-                  aria-current={current ? "step" : undefined}
-                  title={s.title}
-                  className={`h-2.5 rounded-full transition-all ${
-                    current ? `w-8 ${a.bg}` : seen ? "w-2.5 bg-slate-500 hover:bg-slate-400" : "w-2.5 bg-slate-800 hover:bg-slate-600"
-                  }`}
-                />
-              </li>
-            );
-          })}
-        </ol>
+        <div className="hidden flex-1 flex-wrap items-center gap-x-4 gap-y-1 sm:flex" aria-label="Lesson steps">
+          {sectionsOf(steps).map((sec) => (
+            <div key={sec.name ?? "all"} role="group" aria-label={sec.name ?? "Steps"} className="flex items-center gap-1.5">
+              {sec.name && <span className="text-[10px] uppercase tracking-wider text-slate-600">{sec.name}</span>}
+              {sec.indexes.map((i) => {
+                const s = steps[i]!;
+                const current = i === index;
+                const seen = visited.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onMouseDown={keepFocus}
+                    onClick={() => onChange(i)}
+                    aria-label={`Go to step ${i + 1}: ${s.title}`}
+                    aria-current={current ? "step" : undefined}
+                    title={s.title}
+                    className={`h-2.5 rounded-full transition-all ${
+                      current ? `w-8 ${a.bg}` : seen ? "w-2.5 bg-slate-500 hover:bg-slate-400" : "w-2.5 bg-slate-800 hover:bg-slate-600"
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
 
         <span className="ml-auto font-mono text-xs text-slate-500 sm:ml-0">
           Step {index + 1} / {steps.length}

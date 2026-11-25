@@ -1,4 +1,5 @@
 /** Progress persistence in localStorage. Every access is guarded: storage can be unavailable. */
+import { LEGACY_IDS, resolveId } from "./track";
 
 export interface SubjectProgress {
   /** Index of the step the learner last viewed. */
@@ -68,7 +69,10 @@ export function loadProgress(): ProgressMap {
     if (typeof parsed !== "object" || parsed === null) return {};
     const out: ProgressMap = {};
     for (const [id, value] of Object.entries(parsed as Record<string, unknown>)) {
-      out[id] = sanitize(value);
+      const target = LEGACY_IDS[id] ?? id;
+      // A legacy entry never overwrites progress already saved under the new id.
+      if (target !== id && out[target]) continue;
+      out[target] = sanitize(value);
     }
     return out;
   } catch {
@@ -121,7 +125,7 @@ export function withSubjectReset(map: ProgressMap, subjectId: string): ProgressM
 }
 
 export function loadLastSubject(): string | null {
-  return readRaw(LAST_SUBJECT_KEY);
+  return resolveId(readRaw(LAST_SUBJECT_KEY));
 }
 
 export function saveLastSubject(id: string): void {

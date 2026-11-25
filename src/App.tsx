@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChallengeRunner } from "./components/ChallengeRunner";
+import { ComingSoon } from "./components/ComingSoon";
 import { SplitWorkspace } from "./components/SplitWorkspace";
 import { StepControls } from "./components/StepControls";
 import { TopNav } from "./components/TopNav";
@@ -15,6 +16,7 @@ import {
   withStepVisited,
   type ProgressMap,
 } from "./core/storage";
+import { trackEntry, type TrackEntry } from "./core/track";
 import type { PlayerMode } from "./core/types";
 import { useKeyboardShortcuts } from "./core/useKeyboardShortcuts";
 
@@ -40,11 +42,20 @@ function initialLocation(progress: ProgressMap): Location {
   };
 }
 
+/** A link to a curriculum module that isn't built yet. */
+function unbuiltFromHash(hash: string): TrackEntry | null {
+  const { subjectId } = parseHash(hash);
+  if (!subjectId || getSubject(subjectId)) return null;
+  return trackEntry(subjectId) ?? null;
+}
+
 export default function App() {
   const subjects = listSubjects();
   const [progress, setProgress] = useState<ProgressMap>(() => loadProgress());
   const [loc, setLoc] = useState<Location>(() => initialLocation(progress));
+  const [comingSoon, setComingSoon] = useState<TrackEntry | null>(() => unbuiltFromHash(window.location.hash));
   const [autoPlay, setAutoPlay] = useState(false);
+  const isBuilt = useCallback((id: string) => getSubject(id) !== undefined, []);
 
   const subject = getSubject(loc.subjectId) ?? defaultSubject();
   const step = subject.steps[clampStep(loc.stepIndex, subject.steps.length)]!;
@@ -61,16 +72,23 @@ export default function App() {
 
   // Mirror location in the URL hash, and follow back/forward navigation.
   useEffect(() => {
+    if (comingSoon) return; // keep the coming-soon module's link in the address bar
     const hash = formatHash(subject.id, loc.mode, loc.stepIndex);
     if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
     saveLastSubject(subject.id);
-  }, [subject.id, loc.mode, loc.stepIndex]);
+  }, [subject.id, loc.mode, loc.stepIndex, comingSoon]);
 
   useEffect(() => {
     const onHash = () => {
+      const unbuilt = unbuiltFromHash(window.location.hash);
+      if (unbuilt) {
+        setComingSoon(unbuilt);
+        return;
+      }
       const route = parseHash(window.location.hash);
       const s = getSubject(route.subjectId);
       if (!s) return;
+      setComingSoon(null);
       setLoc({
         subjectId: s.id,
         mode: route.mode,
@@ -93,6 +111,7 @@ export default function App() {
       const s = getSubject(id);
       if (!s) return;
       setAutoPlay(false);
+      setComingSoon(null);
       setLoc((l) => ({
         subjectId: s.id,
         mode: l.mode,
@@ -102,7 +121,20 @@ export default function App() {
     [progress],
   );
 
+  const openModule = useCallback(
+    (id: string) => {
+      const s = getSubject(id);
+      if (!s) return;
+      setAutoPlay(false);
+      setComingSoon(null);
+      setLoc({ subjectId: s.id, mode: "lesson", stepIndex: 0 });
+      window.scrollTo?.(0, 0);
+    },
+    [],
+  );
+
   const setMode = useCallback((mode: PlayerMode) => {
+    setComingSoon(null);
     setAutoPlay(false);
     setLoc((l) => ({ ...l, mode }));
   }, []);
@@ -135,7 +167,7 @@ export default function App() {
     }),
     [goToStep, loc.stepIndex, toggleAutoPlay],
   );
-  useKeyboardShortcuts(loc.mode === "lesson", handlers);
+  useKeyboardShortcuts(loc.mode === "lesson" && !comingSoon, handlers);
 
   const Stage = subject.Stage;
 
@@ -150,14 +182,17 @@ export default function App() {
         onModeChange={setMode}
       />
 
-      {loc.mode === "lesson" ? (
+      {comingSoon ? (
+        <ComingSoon entry={comingSoon} />
+      ) : loc.mode === "lesson" ? (
         <>
           <SplitWorkspace
+            subject={subject}
             step={step}
             stepIndex={loc.stepIndex}
             total={subject.steps.length}
-            accent={subject.accent}
-            subjectTitle={subject.title}
+            isBuilt={isBuilt}
+            onOpenModule={openModule}
           >
             {/* key: remount per subject so each subject's control state is independent */}
             <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
