@@ -31,11 +31,16 @@ export const fakeEmbedder: Embedder = {
     if (texts.length > MAX_SENTENCES) throw new Error(`Embed at most ${MAX_SENTENCES} sentences at once`);
     return texts.map((t) => (data.sentences[t] ? Float32Array.from(data.sentences[t]!) : placeholder(t)));
   },
-  async embedTokens(text) {
+  async embedTokens(text, opts) {
     if (!text.trim()) return { tokens: [], vectors: [] };
     const known = data.tokens[text];
-    if (known) return { tokens: known.tokens, vectors: known.vectors.map((v) => Float32Array.from(v)) };
-    const tokens = text.toLowerCase().match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu) ?? [];
-    return { tokens, vectors: tokens.map((t, i) => placeholder(`${t}#${i}#${text}`)) };
+    const tokens = known ? known.tokens : (text.toLowerCase().match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu) ?? []);
+    const vectors = known ? known.vectors.map((v) => Float32Array.from(v)) : tokens.map((t, i) => placeholder(`${t}#${i}#${text}`));
+    if (!opts?.withSpecial) return { tokens, vectors };
+    return { tokens: ["[CLS]", ...tokens, "[SEP]"], vectors: [placeholder(`[CLS]${text}`), ...vectors, placeholder(`[SEP]${text}`)] };
+  },
+  isTruncated(text) {
+    // Approximation for UI tests: one word piece per word or symbol.
+    return (text.match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu) ?? []).length > 254;
   },
 };

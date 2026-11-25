@@ -296,7 +296,7 @@ export const challenges: ChallengeItem[] = [
   },
   {
     id: "emb-search",
-    prompt: "A user searches “I can't sign in”. Why does semantic search find “How do I reset my password?” even though they share no words?",
+    prompt: "A user searches “I can't sign in”. Why does semantic search find “How do I reset my password?” even though they have no keywords in common?",
     options: [
       "It uses a synonym dictionary",
       "Both texts' embeddings point in a similar direction because their meanings are related",

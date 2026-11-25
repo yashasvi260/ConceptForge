@@ -36,7 +36,7 @@ export const steps: LessonStep[] = [
     body: [
       "Instead of one column per word, an **embedding model** maps text to a fixed-length vector (here: 384 numbers from MiniLM, running in your browser). Training pushes texts with similar meaning toward the same region of this space.",
       "Now `The film was great` and `The movie was excellent` score close to each other even though they share only two words, and an unrelated sentence scores near zero.",
-      "It's not perfect: `Dog bites man` vs `Man bites dog` still scores high, because averaging token vectors into one sentence vector blurs word order. Models keep order inside, though; the next modules show where.",
+      "It's not perfect: `Dog bites man` vs `Man bites dog` still scores high, a single sentence vector keeps only part of the word-order information. Inside the model, order is tracked explicitly; Module 03 shows how.",
     ],
     tryIt: "Compare the two similarity columns for each pair. Add a paraphrase of your own.",
     keyTakeaway: "Embeddings place similar meanings close together, so `film` and `movie` finally count as related.",

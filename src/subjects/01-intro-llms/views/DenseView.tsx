@@ -1,35 +1,26 @@
-import { useEffect, useState } from "react";
 import { Panel } from "../../../components/ui";
-import { ModelStatus } from "../../../ml/ModelStatus";
+import { LongInputNote, ModelRunError, ModelStatus } from "../../../ml/ModelStatus";
 import { useEmbeddings } from "../../../ml/useEmbeddings";
+import { useModelRun } from "../../../ml/useModelRun";
 import { cosine } from "../../../ml/vector";
 import { bagOfWords, bowCosine } from "../bow";
 import { SentencesInput, parseSentences } from "./BowView";
 
 export function DenseView({ text, setText }: { text: string; setText: (t: string) => void }) {
   const model = useEmbeddings();
+  const e = model.embedder;
   const sentences = parseSentences(text);
-  const key = sentences.join("\n");
-  const [vectors, setVectors] = useState<{ key: string; vecs: Float32Array[] } | null>(null);
-
-  useEffect(() => {
-    if (!model.embedder) return;
-    let alive = true;
-    model.embedder.embedSentences(sentences).then((vecs) => alive && setVectors({ key, vecs }), () => {});
-    return () => {
-      alive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` captures `sentences`
-  }, [model.embedder, key]);
-
+  const run = useModelRun(e && sentences.length ? () => e.embedSentences(sentences) : null, sentences.join("\n"));
   const { counts } = bagOfWords(sentences);
-  const ready = vectors && vectors.key === key;
+  const vecs = run.value;
 
   return (
     <>
       <SentencesInput text={text} setText={setText} />
       <Panel title="Bag-of-Words vs real MiniLM embeddings">
         <ModelStatus state={model}>
+          {run.error && <ModelRunError />}
+          <LongInputNote show={!!e && sentences.some((x) => e.isTruncated(x))} />
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase tracking-wider text-slate-500">
               <tr>
@@ -42,7 +33,7 @@ export function DenseView({ text, setText }: { text: string; setText: (t: string
               {sentences.flatMap((a, i) =>
                 sentences.slice(i + 1).map((b, k) => {
                   const j = i + k + 1;
-                  const emb = ready ? cosine(vectors.vecs[i]!, vectors.vecs[j]!) : null;
+                  const emb = vecs ? cosine(vecs[i]!, vecs[j]!) : null;
                   return (
                     <tr key={`${i}-${j}`} className="border-t border-slate-800">
                       <td className="py-1.5 pr-3 text-slate-300">

@@ -13,8 +13,24 @@ export const MAX_WORD_PIECES = 256;
 export interface Embedder {
   /** Normalised 384-d sentence vectors (mean pooling). At most MAX_SENTENCES per call. */
   embedSentences(texts: string[]): Promise<Float32Array[]>;
-  /** Contextual vector for every word piece ([CLS]/[SEP] removed; long input truncated by the model). */
-  embedTokens(text: string): Promise<{ tokens: string[]; vectors: Float32Array[] }>;
+  /**
+   * Contextual vector for every word piece (long input truncated by the model). [CLS]/[SEP] are removed
+   * unless `withSpecial` is set; their average then equals the sentence vector's direction.
+   */
+  embedTokens(text: string, opts?: { withSpecial?: boolean }): Promise<{ tokens: string[]; vectors: Float32Array[] }>;
+  /** True when the text is longer than the model reads (MAX_WORD_PIECES incl. [CLS]/[SEP]). */
+  isTruncated(text: string): boolean;
+}
+
+// Download progress is shared by every caller, so a view opened mid-download still sees it move.
+let lastProgress = 0;
+const progressListeners = new Set<(percent: number) => void>();
+function reportProgress(p: number) {
+  lastProgress = Math.max(lastProgress, p);
+  for (const l of progressListeners) l(lastProgress);
+}
+export function currentProgress(): number {
+  return lastProgress;
 }
 
 interface TensorLike {
@@ -30,7 +46,8 @@ type Pipe = {
 /** Node (tests, scripts) reads the model from disk; browsers fetch it from this site. */
 const isNode = typeof process !== "undefined" && typeof process.versions?.node === "string";
 
-async function createEmbedder(onProgress?: (percent: number) => void): Promise<Embedder> {
+async function createEmbedder(): Promise<Embedder> {
+  const onProgress = reportProgress;
   const { env, pipeline } = await import("@huggingface/transformers");
   env.allowRemoteModels = false;
   env.allowLocalModels = true;
@@ -77,12 +94,21 @@ async function createEmbedder(onProgress?: (percent: number) => void): Promise<E
         return v.map((x) => x / n);
       });
     },
-    async embedTokens(text) {
+    async embedTokens(text, opts) {
       if (!text.trim()) return { tokens: [], vectors: [] };
       const { hidden } = await run([text]);
-      const pieces = hidden[0]!.slice(1, -1); // drop [CLS] and [SEP]
+      const rows = hidden[0]!;
+      const pieces = rows.slice(1, -1); // without [CLS] and [SEP]
       const tokens = pipe.tokenizer.tokenize(text).slice(0, pieces.length);
-      return { tokens, vectors: pieces.slice(0, tokens.length).map((v) => Float32Array.from(v)) };
+      const vectors = pieces.slice(0, tokens.length).map((v) => Float32Array.from(v));
+      if (!opts?.withSpecial) return { tokens, vectors };
+      return {
+        tokens: ["[CLS]", ...tokens, "[SEP]"],
+        vectors: [Float32Array.from(rows[0]!), ...vectors, Float32Array.from(rows.at(-1)!)],
+      };
+    },
+    isTruncated(text) {
+      return pipe.tokenizer.tokenize(text).length > MAX_WORD_PIECES - 2;
     },
   };
 }
@@ -91,8 +117,13 @@ let cached: Promise<Embedder> | null = null;
 
 /** Load (once) the embedding model. Failures are not cached, so a retry really retries. */
 export function loadEmbedder(onProgress?: (percent: number) => void): Promise<Embedder> {
+  if (onProgress) {
+    progressListeners.add(onProgress);
+    if (lastProgress > 0) onProgress(lastProgress);
+  }
   if (!cached) {
-    const p = createEmbedder(onProgress);
+    const p = createEmbedder();
+    p.finally(() => progressListeners.clear()).catch(() => {});
     p.catch(() => {
       if (cached === p) cached = null;
     });

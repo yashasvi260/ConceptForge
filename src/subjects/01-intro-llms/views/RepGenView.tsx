@@ -1,8 +1,9 @@
 import { Bot, Sigma } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Bar, Panel } from "../../../components/ui";
-import { ModelStatus } from "../../../ml/ModelStatus";
+import { LongInputNote, ModelRunError, ModelStatus } from "../../../ml/ModelStatus";
 import { useEmbeddings } from "../../../ml/useEmbeddings";
+import { useModelRun } from "../../../ml/useModelRun";
 import { cosine } from "../../../ml/vector";
 import { TextBox } from "../../02-tokens-embeddings/views/common";
 
@@ -11,16 +12,12 @@ export const LABELS = ["This is a positive review.", "This is a negative review.
 export function RepGenView() {
   const model = useEmbeddings();
   const [text, setText] = useState("This movie was fantastic, I loved every minute!");
-  const [scores, setScores] = useState<number[] | null>(null);
-
-  useEffect(() => {
-    if (!model.embedder || !text.trim()) return;
-    let alive = true;
-    model.embedder.embedSentences([text, ...LABELS]).then(([t, ...ls]) => alive && setScores(ls.map((l) => cosine(t!, l))), () => {});
-    return () => {
-      alive = false;
-    };
-  }, [model.embedder, text]);
+  const e = model.embedder;
+  const run = useModelRun(
+    e && text.trim() ? () => e.embedSentences([text, ...LABELS]).then(([t, ...ls]) => ls.map((l) => cosine(t!, l))) : null,
+    text,
+  );
+  const scores = run.value;
 
   const winner = scores ? (scores[0]! >= scores[1]! ? "positive" : "negative") : null;
   return (
@@ -31,6 +28,8 @@ export function RepGenView() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Representation model (real: MiniLM)" icon={<Sigma size={14} />}>
           <ModelStatus state={model}>
+            {run.error && <ModelRunError />}
+            <LongInputNote show={!!e && e.isTruncated(text)} />
             <p className="text-sm text-slate-300">Embed the review and two label descriptions, then compare vectors:</p>
             <div className="mt-3 space-y-1.5" data-testid="label-scores">
               {LABELS.map((l, i) => (

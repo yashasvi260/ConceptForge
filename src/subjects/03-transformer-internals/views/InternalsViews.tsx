@@ -12,10 +12,9 @@ import { Curves, signed } from "./viz";
 const BOXES = [
   { label: "Token IDs → embeddings", step: "Module 02" },
   { label: "+ position", step: "step 2" },
-  { label: "Attention (multi-head, GQA)", step: "steps 3–6" },
-  { label: "⊕ residual + norm", step: "step 7" },
-  { label: "Feed-forward (SwiGLU)", step: "step 8" },
-  { label: "⊕ residual + norm  (× N blocks)", step: "step 7" },
+  { label: "Norm → attention (multi-head, GQA) ⊕ residual", step: "steps 3–7" },
+  { label: "Norm → feed-forward (SwiGLU) ⊕ residual", step: "steps 7–8" },
+  { label: "× N blocks, then a final norm", step: "step 7" },
   { label: "Logits → softmax", step: "step 9" },
   { label: "Decode next token (+ KV cache)", step: "steps 10–11" },
 ];

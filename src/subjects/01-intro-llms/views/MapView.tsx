@@ -2,13 +2,21 @@ import { motion } from "framer-motion";
 import { Repeat } from "lucide-react";
 import { Panel } from "../../../components/ui";
 import { PART_TITLES, TRACK, moduleLabel } from "../../../core/track";
+import { applySampling } from "../../03-transformer-internals/sampling";
+import { NEXT } from "../../03-transformer-internals/views/InternalsViews";
+
+// Same illustrative logits as Module 03's logits step, so both modules show the same numbers.
+const top3 = applySampling(NEXT, { temperature: 1, topK: 0, topP: 1 })
+  .slice(0, 3)
+  .map((c) => `${c.token.trim()} ${Math.round(c.finalProb * 100)}%`)
+  .join(" · ");
 
 const LOOP = [
   { label: "Text", detail: "“The cat sat on the”" },
   { label: "Tokens", detail: "The · cat · sat · on · the" },
   { label: "Vectors", detail: "one list of numbers per token" },
   { label: "Transformer", detail: "mixes in context, layer after layer" },
-  { label: "Next-token probabilities", detail: "mat 41% · floor 22% · sofa 9% … (illustrative)" },
+  { label: "Next-token probabilities", detail: `${top3} … (illustrative)` },
   { label: "Append & repeat", detail: "“The cat sat on the mat”" },
 ];
 

@@ -22,8 +22,8 @@ export const steps: LessonStep[] = [
     summary: "Attention treats tokens as a set, so the model needs to be told where each token sits.",
     body: [
       "The original Transformer adds a **sinusoidal** pattern to each embedding: every position gets its own mix of sine and cosine waves at different frequencies, like a unique barcode.",
-      "Most modern LLMs use **RoPE** (rotary position embedding) instead: queries and keys are **rotated** by an angle proportional to their position. Rotations don't change a vector's length, and the dot product of two rotated vectors depends only on how far apart the tokens are.",
-      "So with RoPE, \"3 tokens apart\" means the same thing at the start of a document and 5,000 tokens in, which helps models generalise across positions.",
+      "Many recent LLMs use **RoPE** (rotary position embedding) instead: queries and keys are **rotated** by an angle proportional to their position. Rotations don't change a vector's length, and the dot product of two rotated vectors depends only on how far apart the tokens are.",
+      "So with RoPE, \"3 tokens apart\" affects the attention score the same way at the start of a document and 5,000 tokens in.",
     ],
     tryIt: "In the RoPE panel, move both positions by the same amount: the score doesn't change. Move only one: it does.",
     keyTakeaway: "Sinusoidal: add a position barcode. RoPE: rotate q and k by position, so scores depend on relative distance.",
@@ -49,7 +49,7 @@ export const steps: LessonStep[] = [
     title: "Self-attention in action",
     summary: "Every token looks at the others and pulls in what it needs, and a decoder may only look backwards.",
     body: [
-      "Click a token to see where it looks. The **Meaning** head links `bank` with `loan` or `river`, which is how the contextual vectors in Module 02 came to differ.",
+      "Click a token to see where it looks. The **Meaning** head links `bank` with `loan` or `river`. Real models learn their attention patterns instead of having them designed, and attention of this kind is what lets them give `bank` different vectors in different sentences (Module 02).",
       "Toggle the **causal mask**: a decoder (GPT, Llama) sets every future score to −∞ before softmax, so a token can only use itself and earlier tokens. An encoder (BERT) leaves the mask off.",
       "These heads are hand-designed to show behaviours researchers find in real models; the masking and softmax arithmetic is exact.",
     ],
@@ -63,7 +63,7 @@ export const steps: LessonStep[] = [
     summary: "Several attention heads run side by side, each free to track a different kind of relationship.",
     body: [
       "One head can only produce one weighting. So the vector is split across several **heads** (BERT-Base uses 12, MiniLM 12), each with its own q/k/v matrices, all computed in parallel.",
-      "Their outputs are concatenated and mixed by one more learned matrix. Different heads end up specialising: position, syntax, coreference, meaning.",
+      "Their outputs are concatenated and mixed by one more learned matrix. Different heads can end up tracking different relationships, like the four illustrative heads here.",
     ],
     tryIt: "Compare the four heatmaps: same sentence, four different patterns.",
     keyTakeaway: "Multi-head = several attention patterns in parallel, concatenated and mixed back together.",

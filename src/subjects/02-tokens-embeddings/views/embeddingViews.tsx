@@ -1,9 +1,10 @@
 import { Search, Table2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Panel, Stat } from "../../../components/ui";
 import { MAX_SENTENCES } from "../../../ml/embeddings";
-import { ModelStatus } from "../../../ml/ModelStatus";
+import { LongInputNote, ModelRunError, ModelStatus } from "../../../ml/ModelStatus";
 import { useEmbeddings } from "../../../ml/useEmbeddings";
+import { useModelRun } from "../../../ml/useModelRun";
 import { cosine, meanPool } from "../../../ml/vector";
 import { findWord } from "../bank";
 import { encodeWordPiece } from "../wordpiece";
@@ -21,21 +22,6 @@ function Strip({ v, n = 48 }: { v: ArrayLike<number>; n?: number }) {
       })}
     </span>
   );
-}
-
-/** Run an async computation when its inputs change, keeping the result for the latest inputs only. */
-function useAsync<T>(fn: (() => Promise<T>) | null, key: string): T | null {
-  const [state, setState] = useState<{ key: string; value: T } | null>(null);
-  useEffect(() => {
-    if (!fn) return;
-    let alive = true;
-    fn().then((value) => alive && setState({ key, value }), () => {});
-    return () => {
-      alive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` identifies the inputs of `fn`
-  }, [key, fn === null]);
-  return state && state.key === key ? state.value : null;
 }
 
 function pseudoRow(id: number, n = 48): number[] {
@@ -91,14 +77,13 @@ const STATIC_SENTENCES = ["The bank approved the loan", "The river bank flooded"
 export function StaticContextualView() {
   const model = useEmbeddings();
   const e = model.embedder;
-  const result = useAsync(
-    e ? () => Promise.all(STATIC_SENTENCES.map((s) => e.embedTokens(s))) : null,
-    STATIC_SENTENCES.join("|"),
-  );
+  const run = useModelRun(e ? () => Promise.all(STATIC_SENTENCES.map((s) => e.embedTokens(s))) : null, STATIC_SENTENCES.join("|"));
+  const result = run.value;
   const vecs = result?.map((r) => r.vectors[findWord(r.tokens, "bank")[0]?.[0] ?? -1]);
   return (
     <Panel title="“bank” in four sentences: static vs contextual">
       <ModelStatus state={model}>
+        {run.error && <ModelRunError />}
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wider text-slate-500">
             <tr>
@@ -135,7 +120,8 @@ export function BankShiftView() {
   const e = model.embedder;
   const [a, setA] = useState("The bank approved the loan");
   const [b, setB] = useState("The river bank flooded");
-  const result = useAsync(e ? () => Promise.all([e.embedTokens(a), e.embedTokens(b)]) : null, `${a}|${b}`);
+  const run = useModelRun(e ? () => Promise.all([e.embedTokens(a), e.embedTokens(b)]) : null, `${a}|${b}`);
+  const result = run.value;
   const hitsA = result ? findWord(result[0].tokens, "bank") : [];
   const hitsB = result ? findWord(result[1].tokens, "bank") : [];
   const missing = result !== null && (hitsA.length === 0 || hitsB.length === 0);
@@ -152,6 +138,8 @@ export function BankShiftView() {
       </Panel>
       <Panel title="Contextual vectors for “bank” (MiniLM, first 48 of 384 numbers)">
         <ModelStatus state={model}>
+          {run.error && <ModelRunError />}
+          <LongInputNote show={!!e && (e.isTruncated(a) || e.isTruncated(b))} />
           {missing ? (
             <p className="text-sm text-amber-200">Type the word bank in both sentences.</p>
           ) : (
@@ -184,16 +172,25 @@ export function SentenceEmbeddingsView() {
   const model = useEmbeddings();
   const e = model.embedder;
   const [text, setText] = useState("The bank approved the loan");
-  const result = useAsync(e ? () => e.embedTokens(text) : null, text);
+  const run = useModelRun(e && text.trim() ? () => e.embedTokens(text, { withSpecial: true }) : null, text);
+  const result = run.value;
   const pooled = result && result.vectors.length ? meanPool(result.vectors) : null;
+  const SHOWN = 12;
   return (
     <Panel title="Mean pooling: token vectors → one sentence vector">
       <TextBox label="Sentence" value={text} onChange={setText} rows={1} maxLength={200} />
       <div className="mt-4">
         <ModelStatus state={model}>
+          {run.error && <ModelRunError />}
+          <LongInputNote show={!!e && e.isTruncated(text)} />
           {result && (
             <div className="space-y-1.5">
-              {result.tokens.slice(0, 12).map((t, i) => (
+              {result.tokens.length > SHOWN && (
+                <p className="text-xs text-slate-500">
+                  Showing the first {SHOWN} of {result.tokens.length} rows; all {result.tokens.length} are averaged.
+                </p>
+              )}
+              {result.tokens.slice(0, SHOWN).map((t, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <span className="w-24 truncate text-right font-mono text-xs text-slate-400">{t}</span>
                   <Strip v={result.vectors[i]!} />
@@ -209,7 +206,10 @@ export function SentenceEmbeddingsView() {
           )}
         </ModelStatus>
       </div>
-      <p className="mt-3 text-xs text-slate-500">MiniLM's sentence vector is this average scaled to length 1. Shown: first 48 of 384 numbers.</p>
+      <p className="mt-3 text-xs text-slate-500">
+        MiniLM averages every position, including its [CLS] and [SEP] markers, then scales the result to length 1: that is its sentence
+        vector. Shown: first 48 of 384 numbers.
+      </p>
     </Panel>
   );
 }
@@ -222,7 +222,8 @@ export function SimilarityView() {
   const [text, setText] = useState(DEFAULT_SIM);
   const all = text.split("\n").map((s) => s.trim()).filter(Boolean);
   const sentences = all.slice(0, MAX_SENTENCES);
-  const vecs = useAsync(e ? () => e.embedSentences(sentences) : null, sentences.join("\n"));
+  const run = useModelRun(e && sentences.length ? () => e.embedSentences(sentences) : null, sentences.join("\n"));
+  const vecs = run.value;
   return (
     <>
       <Panel title="Sentences (one per line, up to 8)">
@@ -231,6 +232,8 @@ export function SimilarityView() {
       </Panel>
       <Panel title="Cosine similarity matrix (MiniLM)">
         <ModelStatus state={model}>
+          {run.error && <ModelRunError />}
+          <LongInputNote show={!!e && sentences.some((x) => e.isTruncated(x))} />
           {vecs && (
             <div className="overflow-x-auto">
               <table className="text-xs">
@@ -266,13 +269,16 @@ export function SearchPreviewView() {
   const model = useEmbeddings();
   const e = model.embedder;
   const [query, setQuery] = useState("I can't sign in to my account");
-  const vecs = useAsync(e && query.trim() ? () => e.embedSentences([query, ...CORPUS]) : null, query);
+  const run = useModelRun(e && query.trim() ? () => e.embedSentences([query, ...CORPUS]) : null, query);
+  const vecs = run.value;
   const ranked = vecs ? CORPUS.map((d, i) => ({ d, s: cosine(vecs[0]!, vecs[i + 1]!) })).sort((x, y) => y.s - x.s) : [];
   return (
     <Panel title="Semantic search over six documents" icon={<Search size={14} />}>
       <TextBox label="Query" value={query} onChange={setQuery} rows={1} maxLength={200} />
       <div className="mt-4">
         <ModelStatus state={model}>
+          {run.error && <ModelRunError />}
+          <LongInputNote show={!!e && e.isTruncated(query)} />
           <ol className="space-y-1.5">
             {ranked.map((r, i) => (
               <li key={r.d} data-testid={`rank-${i + 1}`} className="flex items-center gap-3 text-sm">

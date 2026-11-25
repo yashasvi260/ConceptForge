@@ -6,6 +6,7 @@ import { useEmbeddings } from "./useEmbeddings";
 const fake: Embedder = {
   embedSentences: async (t) => t.map(() => new Float32Array(384)),
   embedTokens: async () => ({ tokens: [], vectors: [] }),
+  isTruncated: () => false,
 };
 
 describe("useEmbeddings", () => {

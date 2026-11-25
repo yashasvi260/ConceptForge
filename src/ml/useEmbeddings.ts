@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loadEmbedder, type Embedder } from "./embeddings";
+import { currentProgress, loadEmbedder, type Embedder } from "./embeddings";
 
 export interface EmbeddingsState {
   status: "loading" | "ready" | "error";
@@ -14,7 +14,7 @@ export function useEmbeddings(
 ): EmbeddingsState {
   const [embedder, setEmbedder] = useState<Embedder | null>(null);
   const [status, setStatus] = useState<EmbeddingsState["status"]>("loading");
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(() => Math.round(currentProgress()));
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {

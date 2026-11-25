@@ -36,7 +36,7 @@ export const steps: LessonStep[] = [
     summary: "The vocabulary is the tokenizer's phrasebook: every entry has a number, and the ID is just its position.",
     body: [
       "A phrasebook with more entries lets you say things in fewer, bigger chunks. The same holds for tokenizers: a bigger vocabulary means fewer tokens per text, which is cheaper and fits more into the model's context.",
-      "The cost: every entry needs its own row in the model's **embedding table** (a list of numbers per token, the topic after this one), so a bigger vocabulary means a bigger model, and very rare entries get little training.",
+      "The cost: every entry needs its own row in the model's **embedding table** (a list of numbers per token, covered in this module's Embeddings section), so a bigger vocabulary means a bigger model, and very rare entries get little training.",
       "Real sizes: BERT 30,522; GPT-2 50,257; GPT-4 (`cl100k_base`) about 100k; Llama 3 128,256; GPT-4o (`o200k_base`) about 200k. The trend is toward bigger vocabularies, partly to serve more languages well.",
     ],
     tryIt: "Switch between raw bytes, GPT-4 and GPT-4o and compare the token count with the embedding-table size.",
@@ -233,7 +233,7 @@ export const steps: LessonStep[] = [
     title: "Sentence and document embeddings",
     summary: "Average the token vectors and you get one vector for the whole sentence.",
     body: [
-      "Many tasks need one vector per text, not per token. The simplest recipe is **mean pooling**: average all the token vectors. MiniLM does exactly this, then scales the result to length 1.",
+      "Many tasks need one vector per text, not per token. The simplest recipe is **mean pooling**: average all the token vectors. MiniLM averages every position, including its special `[CLS]` and `[SEP]` markers, then scales the result to length 1.",
       "Long documents are usually split into chunks first (MiniLM reads at most 256 word pieces), and each chunk gets its own vector.",
       "These sentence vectors are what search engines, clustering and recommendation systems store and compare.",
     ],
@@ -262,7 +262,7 @@ export const steps: LessonStep[] = [
     title: "Preview: searching by meaning",
     summary: "Embed the question, embed the documents, return the closest ones: that's semantic search.",
     body: [
-      "Type “I can't sign in to my account”: no document contains those words, yet the password and login questions rank first because their vectors point the same way.",
+      "Type “I can't sign in to my account”: it shares no keywords with any document (only small words like “I” and “my”), yet the password and login questions rank first because their vectors point the same way.",
       "This is the retrieval half of RAG (Module 08), and the same vectors power classification (Module 04) and clustering (Module 05).",
     ],
     tryIt: "Search for something that uses different words from the documents.",

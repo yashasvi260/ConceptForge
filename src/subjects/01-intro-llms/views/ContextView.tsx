@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Panel, Stat } from "../../../components/ui";
-import { ModelStatus } from "../../../ml/ModelStatus";
+import { ModelRunError, ModelStatus } from "../../../ml/ModelStatus";
 import { useEmbeddings } from "../../../ml/useEmbeddings";
+import { useModelRun } from "../../../ml/useModelRun";
 import { cosine } from "../../../ml/vector";
 import { TextBox } from "../../02-tokens-embeddings/views/common";
 
@@ -9,22 +10,16 @@ export function ContextView() {
   const model = useEmbeddings();
   const [a, setA] = useState("The bank approved the loan");
   const [b, setB] = useState("The river bank flooded");
-  const [sim, setSim] = useState<number | null | "missing">(null);
-
-  useEffect(() => {
-    if (!model.embedder) return;
-    let alive = true;
-    setSim(null);
-    Promise.all([model.embedder.embedTokens(a), model.embedder.embedTokens(b)]).then(([x, y]) => {
-      if (!alive) return;
-      const i = x.tokens.indexOf("bank");
-      const j = y.tokens.indexOf("bank");
-      setSim(i < 0 || j < 0 ? "missing" : cosine(x.vectors[i]!, y.vectors[j]!));
-    }, () => {});
-    return () => {
-      alive = false;
-    };
-  }, [model.embedder, a, b]);
+  const e = model.embedder;
+  const run = useModelRun(e ? () => Promise.all([e.embedTokens(a), e.embedTokens(b)]) : null, `${a}|${b}`);
+  const sim: number | null | "missing" = run.value
+    ? (() => {
+        const [x, y] = run.value;
+        const i = x.tokens.indexOf("bank");
+        const j = y.tokens.indexOf("bank");
+        return i < 0 || j < 0 ? "missing" : cosine(x.vectors[i]!, y.vectors[j]!);
+      })()
+    : null;
 
   return (
     <>
@@ -43,6 +38,7 @@ export function ContextView() {
         </Panel>
         <Panel title="MiniLM's contextual vectors for “bank”">
           <ModelStatus state={model}>
+            {run.error && <ModelRunError />}
             {sim === "missing" ? (
               <p className="text-sm text-amber-200">Type the word bank in both sentences.</p>
             ) : (

@@ -53,4 +53,21 @@ describe("MiniLM embedder (real model)", () => {
     const actual = await (await loadEmbedder()).embedSentences(texts);
     actual.forEach((v, i) => expect(cosine(v, expected[i]!)).toBeGreaterThan(0.99999));
   });
+
+  it("flags input longer than the model's 256 word pieces (review F5)", async () => {
+    const e = await loadEmbedder();
+    expect(e.isTruncated("a short sentence")).toBe(false);
+    expect(e.isTruncated("word ".repeat(300))).toBe(true);
+  });
+
+  it("can include [CLS]/[SEP], whose average is exactly the sentence vector (review F4)", async () => {
+    const e = await loadEmbedder();
+    const text = "The bank approved the loan";
+    const all = await e.embedTokens(text, { withSpecial: true });
+    expect(all.tokens[0]).toBe("[CLS]");
+    expect(all.tokens.at(-1)).toBe("[SEP]");
+    const [sentence] = await e.embedSentences([text]);
+    const { meanPool, cosine: cos } = await import("./vector");
+    expect(cos(meanPool(all.vectors), sentence!)).toBeGreaterThan(0.99999);
+  });
 });
