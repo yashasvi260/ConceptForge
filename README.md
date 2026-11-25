@@ -4,24 +4,31 @@ An interactive, visual learning platform for technical concepts. Each **subject*
 (explanation on the left, live interactive stage on the right) plus a challenge quiz. Subjects plug
 into a shared engine, so adding a new one doesn't touch the player.
 
-The content is organised as a curriculum of **stages**, each made of **topics**:
+Content follows the **LLM Mastery** track (`docs/curriculum.md`): 4 parts, 14 modules. Every module shows
+where it fits in the whole LLM picture, what it builds on and what comes next. Unbuilt modules appear in the
+menu as "coming soon".
 
-| Stage | Topic | What you can play with |
+| Part | Module | Status / what you can play with |
 | --- | --- | --- |
-| 1 · Text-to-Number Foundations | **Tokenization** (14 steps, 16-question challenge) | Real GPT-4o / GPT-4 tokenizers in the browser, a step-through BPE trainer on Sennrich et al.'s example, real BERT WordPiece, SentencePiece/Unigram segmentation, UTF-8 bytes, chat-template special tokens and injection, the multilingual "token tax", strawberry/number quirks, cost, context windows and RAG chunking |
-| 1 · Text-to-Number Foundations | Token Embeddings | *next* |
-| 1 · Text-to-Number Foundations | Positional Encoding | *next* |
+| I · Understanding Language Models | **01 Introduction to Language Models** | The LLM loop and track map; Bag-of-Words vs real embeddings; encoder/decoder/encoder-decoder visibility; pre-training (next-token, BERT masking) vs fine-tuning |
+| | **02 Tokens and Embeddings** | Real GPT-4o/GPT-4 tokenizers, BPE trainer, real BERT WordPiece, SentencePiece, special tokens, token tax; embedding lookup, contextual "bank" shift, mean pooling, similarity matrix, semantic search |
+| | **03 Looking Inside LLMs** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
+| II · Using Pretrained Language Models | 04–09 | coming soon |
+| III · Training and Fine-Tuning | 10–12 | coming soon |
+| IV · Production Inference & Guardrails | 13–14 | coming soon |
 
-Every specific fact in a lesson is checked against primary sources or computed by running the real
-tokenizers; see `docs/research/`. Nothing is sent to any API: the GPT vocabularies come from OpenAI's
-open-source tiktoken project (via `js-tiktoken`) and run locally.
+**Real models, in your browser, for free.** Embedding steps run **all-MiniLM-L6-v2** (Apache-2.0, ~23 MB, served by
+this site and cached after the first load) through transformers.js; tokenizer steps run OpenAI's open-source
+GPT-4o/GPT-4 vocabularies (js-tiktoken) and BERT's real vocabulary. Nothing is sent to any API. Where a full
+generative model would be needed (attention patterns, next-token logits), the lesson says "illustrative".
+Every specific fact is checked against primary sources; see `docs/research/`.
 
 ## Running it
 
 Requires Node 22 (e.g. via [nvm](https://github.com/nvm-sh/nvm): `nvm install 22`).
 
 ```bash
-npm ci                 # install dependencies
+npm ci                 # install dependencies (the model files are in the repo; `npm run fetch-model` re-downloads them)
 npm run dev            # dev server → http://localhost:5173 (also reachable from your LAN)
 npm run typecheck
 npm run test
@@ -34,7 +41,7 @@ npm run preview        # serve the production build
 
 **Keyboard:** `←` / `→` step through a lesson, `Space` toggles Auto-Play (7 s per step).
 Progress (last step, visited steps, best challenge score) is stored in `localStorage`, and the URL hash
-(`#/tokenization/4`, `#/tokenization/challenge`) deep-links to any step.
+(`#/03-transformer-internals/4`, `#/02-tokens-embeddings/challenge`) deep-links to any step; old `#/tokenization/...` links redirect to Module 02.
 
 ## Deployment
 
@@ -57,8 +64,11 @@ src/
   components/         TopNav, StepControls, SplitWorkspace, ChallengeRunner, ui primitives
   subjects/
     _template/        starter copied by the create-subject script
-    tokenization/     algorithms (bpe, wordpiece, unigram, bytes, real tokenizers) + tests,
-                      views/ (one per step), steps.ts, challenges.ts, data/ (BERT vocab)
+    01-intro-llms/ … one folder per built module: logic (+ tests), views/, steps.ts, challenges.ts
+    02-tokens-embeddings/   tokenizers (bpe, wordpiece, unigram, real GPT) + embedding views, data/ (BERT vocab)
+    03-transformer-internals/  positional, attention, norms, ffn, sampling, kvcache maths + views
+  ml/                 MiniLM embedding engine (transformers.js), useEmbeddings, vector maths
+  core/track.ts       the 14-module curriculum, parts, legacy-id redirects
   smoke.test.tsx      every subject × step × control × challenge, failing on any console error
 scripts/
   create-subject.mjs  scaffold a new subject
