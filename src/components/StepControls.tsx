@@ -13,6 +13,8 @@ interface StepControlsProps {
   visited: string[];
   onChange: (index: number) => void;
   onToggleAutoPlay: () => void;
+  /** Called from the last step's "Take Practice Check" button. */
+  onFinishSteps: () => void;
 }
 
 /** Consecutive steps that share a section, in order (one unnamed group when steps have no sections). */
@@ -38,12 +40,13 @@ export function StepControls({
   visited,
   onChange,
   onToggleAutoPlay,
+  onFinishSteps,
 }: StepControlsProps) {
   const a = ACCENTS[accent];
   const atStart = index === 0;
   const atEnd = index === steps.length - 1;
   return (
-    <div className="border-t border-slate-800 bg-slate-950/95">
+    <div className="border-t border-slate-800 bg-slate-900/95 backdrop-blur-md">
       <div className="h-0.5 w-full bg-slate-900">
         {autoPlay && (
           <motion.div
@@ -62,7 +65,7 @@ export function StepControls({
           onClick={() => onChange(index - 1)}
           disabled={atStart}
           aria-label="Previous step"
-          className="flex items-center gap-1 rounded-lg border border-slate-800 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-900 disabled:opacity-30"
+          className="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700 disabled:opacity-40"
         >
           <ChevronLeft size={16} /> Prev
         </button>
@@ -72,21 +75,31 @@ export function StepControls({
           onClick={onToggleAutoPlay}
           aria-label={autoPlay ? "Pause auto-play" : "Start auto-play"}
           aria-pressed={autoPlay}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${a.solid}`}
+          className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 font-mono text-xs text-slate-200 transition hover:bg-slate-700"
         >
           {autoPlay ? <Pause size={15} /> : <Play size={15} />}
           {autoPlay ? "Pause" : "Auto-Play"}
         </button>
-        <button
-          type="button"
-          onMouseDown={keepFocus}
-          onClick={() => onChange(index + 1)}
-          disabled={atEnd}
-          aria-label="Next step"
-          className="flex items-center gap-1 rounded-lg border border-slate-800 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-900 disabled:opacity-30"
-        >
-          Next <ChevronRight size={16} />
-        </button>
+{atEnd ? (
+          <button
+            type="button"
+            onMouseDown={keepFocus}
+            onClick={onFinishSteps}
+            className="flex items-center gap-1 rounded-xl bg-cyan-500 px-3.5 py-1.5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400"
+          >
+            Take Practice Check ✓
+          </button>
+        ) : (
+          <button
+            type="button"
+            onMouseDown={keepFocus}
+            onClick={() => onChange(index + 1)}
+            aria-label="Next step"
+            className="flex items-center gap-1 rounded-xl bg-cyan-500 px-3.5 py-1.5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400"
+          >
+            Next <ChevronRight size={16} />
+          </button>
+        )}
 
         <div className="hidden flex-1 flex-wrap items-center gap-x-4 gap-y-1 sm:flex" aria-label="Lesson steps">
           {sectionsOf(steps).map((sec) => (
@@ -96,6 +109,7 @@ export function StepControls({
                 const s = steps[i]!;
                 const current = i === index;
                 const seen = visited.includes(s.id);
+                const filled = i <= index;
                 return (
                   <button
                     key={s.id}
@@ -104,9 +118,16 @@ export function StepControls({
                     onClick={() => onChange(i)}
                     aria-label={`Go to step ${i + 1}: ${s.title}`}
                     aria-current={current ? "step" : undefined}
+                    data-filled={filled ? "true" : "false"}
                     title={s.title}
-                    className={`h-2.5 rounded-full transition-all ${
-                      current ? `w-8 ${a.bg}` : seen ? "w-2.5 bg-slate-500 hover:bg-slate-400" : "w-2.5 bg-slate-800 hover:bg-slate-600"
+                    className={`h-1.5 w-5 rounded-full transition-all ${
+                      current
+                        ? "bg-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.7)]"
+                        : filled
+                          ? "bg-cyan-500/80 hover:bg-cyan-400"
+                          : seen
+                            ? "bg-slate-600 hover:bg-slate-500"
+                            : "bg-slate-800 hover:bg-slate-700"
                     }`}
                   />
                 );

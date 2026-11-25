@@ -15,16 +15,18 @@ interface SplitWorkspaceProps {
   total: number;
   isBuilt: (id: string) => boolean;
   onOpenModule: (id: string) => void;
+  /** Shown under the narrative (the "Up next in syllabus" card). */
+  footer?: ReactNode;
   /** The subject's interactive stage. */
   children: ReactNode;
 }
 
 /** Narrative column on the left, interactive stage on the right (stacked on small screens). */
-export function SplitWorkspace({ subject, step, stepIndex, total, isBuilt, onOpenModule, children }: SplitWorkspaceProps) {
+export function SplitWorkspace({ subject, step, stepIndex, total, isBuilt, onOpenModule, footer, children }: SplitWorkspaceProps) {
   const a = ACCENTS[subject.accent];
   return (
     <div className="mx-auto grid w-full max-w-[1500px] flex-1 gap-4 px-4 py-4 lg:grid-cols-[minmax(300px,380px)_1fr]">
-      <aside className="lg:sticky lg:top-[72px] lg:max-h-[calc(100vh-150px)] lg:self-start lg:overflow-y-auto">
+      <aside className="flex flex-col gap-4 lg:sticky lg:top-[80px] lg:max-h-[calc(100vh-150px)] lg:self-start lg:overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.article
             key={step.id}
@@ -32,7 +34,7 @@ export function SplitWorkspace({ subject, step, stepIndex, total, isBuilt, onOpe
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="rounded-xl border border-slate-800 bg-slate-900/60 p-5"
+            className="rounded-2xl border border-slate-800 bg-slate-900/95 p-5 shadow-xl"
           >
             <WhereThisFits moduleNumber={subject.moduleNumber} compact />
             <p className={`mt-3 text-xs font-semibold uppercase tracking-wider ${a.text}`}>
@@ -80,9 +82,18 @@ export function SplitWorkspace({ subject, step, stepIndex, total, isBuilt, onOpe
             {stepIndex === total - 1 && <BridgeCard kind="upNext" subject={subject} isBuilt={isBuilt} onOpenModule={onOpenModule} />}
           </motion.article>
         </AnimatePresence>
+        {footer}
       </aside>
       <main className="min-w-0" aria-label="Interactive stage">
-        {children}
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/95 shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900 px-4 py-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" aria-hidden="true" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-200">
+              Interactive stage · {subject.shortTitle}
+            </span>
+          </div>
+          <div className="stage-grid p-3 sm:p-4">{children}</div>
+        </div>
       </main>
     </div>
   );

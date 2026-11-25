@@ -58,7 +58,7 @@ describe("smoke: every subject and step", () => {
       expect(stage().textContent?.length ?? 0).toBeGreaterThan(20);
       act(() => fireEvent.keyDown(window, { key: "ArrowRight" }));
     }
-    expect(screen.getByRole("button", { name: "Next step" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Take Practice Check ✓" })).toBeEnabled();
     expect(errors).toEqual([]);
   });
 });
