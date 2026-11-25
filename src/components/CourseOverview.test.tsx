@@ -36,9 +36,9 @@ describe("CourseOverview", () => {
 
   it("shows coming soon for unbuilt modules without a button", () => {
     render(<CourseOverview subjects={SUBJECTS} progress={{}} onOpenModule={vi.fn()} />);
-    expect(screen.queryByRole("button", { name: /Text Classification/ })).not.toBeInTheDocument();
-    const part2 = screen.getByRole("region", { name: PART_TITLES[2] });
-    expect(within(part2).getAllByText("Coming soon")).toHaveLength(6);
+    expect(screen.queryByRole("button", { name: /Evals, Guardrails/ })).not.toBeInTheDocument();
+    const part4 = screen.getByRole("region", { name: PART_TITLES[4] });
+    expect(within(part4).getAllByText("Coming soon")).toHaveLength(2);
   });
 
   it("Resume opens the up-next module", async () => {

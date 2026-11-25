@@ -10,6 +10,7 @@ const RESPONSE = {
   done: true,
   total_duration: 1_500_000_000,
   eval_count: 2,
+  prompt_eval_count: 41,
   logprobs: [
     { token: "card", logprob: -0.01, bytes: [99, 97, 114, 100], top_logprobs: [{ token: "card", logprob: -0.01, bytes: [99] }, { token: "fraud", logprob: -4.6, bytes: [102] }] },
   ],
@@ -26,6 +27,7 @@ describe("record-generations", () => {
       tokens: [{ token: "card", logprob: -0.01, top: [{ token: "card", logprob: -0.01 }, { token: "fraud", logprob: -4.6 }] }],
       durationMs: 1500,
       evalCount: 2,
+      promptEvalCount: 41,
     });
   });
 

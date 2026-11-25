@@ -18,3 +18,16 @@ Every number shown in these modules is computed by the site's own code, recorded
   96 heads, context 2,048, 300B training tokens. `paramBreakdown` ≈ 174.6B (the paper's 175B).
 - **Compute estimates**: training ≈ 6·N·D FLOPs and inference ≈ 2·N FLOPs per token, Kaplan et al. 2020
   "Scaling Laws for Neural Language Models" (https://arxiv.org/abs/2001.08361), §2.1.
+
+## Module 04 · text classification
+
+- **Tickets**: 60 short banking support messages written for this lesson (5 labels × 12; 8 train / 4 test each).
+- **MiniLM size**: all-MiniLM-L6-v2 (https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) is a 6-layer,
+  384-wide BERT (vocab 30,522, FFN 1,536): 22,713,216 weights from its config, the published "22.7M".
+- **Head**: 5 × 384 + 5 = 1,925 weights, softmax regression, full-batch gradient descent from zero (our code).
+  Measured: 20/20 held-out tickets with the default settings (epochs 200, lr 2).
+- **Zero-shot**: cosine to label descriptions (our code, live MiniLM). Measured with the default descriptions:
+  17/20 (misses: three transfer tickets).
+- **Generative**: gemma4:12b via Ollama 0.40.18, temperature 0, `think: false`, recorded 2026-11-25 with
+  `logprobs`/`top_logprobs: 5`; 20/20 correct. Latency is what the recording took on the owner's local GPU.
+  Token counts (`prompt_eval_count` + `eval_count`) are gemma4's own.

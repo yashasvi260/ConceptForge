@@ -1,6 +1,7 @@
 import tokensEmbeddings from "../subjects/02-tokens-embeddings";
 import s01IntroLlms from "../subjects/01-intro-llms";
 import s03TransformerInternals from "../subjects/03-transformer-internals";
+import textClassification from "../subjects/04-text-classification";
 // @register-import — add new subject imports above this line
 import type { SubjectModule } from "./types";
 
@@ -11,6 +12,7 @@ const REGISTERED: SubjectModule[] = [
   tokensEmbeddings,
   s01IntroLlms,
   s03TransformerInternals,
+  textClassification,
   // @register-subject — add new subjects above this line
 ];
 

@@ -36,7 +36,8 @@ describe("track", () => {
     expect(groups.flatMap((g) => g.modules)).toHaveLength(14);
     const m2 = groups[0]!.modules.find((m) => m.entry.id === "02-tokens-embeddings")!;
     expect(m2.subject?.id).toBe("02-tokens-embeddings");
-    expect(groups[1]!.modules.every((m) => m.subject === undefined)).toBe(true);
+    const built = new Set(SUBJECTS.map((s) => s.id));
+    expect(groups.flatMap((g) => g.modules).every((m) => (m.subject !== undefined) === built.has(m.entry.id))).toBe(true);
   });
 });
 

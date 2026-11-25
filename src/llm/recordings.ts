@@ -15,7 +15,10 @@ export interface RecordedGeneration {
   tokens?: TokenProb[];
   toolCalls?: { name: string; arguments: Record<string, unknown> }[];
   durationMs: number;
+  /** Tokens generated. */
   evalCount: number;
+  /** Tokens in the prompt, counted by the model's own tokenizer. */
+  promptEvalCount?: number;
 }
 
 export interface RecordingFile {

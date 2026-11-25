@@ -1,0 +1,730 @@
+{
+ "model": "gemma4:12b",
+ "ollamaVersion": "0.40.18",
+ "recordedAt": "2026-11-25T21:22:30.544Z",
+ "options": {
+  "temperature": 0
+ },
+ "items": [
+  {
+   "key": "classify:ca03",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I left my card in an ATM and now it is gone. Please block it.\nCategory:",
+   "output": "card",
+   "tokens": [
+    {
+     "token": "card",
+     "logprob": -4.768372718899627e-7,
+     "top": [
+      {
+       "token": "card",
+       "logprob": -4.768372718899627e-7
+      },
+      {
+       "token": "fraud",
+       "logprob": -14.614152908325195
+      },
+      {
+       "token": " card",
+       "logprob": -19.92149543762207
+      },
+      {
+       "token": "lost",
+       "logprob": -19.937349319458008
+      },
+      {
+       "token": "transfer",
+       "logprob": -21.31401252746582
+      }
+     ]
+    }
+   ],
+   "durationMs": 284,
+   "evalCount": 2,
+   "promptEvalCount": 77
+  },
+  {
+   "key": "classify:ca06",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: My card expires next month, when will the replacement arrive?\nCategory:",
+   "output": "card",
+   "tokens": [
+    {
+     "token": "card",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "card",
+       "logprob": 0
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -20.21803855895996
+      },
+      {
+       "token": " card",
+       "logprob": -20.807985305786133
+      },
+      {
+       "token": "_",
+       "logprob": -21.760305404663086
+      },
+      {
+       "token": "1",
+       "logprob": -22.459613800048828
+      }
+     ]
+    }
+   ],
+   "durationMs": 71,
+   "evalCount": 2,
+   "promptEvalCount": 72
+  },
+  {
+   "key": "classify:ca09",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: My card got bent and the terminal can't read it anymore.\nCategory:",
+   "output": "card",
+   "tokens": [
+    {
+     "token": "card",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "card",
+       "logprob": 0
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -20.490846633911133
+      },
+      {
+       "token": " card",
+       "logprob": -21.05816078186035
+      },
+      {
+       "token": "_",
+       "logprob": -21.824501037597656
+      },
+      {
+       "token": "1",
+       "logprob": -22.36981964111328
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 74
+  },
+  {
+   "key": "classify:ca12",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I need a card that works abroad without extra fees.\nCategory:",
+   "output": "card",
+   "tokens": [
+    {
+     "token": "card",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "card",
+       "logprob": 0
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -20.07024383544922
+      },
+      {
+       "token": " card",
+       "logprob": -20.176795959472656
+      },
+      {
+       "token": "_",
+       "logprob": -21.090045928955078
+      },
+      {
+       "token": "1",
+       "logprob": -21.699724197387695
+      }
+     ]
+    }
+   ],
+   "durationMs": 74,
+   "evalCount": 2,
+   "promptEvalCount": 71
+  },
+  {
+   "key": "classify:tr03",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I typed the wrong account number on a transfer, can it be reversed?\nCategory:",
+   "output": "transfer",
+   "tokens": [
+    {
+     "token": "transfer",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "transfer",
+       "logprob": 0
+      },
+      {
+       "token": " transfer",
+       "logprob": -19.204036712646484
+      },
+      {
+       "token": "1",
+       "logprob": -19.35236930847168
+      },
+      {
+       "token": "_",
+       "logprob": -20.68338394165039
+      },
+      {
+       "token": " transferencia",
+       "logprob": -21.696949005126953
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 75
+  },
+  {
+   "key": "classify:tr06",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: Why was a fee charged on my SEPA transfer?\nCategory:",
+   "output": "transfer",
+   "tokens": [
+    {
+     "token": "transfer",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "transfer",
+       "logprob": 0
+      },
+      {
+       "token": " transfer",
+       "logprob": -19.327564239501953
+      },
+      {
+       "token": "1",
+       "logprob": -19.975629806518555
+      },
+      {
+       "token": "_",
+       "logprob": -20.696514129638672
+      },
+      {
+       "token": " transferencia",
+       "logprob": -22.11664581298828
+      }
+     ]
+    }
+   ],
+   "durationMs": 74,
+   "evalCount": 2,
+   "promptEvalCount": 71
+  },
+  {
+   "key": "classify:tr09",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I need the SWIFT code to receive a transfer from Germany.\nCategory:",
+   "output": "transfer",
+   "tokens": [
+    {
+     "token": "transfer",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "transfer",
+       "logprob": 0
+      },
+      {
+       "token": " transfer",
+       "logprob": -19.526256561279297
+      },
+      {
+       "token": "1",
+       "logprob": -20.210582733154297
+      },
+      {
+       "token": "_",
+       "logprob": -20.58110809326172
+      },
+      {
+       "token": "account",
+       "logprob": -21.109909057617188
+      }
+     ]
+    }
+   ],
+   "durationMs": 76,
+   "evalCount": 2,
+   "promptEvalCount": 73
+  },
+  {
+   "key": "classify:tr12",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: How do I cancel a payment I set up for next week?\nCategory:",
+   "output": "transfer",
+   "tokens": [
+    {
+     "token": "transfer",
+     "logprob": -5.960466182841628e-7,
+     "top": [
+      {
+       "token": "transfer",
+       "logprob": -5.960466182841628e-7
+      },
+      {
+       "token": "card",
+       "logprob": -15.343944549560547
+      },
+      {
+       "token": "payment",
+       "logprob": -15.439558029174805
+      },
+      {
+       "token": "account",
+       "logprob": -16.48512840270996
+      },
+      {
+       "token": "trans",
+       "logprob": -17.622535705566406
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 73
+  },
+  {
+   "key": "classify:fr03",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I got a text with a link saying my account is locked. Is it real?\nCategory:",
+   "output": "fraud",
+   "tokens": [
+    {
+     "token": "fraud",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "fraud",
+       "logprob": 0
+      },
+      {
+       "token": " fraud",
+       "logprob": -17.104774475097656
+      },
+      {
+       "token": "fra",
+       "logprob": -18.224407196044922
+      },
+      {
+       "token": "詐",
+       "logprob": -20.803878784179688
+      },
+      {
+       "token": "[",
+       "logprob": -21.33820915222168
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 77
+  },
+  {
+   "key": "classify:fr06",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: A merchant charged me twice and I don't recognise the company.\nCategory:",
+   "output": "fraud",
+   "tokens": [
+    {
+     "token": "fraud",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "fraud",
+       "logprob": 0
+      },
+      {
+       "token": " fraud",
+       "logprob": -17.651670455932617
+      },
+      {
+       "token": "fra",
+       "logprob": -17.94029426574707
+      },
+      {
+       "token": "card",
+       "logprob": -19.53091049194336
+      },
+      {
+       "token": "欺",
+       "logprob": -21.623397827148438
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 74
+  },
+  {
+   "key": "classify:fr09",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: An email asked me to confirm my password for a security check.\nCategory:",
+   "output": "fraud",
+   "tokens": [
+    {
+     "token": "fraud",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "fraud",
+       "logprob": 0
+      },
+      {
+       "token": "fra",
+       "logprob": -17.228403091430664
+      },
+      {
+       "token": " fraud",
+       "logprob": -17.34999656677246
+      },
+      {
+       "token": "account",
+       "logprob": -19.03978729248047
+      },
+      {
+       "token": "詐",
+       "logprob": -19.62078285217285
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 73
+  },
+  {
+   "key": "classify:fr12",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: Someone opened a credit line in my name using my documents.\nCategory:",
+   "output": "fraud",
+   "tokens": [
+    {
+     "token": "fraud",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "fraud",
+       "logprob": 0
+      },
+      {
+       "token": " fraud",
+       "logprob": -17.981691360473633
+      },
+      {
+       "token": "fra",
+       "logprob": -18.406972885131836
+      },
+      {
+       "token": "[",
+       "logprob": -22.26034164428711
+      },
+      {
+       "token": "欺",
+       "logprob": -22.505172729492188
+      }
+     ]
+    }
+   ],
+   "durationMs": 75,
+   "evalCount": 2,
+   "promptEvalCount": 72
+  },
+  {
+   "key": "classify:ac03",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: Can I open a joint account with my partner online?\nCategory:",
+   "output": "account",
+   "tokens": [
+    {
+     "token": "account",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "account",
+       "logprob": 0
+      },
+      {
+       "token": " account",
+       "logprob": -20.258895874023438
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -22.358423233032227
+      },
+      {
+       "token": "账户",
+       "logprob": -23.20102310180664
+      },
+      {
+       "token": "_",
+       "logprob": -23.511701583862305
+      }
+     ]
+    }
+   ],
+   "durationMs": 74,
+   "evalCount": 2,
+   "promptEvalCount": 71
+  },
+  {
+   "key": "classify:ac06",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: How do I update my phone number for security codes?\nCategory:",
+   "output": "account",
+   "tokens": [
+    {
+     "token": "account",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "account",
+       "logprob": 0
+      },
+      {
+       "token": " account",
+       "logprob": -18.247419357299805
+      },
+      {
+       "token": "card",
+       "logprob": -22.193145751953125
+      },
+      {
+       "token": "账户",
+       "logprob": -22.402725219726562
+      },
+      {
+       "token": "_",
+       "logprob": -22.413768768310547
+      }
+     ]
+    }
+   ],
+   "durationMs": 69,
+   "evalCount": 2,
+   "promptEvalCount": 71
+  },
+  {
+   "key": "classify:ac09",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I changed my name after getting married, how do I update it?\nCategory:",
+   "output": "account",
+   "tokens": [
+    {
+     "token": "account",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "account",
+       "logprob": 0
+      },
+      {
+       "token": " account",
+       "logprob": -19.665367126464844
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -21.896995544433594
+      },
+      {
+       "token": "账户",
+       "logprob": -22.706214904785156
+      },
+      {
+       "token": "1",
+       "logprob": -23.284469604492188
+      }
+     ]
+    }
+   ],
+   "durationMs": 74,
+   "evalCount": 2,
+   "promptEvalCount": 74
+  },
+  {
+   "key": "classify:ac12",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I need a letter confirming my account details for my employer.\nCategory:",
+   "output": "account",
+   "tokens": [
+    {
+     "token": "account",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "account",
+       "logprob": 0
+      },
+      {
+       "token": " account",
+       "logprob": -20.071121215820312
+      },
+      {
+       "token": "<|channel>",
+       "logprob": -21.46460723876953
+      },
+      {
+       "token": "1",
+       "logprob": -22.50464630126953
+      },
+      {
+       "token": "账户",
+       "logprob": -22.75779151916504
+      }
+     ]
+    }
+   ],
+   "durationMs": 74,
+   "evalCount": 2,
+   "promptEvalCount": 72
+  },
+  {
+   "key": "classify:lo03",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I missed a mortgage payment, what happens now?\nCategory:",
+   "output": "loan",
+   "tokens": [
+    {
+     "token": "loan",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "loan",
+       "logprob": 0
+      },
+      {
+       "token": " loan",
+       "logprob": -18.26472282409668
+      },
+      {
+       "token": "account",
+       "logprob": -20.36214828491211
+      },
+      {
+       "token": " préstamo",
+       "logprob": -20.972414016723633
+      },
+      {
+       "token": "1",
+       "logprob": -21.567066192626953
+      }
+     ]
+    }
+   ],
+   "durationMs": 72,
+   "evalCount": 2,
+   "promptEvalCount": 70
+  },
+  {
+   "key": "classify:lo06",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: My loan repayment went up this month, why?\nCategory:",
+   "output": "loan",
+   "tokens": [
+    {
+     "token": "loan",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "loan",
+       "logprob": 0
+      },
+      {
+       "token": " loan",
+       "logprob": -18.032041549682617
+      },
+      {
+       "token": " préstamo",
+       "logprob": -19.881248474121094
+      },
+      {
+       "token": "account",
+       "logprob": -20.425434112548828
+      },
+      {
+       "token": "lo",
+       "logprob": -21.618541717529297
+      }
+     ]
+    }
+   ],
+   "durationMs": 69,
+   "evalCount": 2,
+   "promptEvalCount": 70
+  },
+  {
+   "key": "classify:lo09",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: I would like to consolidate my credit card debts into one loan.\nCategory:",
+   "output": "loan",
+   "tokens": [
+    {
+     "token": "loan",
+     "logprob": -1.1920930376163597e-7,
+     "top": [
+      {
+       "token": "loan",
+       "logprob": -1.1920930376163597e-7
+      },
+      {
+       "token": " loan",
+       "logprob": -16.403289794921875
+      },
+      {
+       "token": "account",
+       "logprob": -17.122695922851562
+      },
+      {
+       "token": " préstamo",
+       "logprob": -17.557849884033203
+      },
+      {
+       "token": "transfer",
+       "logprob": -18.260692596435547
+      }
+     ]
+    }
+   ],
+   "durationMs": 72,
+   "evalCount": 2,
+   "promptEvalCount": 73
+  },
+  {
+   "key": "classify:lo12",
+   "prompt": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: Do you offer loans for buying a used car?\nCategory:",
+   "output": "loan",
+   "tokens": [
+    {
+     "token": "loan",
+     "logprob": 0,
+     "top": [
+      {
+       "token": "loan",
+       "logprob": 0
+      },
+      {
+       "token": " loan",
+       "logprob": -17.597888946533203
+      },
+      {
+       "token": "lo",
+       "logprob": -20.96978759765625
+      },
+      {
+       "token": " préstamo",
+       "logprob": -21.726511001586914
+      },
+      {
+       "token": "Loan",
+       "logprob": -21.96310043334961
+      }
+     ]
+    }
+   ],
+   "durationMs": 76,
+   "evalCount": 2,
+   "promptEvalCount": 70
+  }
+ ]
+}

@@ -12,6 +12,7 @@ const GEN = {
   done: true,
   total_duration: 250_000_000,
   eval_count: 2,
+  prompt_eval_count: 30,
   logprobs: [{ token: "card", logprob: -0.05, bytes: [99], top_logprobs: [{ token: "card", logprob: -0.05 }, { token: "fraud", logprob: -3.2 }] }],
 };
 
@@ -29,7 +30,7 @@ describe("ollama client", () => {
   it("maps logprobs to TokenProb", async () => {
     const c = createOllamaClient("http://x", fakeFetch(GEN));
     const r = await c.generate({ model: "gemma4:12b", prompt: "hi", key: "k1" });
-    expect(r).toMatchObject({ key: "k1", prompt: "hi", output: "card", durationMs: 250, evalCount: 2 });
+    expect(r).toMatchObject({ key: "k1", prompt: "hi", output: "card", durationMs: 250, evalCount: 2, promptEvalCount: 30 });
     expect(r.tokens).toEqual([{ token: "card", logprob: -0.05, top: [{ token: "card", logprob: -0.05 }, { token: "fraud", logprob: -3.2 }] }]);
   });
 

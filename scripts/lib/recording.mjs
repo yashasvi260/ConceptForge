@@ -33,6 +33,7 @@ export function toRecordedGeneration(job, response) {
     ...(toolCalls?.length ? { toolCalls } : {}),
     durationMs: Math.round((response.total_duration ?? 0) / 1e6),
     evalCount: response.eval_count ?? 0,
+    ...(response.prompt_eval_count !== undefined ? { promptEvalCount: response.prompt_eval_count } : {}),
   };
 }
 

@@ -74,7 +74,7 @@ export function createOllamaClient(baseUrl: string, fetchFn: typeof fetch = (...
     async generate(req) {
       const options: Record<string, number> = { num_ctx: NUM_CTX };
       if (req.temperature !== undefined) options.temperature = req.temperature;
-      const r = await call<{ response: string; total_duration?: number; eval_count?: number; logprobs?: OllamaLogprob[] }>(
+      const r = await call<{ response: string; total_duration?: number; eval_count?: number; prompt_eval_count?: number; logprobs?: OllamaLogprob[] }>(
         "/api/generate",
         {
           model: req.model,
@@ -96,6 +96,7 @@ export function createOllamaClient(baseUrl: string, fetchFn: typeof fetch = (...
         ...(tokens ? { tokens } : {}),
         durationMs: Math.round((r.total_duration ?? 0) / 1e6),
         evalCount: r.eval_count ?? 0,
+        ...(r.prompt_eval_count !== undefined ? { promptEvalCount: r.prompt_eval_count } : {}),
       };
     },
     async chat(req) {

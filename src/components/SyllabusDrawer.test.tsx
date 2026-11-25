@@ -46,7 +46,7 @@ describe("SyllabusDrawer", () => {
 
   it("unbuilt modules are disabled", () => {
     render(<SyllabusDrawer {...props} />);
-    expect(screen.getByRole("button", { name: /^04\. Text Classification/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^14\. Evals, Guardrails/ })).toBeDisabled();
   });
 
   it("Tab and Shift+Tab stay inside the dialog", async () => {
