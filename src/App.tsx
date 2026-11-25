@@ -23,6 +23,7 @@ import {
 import { trackEntry, type TrackEntry } from "./core/track";
 import type { PlayerMode } from "./core/types";
 import { useKeyboardShortcuts } from "./core/useKeyboardShortcuts";
+import { OllamaProvider } from "./llm/OllamaContext";
 import { applyTheme, loadTheme, type Theme } from "./core/theme";
 
 export const AUTOPLAY_MS = 7000;
@@ -37,12 +38,20 @@ interface Location {
   mode: PlayerMode;
 }
 
-function locationFromHash(hash: string, progress: ProgressMap): Location | null {
+function locationFromHash(
+  hash: string,
+  progress: ProgressMap,
+): Location | null {
   const route = parseHash(hash);
   const s = getSubject(route.subjectId);
   if (route.view === "course" || !s) return null;
   const stepIndex = route.stepIndex ?? getProgress(progress, s.id).lastStep;
-  return { view: "module", subjectId: s.id, stepIndex: clampStep(stepIndex, s.steps.length), mode: route.mode };
+  return {
+    view: "module",
+    subjectId: s.id,
+    stepIndex: clampStep(stepIndex, s.steps.length),
+    mode: route.mode,
+  };
 }
 
 function initialLocation(progress: ProgressMap): Location {
@@ -63,7 +72,9 @@ export default function App() {
   const subjects = listSubjects();
   const [progress, setProgress] = useState<ProgressMap>(() => loadProgress());
   const [loc, setLoc] = useState<Location>(() => initialLocation(progress));
-  const [comingSoon, setComingSoon] = useState<TrackEntry | null>(() => unbuiltFromHash(window.location.hash));
+  const [comingSoon, setComingSoon] = useState<TrackEntry | null>(() =>
+    unbuiltFromHash(window.location.hash),
+  );
   const [autoPlay, setAutoPlay] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
@@ -99,9 +110,13 @@ export default function App() {
   useEffect(() => {
     if (comingSoon) return; // keep the coming-soon module's link in the address bar
     const page = loc.view === "course" ? "course" : subject.id;
-    const hash = loc.view === "course" ? HOME_HASH : formatHash(subject.id, loc.mode, loc.stepIndex);
+    const hash =
+      loc.view === "course"
+        ? HOME_HASH
+        : formatHash(subject.id, loc.mode, loc.stepIndex);
     if (window.location.hash !== hash) {
-      if (lastPage.current !== null && lastPage.current !== page) window.history.pushState(null, "", hash);
+      if (lastPage.current !== null && lastPage.current !== page)
+        window.history.pushState(null, "", hash);
       else window.history.replaceState(null, "", hash);
     }
     lastPage.current = page;
@@ -111,13 +126,18 @@ export default function App() {
   useEffect(() => {
     const onHash = () => {
       const unbuilt = unbuiltFromHash(window.location.hash);
-      const next = unbuilt ? null : locationFromHash(window.location.hash, progressRef.current);
+      const next = unbuilt
+        ? null
+        : locationFromHash(window.location.hash, progressRef.current);
       const cur = locRef.current;
       const same = unbuilt
         ? comingSoonRef.current?.id === unbuilt.id
         : !comingSoonRef.current &&
           (next
-            ? cur.view === "module" && cur.subjectId === next.subjectId && cur.mode === next.mode && cur.stepIndex === next.stepIndex
+            ? cur.view === "module" &&
+              cur.subjectId === next.subjectId &&
+              cur.mode === next.mode &&
+              cur.stepIndex === next.stepIndex
             : cur.view === "course");
       if (same) return; // the hash already describes where we are (e.g. our own update echoed back)
       setAutoPlay(false);
@@ -135,7 +155,11 @@ export default function App() {
 
   const goToStep = useCallback(
     (index: number) => {
-      setLoc((l) => ({ ...l, mode: "lesson", stepIndex: clampStep(index, subject.steps.length) }));
+      setLoc((l) => ({
+        ...l,
+        mode: "lesson",
+        stepIndex: clampStep(index, subject.steps.length),
+      }));
     },
     [subject.steps.length],
   );
@@ -156,7 +180,15 @@ export default function App() {
       setAutoPlay(false);
       setDrawerOpen(false);
       setComingSoon(null);
-      setLoc({ view: "module", subjectId: s.id, mode: "lesson", stepIndex: clampStep(getProgress(progress, s.id).lastStep, s.steps.length) });
+      setLoc({
+        view: "module",
+        subjectId: s.id,
+        mode: "lesson",
+        stepIndex: clampStep(
+          getProgress(progress, s.id).lastStep,
+          s.steps.length,
+        ),
+      });
       window.scrollTo?.(0, 0);
     },
     [progress],
@@ -188,7 +220,14 @@ export default function App() {
     }
     const t = window.setTimeout(() => goToStep(loc.stepIndex + 1), AUTOPLAY_MS);
     return () => window.clearTimeout(t);
-  }, [autoPlay, inPlayer, loc.mode, loc.stepIndex, subject.steps.length, goToStep]);
+  }, [
+    autoPlay,
+    inPlayer,
+    loc.mode,
+    loc.stepIndex,
+    subject.steps.length,
+    goToStep,
+  ]);
 
   const toggleAutoPlay = useCallback(() => {
     // Starting from the last step replays from the beginning.
@@ -207,87 +246,128 @@ export default function App() {
     }),
     [goToStep, loc.stepIndex, toggleAutoPlay],
   );
-  useKeyboardShortcuts(inPlayer && loc.mode === "lesson" && !drawerOpen, handlers);
+  useKeyboardShortcuts(
+    inPlayer && loc.mode === "lesson" && !drawerOpen,
+    handlers,
+  );
 
   const Stage = subject.Stage;
-  const upNext = <UpNextCard subject={subject} isBuilt={isBuilt} onOpenModule={openModuleStart} onHome={goHome} />;
+  const upNext = (
+    <UpNextCard
+      subject={subject}
+      isBuilt={isBuilt}
+      onOpenModule={openModuleStart}
+      onHome={goHome}
+    />
+  );
   const summary = courseSummary(subjects, progress);
   const crumbEntry = comingSoon ?? (loc.view === "module" ? subject : null);
 
   return (
-    <div className="flex min-h-full flex-col">
-      <AppHeader
-        crumb={crumbEntry ? { moduleNumber: crumbEntry.moduleNumber, title: crumbEntry.title } : null}
-        tabs={inPlayer ? { mode: loc.mode, badge: quizBadge(subject, progress), onModeChange: setMode } : null}
-        mastered={loc.view === "course" && !comingSoon ? { completed: summary.completed, total: summary.total } : null}
-        onHome={goHome}
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === "cream" ? "dark" : "cream"))}
-        onOpenSyllabus={() => {
-          setAutoPlay(false);
-          setDrawerOpen(true);
-        }}
-      />
-      <SyllabusDrawer
-        open={drawerOpen}
-        subjects={subjects}
-        progress={progress}
-        activeId={inPlayer ? subject.id : null}
-        onClose={() => setDrawerOpen(false)}
-        onOpenModule={resumeModule}
-        onHome={goHome}
-      />
+    <OllamaProvider>
+      <div className="flex min-h-full flex-col">
+        <AppHeader
+          crumb={
+            crumbEntry
+              ? {
+                  moduleNumber: crumbEntry.moduleNumber,
+                  title: crumbEntry.title,
+                }
+              : null
+          }
+          tabs={
+            inPlayer
+              ? {
+                  mode: loc.mode,
+                  badge: quizBadge(subject, progress),
+                  onModeChange: setMode,
+                }
+              : null
+          }
+          mastered={
+            loc.view === "course" && !comingSoon
+              ? { completed: summary.completed, total: summary.total }
+              : null
+          }
+          onHome={goHome}
+          theme={theme}
+          onToggleTheme={() =>
+            setTheme((t) => (t === "cream" ? "dark" : "cream"))
+          }
+          onOpenSyllabus={() => {
+            setAutoPlay(false);
+            setDrawerOpen(true);
+          }}
+        />
+        <SyllabusDrawer
+          open={drawerOpen}
+          subjects={subjects}
+          progress={progress}
+          activeId={inPlayer ? subject.id : null}
+          onClose={() => setDrawerOpen(false)}
+          onOpenModule={resumeModule}
+          onHome={goHome}
+        />
 
-      {comingSoon ? (
-        <ComingSoon entry={comingSoon} onHome={goHome} />
-      ) : loc.view === "course" ? (
-        <CourseOverview subjects={subjects} progress={progress} onOpenModule={resumeModule} />
-      ) : loc.mode === "lesson" ? (
-        <>
-          <SplitWorkspace
-            subject={subject}
-            step={step}
-            stepIndex={loc.stepIndex}
-            total={subject.steps.length}
-            isBuilt={isBuilt}
-            onOpenModule={openModuleStart}
-            footer={upNext}
-          >
-            {/* key: remount per subject so each subject's control state is independent */}
-            <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
-          </SplitWorkspace>
-          <div className="sticky bottom-0 z-10">
-            <StepControls
-              steps={subject.steps}
-              index={loc.stepIndex}
-              accent={subject.accent}
-              autoPlay={autoPlay}
-              autoPlayMs={AUTOPLAY_MS}
-              visited={subjectProgress.visitedSteps}
-              onChange={(i) => {
-                if (i < loc.stepIndex) setAutoPlay(false);
-                goToStep(i);
-              }}
-              onToggleAutoPlay={toggleAutoPlay}
-              onFinishSteps={() => setMode("challenge")}
-            />
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col">
-          <ChallengeRunner
-            key={subject.id}
-            subject={subject}
-            progress={subjectProgress}
-            onFinish={(correct, total) => setProgress((p) => withChallengeResult(p, subject.id, correct, total))}
-            onReviewStep={(stepId) => {
-              const i = subject.steps.findIndex((s) => s.id === stepId);
-              goToStep(i < 0 ? 0 : i);
-            }}
+        {comingSoon ? (
+          <ComingSoon entry={comingSoon} onHome={goHome} />
+        ) : loc.view === "course" ? (
+          <CourseOverview
+            subjects={subjects}
+            progress={progress}
+            onOpenModule={resumeModule}
           />
-          <div className="mx-auto w-full max-w-2xl px-4 pb-10">{upNext}</div>
-        </div>
-      )}
-    </div>
+        ) : loc.mode === "lesson" ? (
+          <>
+            <SplitWorkspace
+              subject={subject}
+              step={step}
+              stepIndex={loc.stepIndex}
+              total={subject.steps.length}
+              isBuilt={isBuilt}
+              onOpenModule={openModuleStart}
+              footer={upNext}
+            >
+              {/* key: remount per subject so each subject's control state is independent */}
+              <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
+            </SplitWorkspace>
+            <div className="sticky bottom-0 z-10">
+              <StepControls
+                steps={subject.steps}
+                index={loc.stepIndex}
+                accent={subject.accent}
+                autoPlay={autoPlay}
+                autoPlayMs={AUTOPLAY_MS}
+                visited={subjectProgress.visitedSteps}
+                onChange={(i) => {
+                  if (i < loc.stepIndex) setAutoPlay(false);
+                  goToStep(i);
+                }}
+                onToggleAutoPlay={toggleAutoPlay}
+                onFinishSteps={() => setMode("challenge")}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col">
+            <ChallengeRunner
+              key={subject.id}
+              subject={subject}
+              progress={subjectProgress}
+              onFinish={(correct, total) =>
+                setProgress((p) =>
+                  withChallengeResult(p, subject.id, correct, total),
+                )
+              }
+              onReviewStep={(stepId) => {
+                const i = subject.steps.findIndex((s) => s.id === stepId);
+                goToStep(i < 0 ? 0 : i);
+              }}
+            />
+            <div className="mx-auto w-full max-w-2xl px-4 pb-10">{upNext}</div>
+          </div>
+        )}
+      </div>
+    </OllamaProvider>
   );
 }
