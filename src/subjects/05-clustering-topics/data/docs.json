@@ -1,0 +1,394 @@
+{
+ "docs": [
+  {
+   "id": "ap01",
+   "text": "The mobile app crashes every time I open the payments screen.",
+   "theme": "app"
+  },
+  {
+   "id": "ap02",
+   "text": "Since the last update the app won't let me log in with my fingerprint.",
+   "theme": "app"
+  },
+  {
+   "id": "ap03",
+   "text": "The app is so slow to load my balance in the morning.",
+   "theme": "app"
+  },
+  {
+   "id": "ap04",
+   "text": "I love the new app design, transfers take two taps now.",
+   "theme": "app"
+  },
+  {
+   "id": "ap05",
+   "text": "App notifications arrive hours after the payment happened.",
+   "theme": "app"
+  },
+  {
+   "id": "ap06",
+   "text": "The banking app keeps asking me to update even after I updated.",
+   "theme": "app"
+  },
+  {
+   "id": "ap07",
+   "text": "Face ID login stopped working in the app this week.",
+   "theme": "app"
+  },
+  {
+   "id": "ap08",
+   "text": "The app shows the wrong balance until I refresh twice.",
+   "theme": "app"
+  },
+  {
+   "id": "ap09",
+   "text": "Dark mode in the app makes the numbers hard to read.",
+   "theme": "app"
+  },
+  {
+   "id": "ap10",
+   "text": "I can't find where to download statements in the new app.",
+   "theme": "app"
+  },
+  {
+   "id": "ap11",
+   "text": "The app froze while I was paying a bill and charged me twice.",
+   "theme": "app"
+  },
+  {
+   "id": "ap12",
+   "text": "Please add a widget so I can see my balance without opening the app.",
+   "theme": "app"
+  },
+  {
+   "id": "ap13",
+   "text": "The app logs me out every few minutes, very annoying.",
+   "theme": "app"
+  },
+  {
+   "id": "fe01",
+   "text": "Why am I paying a monthly fee on a basic account?",
+   "theme": "fees"
+  },
+  {
+   "id": "fe02",
+   "text": "I was charged an overdraft fee for being one dollar short.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe03",
+   "text": "The fee for using another bank's ATM is far too high.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe04",
+   "text": "Foreign transaction fees on my card are higher than other banks.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe05",
+   "text": "You charged me a late fee even though I paid on time.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe06",
+   "text": "Hidden fees on wire transfers make your bank expensive.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe07",
+   "text": "I want the account maintenance fee refunded.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe08",
+   "text": "Paper statement fee is ridiculous in this day and age.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe09",
+   "text": "Why did the fee for international transfers go up again?",
+   "theme": "fees"
+  },
+  {
+   "id": "fe10",
+   "text": "Please explain the fee schedule, it is confusing.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe11",
+   "text": "Got hit with a returned payment fee I never knew about.",
+   "theme": "fees"
+  },
+  {
+   "id": "fe12",
+   "text": "Fees on my savings account eat all the interest I earn.",
+   "theme": "fees"
+  },
+  {
+   "id": "br01",
+   "text": "The staff at the downtown branch were friendly and quick.",
+   "theme": "branch"
+  },
+  {
+   "id": "br02",
+   "text": "Waited forty minutes in the branch queue to deposit a cheque.",
+   "theme": "branch"
+  },
+  {
+   "id": "br03",
+   "text": "My local branch is closing, where am I supposed to go now?",
+   "theme": "branch"
+  },
+  {
+   "id": "br04",
+   "text": "Branch opening hours are too short for people who work.",
+   "theme": "branch"
+  },
+  {
+   "id": "br05",
+   "text": "The branch advisor helped me sort out my documents in minutes.",
+   "theme": "branch"
+  },
+  {
+   "id": "br06",
+   "text": "Only one teller was working at the branch on Saturday.",
+   "theme": "branch"
+  },
+  {
+   "id": "br07",
+   "text": "The branch ran out of cash at the counter, unbelievable.",
+   "theme": "branch"
+  },
+  {
+   "id": "br08",
+   "text": "Great service from the manager at the high street branch.",
+   "theme": "branch"
+  },
+  {
+   "id": "br09",
+   "text": "The branch was dirty and the card machine was broken.",
+   "theme": "branch"
+  },
+  {
+   "id": "br10",
+   "text": "Booking a branch appointment online was easy and fast.",
+   "theme": "branch"
+  },
+  {
+   "id": "br11",
+   "text": "Nobody at the branch could answer my question about my account.",
+   "theme": "branch"
+  },
+  {
+   "id": "br12",
+   "text": "The branch is not wheelchair accessible, please fix the ramp.",
+   "theme": "branch"
+  },
+  {
+   "id": "mo01",
+   "text": "The mortgage application process took three months, way too long.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo02",
+   "text": "My mortgage adviser explained the fixed and variable rates clearly.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo03",
+   "text": "Remortgaging with you was smooth and the rate is good.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo04",
+   "text": "Why did my mortgage payment increase without notice?",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo05",
+   "text": "The mortgage valuation came in lower than the agreed price.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo06",
+   "text": "I want to overpay my mortgage but the app won't let me.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo07",
+   "text": "Your mortgage rates are not competitive anymore.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo08",
+   "text": "First time buyer here, the mortgage team was really patient.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo09",
+   "text": "The mortgage documents asked for the same payslips three times.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo10",
+   "text": "Can I port my mortgage when I move house next year?",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo11",
+   "text": "Mortgage offer expired while waiting for your underwriters.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "mo12",
+   "text": "Thanks for the payment holiday on my mortgage during illness.",
+   "theme": "mortgage"
+  },
+  {
+   "id": "se01",
+   "text": "Someone tried to log into my account from another country.",
+   "theme": "security"
+  },
+  {
+   "id": "se02",
+   "text": "I received a scam text pretending to be from your bank.",
+   "theme": "security"
+  },
+  {
+   "id": "se03",
+   "text": "Your fraud team blocked my card while I was on holiday.",
+   "theme": "security"
+  },
+  {
+   "id": "se04",
+   "text": "Great job catching that fraudulent payment so quickly.",
+   "theme": "security"
+  },
+  {
+   "id": "se05",
+   "text": "A caller claiming to be bank security asked for my PIN.",
+   "theme": "security"
+  },
+  {
+   "id": "se06",
+   "text": "I got a phishing email with your logo asking for my password.",
+   "theme": "security"
+  },
+  {
+   "id": "se07",
+   "text": "Two-factor codes arrive too late to log in.",
+   "theme": "security"
+  },
+  {
+   "id": "se08",
+   "text": "My card was cloned and used at petrol stations.",
+   "theme": "security"
+  },
+  {
+   "id": "se09",
+   "text": "The fraud alert asked me to confirm a payment I made, good system.",
+   "theme": "security"
+  },
+  {
+   "id": "se10",
+   "text": "How do I report a suspicious transaction on my statement?",
+   "theme": "security"
+  },
+  {
+   "id": "se11",
+   "text": "Scammers spoofed your phone number to call me.",
+   "theme": "security"
+  },
+  {
+   "id": "se12",
+   "text": "Please add stronger protection against account takeover.",
+   "theme": "security"
+  },
+  {
+   "id": "tr01",
+   "text": "My card worked perfectly everywhere in Japan, thank you.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr02",
+   "text": "The card was declined at a hotel in Spain with no warning.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr03",
+   "text": "Exchange rates on my travel card are better than airport kiosks.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr04",
+   "text": "Do I need to tell you before travelling abroad with my card?",
+   "theme": "travel"
+  },
+  {
+   "id": "tr05",
+   "text": "Withdrawing euros cost me a fortune in fees and bad rates.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr06",
+   "text": "The travel insurance with my account covered my lost luggage.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr07",
+   "text": "My card stopped working in the USA after the first day.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr08",
+   "text": "Contactless worked on the London underground with my card.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr09",
+   "text": "I couldn't use my card in Morocco, which countries are blocked?",
+   "theme": "travel"
+  },
+  {
+   "id": "tr10",
+   "text": "Travel money order arrived on time and the rate was fair.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr11",
+   "text": "Holiday spending in dollars showed a different rate than promised.",
+   "theme": "travel"
+  },
+  {
+   "id": "tr12",
+   "text": "Getting emergency cash abroad after losing my wallet was easy.",
+   "theme": "travel"
+  },
+  {
+   "id": "ot01",
+   "text": "What is the capital of Australia?",
+   "theme": "other"
+  },
+  {
+   "id": "ot02",
+   "text": "My cat knocked a glass off the table this morning.",
+   "theme": "other"
+  },
+  {
+   "id": "ot03",
+   "text": "Recommend a good pizza place near the station.",
+   "theme": "other"
+  },
+  {
+   "id": "ot04",
+   "text": "The football match last night was amazing.",
+   "theme": "other"
+  },
+  {
+   "id": "ot05",
+   "text": "How do I bake sourdough bread at home?",
+   "theme": "other"
+  }
+ ]
+}
