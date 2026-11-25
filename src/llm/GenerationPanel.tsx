@@ -12,26 +12,35 @@ interface GenerationPanelProps {
   /** What to send when the learner runs this live on their own Ollama. */
   live?: { request: GenerateRequest };
   title?: string;
+  /** The recordings themselves are still downloading. */
+  loading?: boolean;
 }
 
 /** Shows a recorded model output with its provenance; optionally re-runs it live on the learner's Ollama. */
-export function GenerationPanel({ file, recording, live, title = "Model output" }: GenerationPanelProps) {
+export function GenerationPanel({ file, recording, live, title = "Model output", loading = false }: GenerationPanelProps) {
   const o = useOllama();
-  const [liveOut, setLiveOut] = useState<{ text: string; model: string; ms: number } | null>(null);
-  const [liveErr, setLiveErr] = useState<string | null>(null);
-  const [running, setRunning] = useState(false);
+  // Live results remember the request they answer; they are shown only while that request is current,
+  // so changing the ticket or setting never leaves an answer to a different prompt on screen.
+  const requestKey = live ? JSON.stringify(live.request) : "";
+  const [liveOut, setLiveOut] = useState<{ key: string; text: string; model: string; ms: number } | null>(null);
+  const [liveErr, setLiveErr] = useState<{ key: string; message: string } | null>(null);
+  const [runningKey, setRunningKey] = useState<string | null>(null);
+  const shownOut = liveOut?.key === requestKey ? liveOut : null;
+  const shownErr = liveErr?.key === requestKey ? liveErr.message : null;
+  const running = runningKey === requestKey;
 
   const runLive = async () => {
     if (!o.client || !live) return;
-    setRunning(true);
+    const key = requestKey;
+    setRunningKey(key);
     setLiveErr(null);
     try {
       const r = await o.client.generate(live.request);
-      setLiveOut({ text: r.output, model: live.request.model, ms: r.durationMs });
+      setLiveOut({ key, text: r.output, model: live.request.model, ms: r.durationMs });
     } catch (e) {
-      setLiveErr(e instanceof Error ? e.message : String(e));
+      setLiveErr({ key, message: e instanceof Error ? e.message : String(e) });
     } finally {
-      setRunning(false);
+      setRunningKey((k) => (k === key ? null : k));
     }
   };
 
@@ -40,7 +49,11 @@ export function GenerationPanel({ file, recording, live, title = "Model output" 
       <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
         <Bot size={13} /> {title}
       </p>
-      {recording ? (
+      {loading ? (
+        <p role="status" className="rounded-lg border border-dashed border-slate-700 p-2.5 text-xs text-slate-400">
+          Loading the recorded runs…
+        </p>
+      ) : recording ? (
         <>
           <pre className="whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-2.5 font-mono text-xs text-slate-200">{recording.output}</pre>
           <p className="font-mono text-[10px] text-slate-500">
@@ -66,12 +79,12 @@ export function GenerationPanel({ file, recording, live, title = "Model output" 
               <Play size={12} /> {running ? "Running…" : "Run live"}
             </button>
           )}
-          {liveErr && <p role="alert" className="text-xs text-rose-300">{liveErr}</p>}
-          {liveOut && (
+          {shownErr && <p role="alert" className="text-xs text-rose-300">{shownErr}</p>}
+          {shownOut && (
             <>
-              <pre className="whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-2.5 font-mono text-xs text-slate-200">{liveOut.text}</pre>
+              <pre className="whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-2.5 font-mono text-xs text-slate-200">{shownOut.text}</pre>
               <p className="font-mono text-[10px] text-slate-500">
-                live from {liveOut.model} · {(liveOut.ms / 1000).toFixed(1)} s
+                live from {shownOut.model} · {(shownOut.ms / 1000).toFixed(1)} s
               </p>
             </>
           )}

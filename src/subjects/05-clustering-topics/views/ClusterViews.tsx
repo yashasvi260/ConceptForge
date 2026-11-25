@@ -2,16 +2,12 @@ import { Plus, Shapes, Tag } from "lucide-react";
 import { useState } from "react";
 import { Panel, Slider, Stat } from "../../../components/ui";
 import { GenerationPanel } from "../../../llm/GenerationPanel";
-import { findRecording, type RecordingFile } from "../../../llm/recordings";
 import { ModelStatus } from "../../../ml/ModelStatus";
 import { useEmbeddings } from "../../../ml/useEmbeddings";
-import topicPrompt from "../data/topicPrompt.json";
-import topicsRec from "../data/recordings/topics.json";
-import { clusterKey, type Clustering } from "../pipeline";
+import type { Clustering } from "../pipeline";
+import { TOPICS, topicPrompt, topicRecording } from "../topics";
 import { clusterColor, type Doc, type ExtraDoc, type Params } from "../usePipeline";
 import { Scatter } from "./Scatter";
-
-const TOPICS = topicsRec as RecordingFile;
 
 type Run = { docs: Doc[]; xy: [number, number][]; result: Clustering };
 
@@ -162,7 +158,7 @@ export function NamesView({ run, onAdd }: { run: Run; onAdd: (d: ExtraDoc) => vo
         {Array.from({ length: result.clusters }, (_, c) => {
           const members = docs.filter((_, i) => result.labels[i] === c && !result.isOutlier[i]);
           const keywords = result.keywords[c]!.map((w) => w.word);
-          const prompt = topicPrompt.template.replace("{keywords}", keywords.join(", ")).replace("{comments}", members.map((d) => `- ${d.text}`).join("\n"));
+          const prompt = topicPrompt(members, keywords);
           return (
             <div key={c} className="space-y-1.5">
               <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -171,7 +167,7 @@ export function NamesView({ run, onAdd }: { run: Run; onAdd: (d: ExtraDoc) => vo
               <GenerationPanel
                 title={`Topic name, cluster ${c + 1}`}
                 file={TOPICS}
-                recording={findRecording(TOPICS, clusterKey(members.map((d) => d.id)))}
+                recording={topicRecording(members, keywords)}
                 live={{ request: { model: TOPICS.model, prompt, temperature: 0 } }}
               />
             </div>

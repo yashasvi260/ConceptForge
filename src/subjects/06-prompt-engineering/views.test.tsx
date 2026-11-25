@@ -42,6 +42,11 @@ describe("Module 06 content", () => {
 });
 
 describe("Module 06 views", () => {
+  it("the intro names both recorded models", () => {
+    renderStep("intro");
+    expect(screen.getByText(/gemma4:12b/)).toHaveTextContent(/qwen2.5-coder:1.5b/);
+  });
+
   it("prompt builder: toggling a component changes the prompt and the recorded numbers", async () => {
     renderStep("builder");
     const acc = await screen.findByTestId("combo-accuracy");
@@ -61,6 +66,20 @@ describe("Module 06 views", () => {
     fireEvent.click(screen.getByRole("radio", { name: /qwen2.5-coder/ }));
     const smallStats = comboStats(SMALL, off)!;
     await waitFor(() => expect(screen.getByTestId("combo-accuracy")).toHaveTextContent(`${smallStats.fieldsCorrect} / ${smallStats.fieldsTotal}`));
+  });
+
+  it("prompt tokens are the selected ticket's count, labelled with the selected model", async () => {
+    renderStep("builder");
+    await screen.findByTestId("combo-accuracy");
+    const rec = (id: string, f: RecordingFile) => f.items.find((i) => i.key === `r0f0c0s0:${id}:s0`)!;
+    expect(screen.getByTestId("combo-tokens")).toHaveTextContent(String(rec("x1", FILE).promptEvalCount));
+    fireEvent.change(screen.getByRole("combobox", { name: "Ticket" }), { target: { value: "x5" } });
+    await waitFor(() => expect(screen.getByTestId("combo-tokens")).toHaveTextContent(String(rec("x5", FILE).promptEvalCount)));
+    expect(screen.getByTestId("combo-tokens-label")).toHaveTextContent("gemma4:12b");
+    fireEvent.click(screen.getByRole("radio", { name: /qwen2.5-coder/ }));
+    await waitFor(() => expect(screen.getByTestId("combo-tokens-label")).toHaveTextContent("qwen2.5-coder:1.5b"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Ticket text" }), { target: { value: "edited ticket text" } });
+    await waitFor(() => expect(screen.getByTestId("combo-tokens")).toHaveTextContent("–"));
   });
 
   it("editing the ticket text shows the no-recording note with a live option", async () => {

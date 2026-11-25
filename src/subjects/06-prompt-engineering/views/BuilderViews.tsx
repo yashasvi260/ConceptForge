@@ -8,7 +8,7 @@ import { TICKETS, buildPrompt, comboKey, recordingKey, type Combo } from "../pro
 import { tokenProbs } from "../probs";
 import { extractJson, scoreExtraction } from "../scoring";
 import { emptyFile, useExperiment, type ModelChoice } from "../useExperiment";
-import { ModelPicker, StatsRow, TicketPicker } from "./shared";
+import { LoadError, ModelPicker, StatsRow, TicketPicker } from "./shared";
 
 const COMPONENTS: { key: keyof Combo; label: string; description: string }[] = [
   { key: "role", label: "Role", description: "a system prompt saying who the model should be" },
@@ -18,7 +18,7 @@ const COMPONENTS: { key: keyof Combo; label: string; description: string }[] = [
 ];
 
 export function BuilderView({ combo, setCombo, ticketId, setTicketId, model, setModel }: { combo: Combo; setCombo: (c: Combo) => void; ticketId: string; setTicketId: (id: string) => void; model: ModelChoice; setModel: (m: ModelChoice) => void }) {
-  const file = useExperiment(model);
+  const { file, error, retry } = useExperiment(model);
   const ticket = TICKETS.find((t) => t.id === ticketId)!;
   const [edited, setEdited] = useState<{ id: string; text: string } | null>(null);
   const text = edited?.id === ticketId ? edited.text : ticket.text;
@@ -40,8 +40,9 @@ export function BuilderView({ combo, setCombo, ticketId, setTicketId, model, set
         ))}
       </div>
       <p className="mt-2 font-mono text-[11px] text-slate-500">combination {comboKey(combo)} · 8 tickets × 4 samples recorded</p>
+      {error && <LoadError retry={retry} />}
       <div className="mt-3">
-        <StatsRow s={stats} />
+        <StatsRow s={stats} tokens={rec?.promptEvalCount ?? null} model={(file ?? emptyFile(model)).model} />
       </div>
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <div className="space-y-2">
@@ -64,7 +65,7 @@ export function BuilderView({ combo, setCombo, ticketId, setTicketId, model, set
           </pre>
         </div>
         <div className="space-y-2">
-          <GenerationPanel title="Answer · temperature 0" file={file ?? emptyFile(model)} recording={rec} live={{ request: { model: (file ?? emptyFile(model)).model, ...p, temperature: 0 } }} />
+          <GenerationPanel title="Answer · temperature 0" file={file ?? emptyFile(model)} recording={rec} loading={!file && isOriginal} live={{ request: { model: (file ?? emptyFile(model)).model, ...p, temperature: 0 } }} />
           {score && (
             <p className="text-sm text-slate-300">
               Score: <span className="font-mono">{score.valid ? `${score.fieldsCorrect} / 4 fields` : "invalid JSON"}</span> · correct answer{" "}
@@ -88,7 +89,7 @@ export function BuilderView({ combo, setCombo, ticketId, setTicketId, model, set
 }
 
 export function InspectorView({ combo, ticketId, setTicketId, model, setModel }: { combo: Combo; ticketId: string; setTicketId: (id: string) => void; model: ModelChoice; setModel: (m: ModelChoice) => void }) {
-  const file = useExperiment(model);
+  const { file, error, retry } = useExperiment(model);
   const rec = file ? findRecording(file, recordingKey(combo, ticketId, 0)) : undefined;
   const toks = rec?.tokens ? tokenProbs(rec.tokens) : [];
   const [sel, setSel] = useState(0);
@@ -101,7 +102,9 @@ export function InspectorView({ combo, ticketId, setTicketId, model, setModel }:
         <TicketPicker value={ticketId} onChange={setTicketId} />
       </div>
       <p className="mt-2 font-mono text-[11px] text-slate-500">combination {comboKey(combo)} (set on the builder step)</p>
-      {!file ? (
+      {error ? (
+        <LoadError retry={retry} />
+      ) : !file ? (
         <p className="mt-3 text-sm text-slate-500">Loading the recorded runs…</p>
       ) : (
         <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem]">

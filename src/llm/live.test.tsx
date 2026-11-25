@@ -34,6 +34,16 @@ describe("live Ollama mode", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("while recordings load, the panel says so instead of claiming there is no recording", () => {
+    render(
+      <OllamaProvider>
+        <GenerationPanel file={file} recording={undefined} loading />
+      </OllamaProvider>,
+    );
+    expect(screen.getByText(/Loading the recorded runs/)).toBeInTheDocument();
+    expect(screen.queryByText(/No recording for this setting/)).not.toBeInTheDocument();
+  });
+
   it("missing recording shows the no-recording note", () => {
     setup(null);
     expect(screen.getByText(/No recording for this setting/)).toBeInTheDocument();
@@ -51,6 +61,28 @@ describe("live Ollama mode", () => {
     expect(await screen.findByText("fraud")).toBeInTheDocument();
     expect(screen.getByText(/live from gemma4:12b/)).toBeInTheDocument();
     expect(spy).toHaveBeenCalledWith("http://localhost:11434/api/version", expect.anything());
+  });
+
+  it("a live answer disappears when the request changes (never shown for another setting)", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (url) =>
+      String(url).endsWith("/api/version")
+        ? new Response(JSON.stringify({ version: "0.40.18" }))
+        : new Response(JSON.stringify({ response: "fraud", done: true, total_duration: 1e8, eval_count: 1 })),
+    );
+    const view = render(
+      <OllamaProvider>
+        <GenerationPanel file={file} recording={file.items[0]} live={{ request }} />
+      </OllamaProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Connect my Ollama" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Run live" }));
+    expect(await screen.findByText(/live from gemma4:12b/)).toBeInTheDocument();
+    view.rerender(
+      <OllamaProvider>
+        <GenerationPanel file={file} recording={undefined} live={{ request: { ...request, prompt: "Classify: another ticket" } }} />
+      </OllamaProvider>,
+    );
+    expect(screen.queryByText(/live from gemma4:12b/)).not.toBeInTheDocument();
   });
 
   it("connect failure keeps recordings and explains OLLAMA_ORIGINS", async () => {

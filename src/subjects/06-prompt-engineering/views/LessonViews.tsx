@@ -6,7 +6,7 @@ import chainRec from "../data/recordings/chain.json";
 import { comboStats } from "../experiment";
 import { TASK, TICKETS, buildPrompt, recordingKey, type Combo } from "../prompts";
 import { useExperiment, type ModelChoice } from "../useExperiment";
-import { ModelPicker, StatsRow, TicketPicker } from "./shared";
+import { LoadError, ModelPicker, StatsRow, TicketPicker } from "./shared";
 
 const CHAIN = chainRec as RecordingFile;
 const ALL: Combo = { role: true, fewShot: true, cot: true, schema: true };
@@ -18,8 +18,8 @@ export function IntroView() {
       <p className="text-sm text-slate-300">“{t.text}”</p>
       <pre className="mt-2 rounded-lg bg-slate-950 p-2.5 font-mono text-xs text-emerald-200">{JSON.stringify(t.gold, null, 2)}</pre>
       <p className="mt-2 text-sm text-slate-400">
-        Four fields, {TICKETS.length} test tickets with known answers. Every prompt variant in this module was sent to gemma4:12b for every ticket, four times
-        each, and scored automatically.
+        Four fields, {TICKETS.length} test tickets with known answers. Every prompt variant in this module was sent to two models, gemma4:12b and
+        qwen2.5-coder:1.5b, for every ticket, four times each, and scored automatically.
       </p>
     </Panel>
   );
@@ -51,20 +51,21 @@ export function AnatomyView() {
 
 /** Two prompt variants side by side, with their recorded results and one ticket's answers. */
 export function CompareView({ a, b, labels, ticketId, setTicketId, model, setModel }: { a: Combo; b: Combo; labels: [string, string]; ticketId: string; setTicketId: (id: string) => void; model: ModelChoice; setModel: (m: ModelChoice) => void }) {
-  const file = useExperiment(model);
+  const { file, error, retry } = useExperiment(model);
   return (
     <Panel title={`${labels[0]} vs ${labels[1]}`} icon={<Split size={14} />}>
       <div className="grid gap-3 md:grid-cols-2">
         <ModelPicker value={model} onChange={setModel} />
         <TicketPicker value={ticketId} onChange={setTicketId} />
       </div>
+      {error && <LoadError retry={retry} />}
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         {[a, b].map((c, i) => {
           const rec = file ? findRecording(file, recordingKey(c, ticketId, 0)) : undefined;
           return (
             <section key={i} aria-label={labels[i]} className="space-y-2">
               <h4 className="text-sm font-semibold text-slate-100">{labels[i]}</h4>
-              <StatsRow s={file ? comboStats(file, c) : null} />
+              <StatsRow s={file ? comboStats(file, c) : null} tokens={rec?.promptEvalCount ?? null} model={file?.model ?? ""} />
               <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-2.5 font-mono text-[11px] text-slate-300">{rec?.output ?? "…"}</pre>
             </section>
           );

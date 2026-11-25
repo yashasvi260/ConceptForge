@@ -1,8 +1,8 @@
 import { Shapes } from "lucide-react";
 import { PART_TITLES } from "../../core/track";
+import { lazyStage } from "../../core/lazyStage";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { Stage } from "./Stage";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
@@ -23,7 +23,7 @@ const subject: SubjectModule = {
   accent: "emerald",
   steps,
   challenges,
-  Stage,
+  Stage: lazyStage(() => import("./Stage")),
 };
 
 export default subject;
