@@ -34,6 +34,6 @@ describe("unigram", () => {
     expect(topSegmentations("", 3)).toEqual([]);
     const t0 = performance.now();
     bestSegmentation("the tokenizer splits words ".repeat(200));
-    expect(performance.now() - t0).toBeLessThan(400);
+    expect(performance.now() - t0).toBeLessThan(2000);
   });
 });

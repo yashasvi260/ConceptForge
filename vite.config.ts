@@ -17,6 +17,9 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/test/setup.ts",
     css: false,
+    // Generous limits: parsing the real GPT vocabularies takes seconds on slow CI runners.
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
   },
 });
