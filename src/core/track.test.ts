@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PART_TITLES, TRACK, nextModule, trackGroups } from "./track";
+import { COURSE, PART_TITLES, TRACK, nextModule, trackGroups } from "./track";
 import { SUBJECTS } from "./registry";
 
 const CURRICULUM_IDS = [
@@ -37,5 +37,19 @@ describe("track", () => {
     const m2 = groups[0]!.modules.find((m) => m.entry.id === "02-tokens-embeddings")!;
     expect(m2.subject?.id).toBe("02-tokens-embeddings");
     expect(groups[1]!.modules.every((m) => m.subject === undefined)).toBe(true);
+  });
+});
+
+describe("course data", () => {
+  it("names the course", () => {
+    expect(COURSE.title).toBe("LLM Mastery");
+    expect(COURSE.description.length).toBeGreaterThan(20);
+  });
+
+  it("every module has 2–4 tags", () => {
+    for (const m of TRACK) {
+      expect(m.tags.length, m.id).toBeGreaterThanOrEqual(2);
+      expect(m.tags.length, m.id).toBeLessThanOrEqual(4);
+    }
   });
 });
