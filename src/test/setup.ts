@@ -6,6 +6,7 @@ import { afterEach } from "vitest";
 configure({ asyncUtilTimeout: 20_000 });
 
 afterEach(() => {
+  if (typeof window === "undefined") return; // node-environment tests (e.g. the real embedding model)
   cleanup();
   window.localStorage.clear();
   window.location.hash = "";
