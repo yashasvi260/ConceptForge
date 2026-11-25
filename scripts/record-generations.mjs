@@ -35,7 +35,7 @@ console.log(`Ollama ${ollamaVersion} at ${OLLAMA} · ${spec.model} · ${todo.len
 let current = existing;
 const save = (items) => {
   current = mergeRecordings(current, items, { model: spec.model, ollamaVersion, options: spec.options ?? {}, now: new Date().toISOString() });
-  writeFileSync(outPath, JSON.stringify(current, null, 1) + "\n");
+  writeFileSync(outPath, JSON.stringify(current) + "\n");
 };
 
 for (const [n, job] of todo.entries()) {

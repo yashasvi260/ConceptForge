@@ -1,0 +1,147 @@
+{
+ "instruction": "Extract these fields from the customer message:\n- category: one of card, transfer, fraud, account, loan\n- amount: the money amount mentioned, as a number (null if none)\n- currency: 3-letter currency code such as USD, EUR, GBP or INR (null if none)\n- urgent: true if the customer needs help right now, otherwise false\nReply in JSON with the keys category, amount, currency, urgent.",
+ "role": "You are a meticulous operations assistant at a retail bank. You extract data for downstream systems, never guess values that are not in the message, and follow the output format exactly.",
+ "cot": "First think step by step about each field, then give the final JSON on the last line.",
+ "cotSchema": "Use the reasoning field to think step by step about each field before filling in the others.",
+ "fewShot": [
+  {
+   "text": "I paid my rent of 1,200 dollars by transfer on Monday and the landlord still hasn't got it.",
+   "answer": {
+    "category": "transfer",
+    "amount": 1200,
+    "currency": "USD",
+    "urgent": false
+   }
+  },
+  {
+   "text": "URGENT: there's a 45 euro charge from a shop I've never heard of, please stop my card now!",
+   "answer": {
+    "category": "fraud",
+    "amount": 45,
+    "currency": "EUR",
+    "urgent": true
+   }
+  }
+ ],
+ "schema": {
+  "type": "object",
+  "properties": {
+   "category": {
+    "type": "string",
+    "enum": [
+     "card",
+     "transfer",
+     "fraud",
+     "account",
+     "loan"
+    ]
+   },
+   "amount": {
+    "type": [
+     "number",
+     "null"
+    ]
+   },
+   "currency": {
+    "type": [
+     "string",
+     "null"
+    ]
+   },
+   "urgent": {
+    "type": "boolean"
+   }
+  },
+  "required": [
+   "category",
+   "amount",
+   "currency",
+   "urgent"
+  ]
+ },
+ "tickets": [
+  {
+   "id": "x1",
+   "text": "Someone just took 300 pounds from my account using my card in Madrid, I'm at home in Leeds! Block it immediately.",
+   "gold": {
+    "category": "fraud",
+    "amount": 300,
+    "currency": "GBP",
+    "urgent": true
+   }
+  },
+  {
+   "id": "x2",
+   "text": "I'd like to know the interest on a 15,000 USD personal loan over three years.",
+   "gold": {
+    "category": "loan",
+    "amount": 15000,
+    "currency": "USD",
+    "urgent": false
+   }
+  },
+  {
+   "id": "x3",
+   "text": "My debit card got declined twice today at the pharmacy and I need my medicine now.",
+   "gold": {
+    "category": "card",
+    "amount": null,
+    "currency": null,
+    "urgent": true
+   }
+  },
+  {
+   "id": "x4",
+   "text": "I sent fifty euros to my sister on Friday but she says nothing arrived.",
+   "gold": {
+    "category": "transfer",
+    "amount": 50,
+    "currency": "EUR",
+    "urgent": false
+   }
+  },
+  {
+   "id": "x5",
+   "text": "Please update the email address on my account when you have a moment.",
+   "gold": {
+    "category": "account",
+    "amount": null,
+    "currency": null,
+    "urgent": false
+   }
+  },
+  {
+   "id": "x6",
+   "text": "Paid an invoice of two thousand five hundred rupees through the app, but it shows as failed. Not urgent.",
+   "gold": {
+    "category": "transfer",
+    "amount": 2500,
+    "currency": "INR",
+    "urgent": false
+   }
+  },
+  {
+   "id": "x7",
+   "text": "My mortgage payment of $1,850 bounced and the deadline is today, help!",
+   "gold": {
+    "category": "loan",
+    "amount": 1850,
+    "currency": "USD",
+    "urgent": true
+   }
+  },
+  {
+   "id": "x8",
+   "text": "Can I raise my card's contactless limit to 100 GBP?",
+   "gold": {
+    "category": "card",
+    "amount": 100,
+    "currency": "GBP",
+    "urgent": false
+   }
+  }
+ ],
+ "chain": {
+  "step2": "You are a friendly bank support agent. Using the extracted data below, write a two-sentence reply to the customer: acknowledge the issue and say what happens next. Do not invent details.\n\nCustomer message: {ticket}\nExtracted data: {json}\n\nReply:"
+ }
+}

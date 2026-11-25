@@ -31,6 +31,11 @@ describe("record-generations", () => {
     });
   });
 
+  it("rounds log-probabilities to 4 decimals to keep fixtures small", () => {
+    const r = toRecordedGeneration({ key: "k", prompt: "p" }, { ...RESPONSE, logprobs: [{ token: "a", logprob: -0.123456789, top_logprobs: [{ token: "a", logprob: -0.123456789 }] }] });
+    expect(r.tokens).toEqual([{ token: "a", logprob: -0.1235, top: [{ token: "a", logprob: -0.1235 }] }]);
+  });
+
   it("builds the request with think off, num_ctx 32768 and logprobs when asked", () => {
     const body = buildGenerateBody("gemma4:12b", { key: "k", prompt: "p", temperature: 0.8, logprobs: true, format: { type: "object" } });
     expect(body).toEqual({

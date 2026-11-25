@@ -17,11 +17,14 @@ export function buildGenerateBody(model, job) {
   };
 }
 
+const r4 = (x) => Math.round(x * 1e4) / 1e4;
+
 export function toRecordedGeneration(job, response) {
+  // Log-probabilities rounded to 4 decimals: plenty for display, and it keeps big fixtures small.
   const tokens = response.logprobs?.map((l) => ({
     token: l.token,
-    logprob: l.logprob,
-    top: (l.top_logprobs ?? []).map((t) => ({ token: t.token, logprob: t.logprob })),
+    logprob: r4(l.logprob),
+    top: (l.top_logprobs ?? []).map((t) => ({ token: t.token, logprob: r4(t.logprob) })),
   }));
   const toolCalls = response.message?.tool_calls?.map((t) => ({ name: t.function.name, arguments: t.function.arguments }));
   return {
