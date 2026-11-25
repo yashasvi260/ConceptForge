@@ -25,6 +25,74 @@ export interface LessonStep {
   section?: string;
   /** Formula or metric shown in a monospace callout (e.g. "softmax(QKᵀ/√d)·V"). */
   callout?: string;
+  /** Six-section deep lesson; when present the player renders a scrolling lesson page. */
+  deep?: DeepLesson;
+}
+
+export type WorkedBlock =
+  | { kind: "text"; text: string }
+  | { kind: "math"; text: string }
+  /** `source` is a worked/*.py script whose printed JSON equals `rows` (checked in tests). */
+  | { kind: "table"; caption: string; columns: string[]; rows: (string | number)[][]; source: string };
+
+export interface Formula {
+  expr: string;
+  symbols: { sym: string; meaning: string }[];
+  example: string;
+}
+
+export interface ConceptPart {
+  heading: string;
+  paragraphs: string[];
+  formula?: Formula;
+  mistake?: string;
+}
+
+export interface ExercisePart {
+  id: string;
+  prompt: string;
+  starter: string;
+  solution: string;
+  /** Python defining `check_*(ns)` functions. */
+  checks: string;
+  hints: string[];
+}
+
+export interface Exercise {
+  id: string;
+  title: string;
+  packages: "numpy"[];
+  /** Key into the subject's precomputed data, injected into Python as `DATA`. */
+  data?: string;
+  parts: ExercisePart[];
+}
+
+export interface LocalListing {
+  id: string;
+  title: string;
+  install: string;
+  code: string;
+  /** Captured from a real run (scripts/capture-local-outputs.mjs). */
+  output: string;
+}
+
+export interface SourceLink {
+  label: string;
+  url: string;
+  adds: string;
+}
+
+export interface DeepLesson {
+  why: string[];
+  worked: WorkedBlock[];
+  concept: ConceptPart[];
+  /** "Predict → change it → explain" task shown above the interactive view. */
+  guided: string;
+  build: Exercise;
+  local: LocalListing[];
+  checks: ChallengeItem[];
+  oneSentence: string;
+  deeper: SourceLink[];
 }
 
 /** Props every subject Stage receives from the lesson player. */
