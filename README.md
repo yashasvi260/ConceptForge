@@ -40,8 +40,13 @@ npm run preview        # serve the production build
 (e.g. `scripts/docker-npm.sh npm run test`), and `docker compose up` starts the dev server.
 
 **Keyboard:** `←` / `→` step through a lesson, `Space` toggles Auto-Play (7 s per step).
-Progress (last step, visited steps, best challenge score) is stored in `localStorage`, and the URL hash
-(`#/03-transformer-internals/4`, `#/02-tokens-embeddings/challenge`) deep-links to any step; old `#/tokenization/...` links redirect to Module 02.
+The home page (`#/`) is the course overview: how much of the syllabus is complete, a Resume button, and every
+Part and module with its status. A module counts as complete when every step has been viewed and its
+practice check attempted. The ☰ button opens the syllabus from anywhere; each module ends with an
+"Up next in syllabus" card.
+Progress (last step, visited steps, best practice score) is stored in `localStorage`, and the URL hash
+(`#/03-transformer-internals/4`, `#/02-tokens-embeddings/quiz`) deep-links to any step; old `#/tokenization/...`
+and `…/challenge` links still work.
 
 ## Deployment
 
@@ -59,9 +64,10 @@ src/
     types.ts          SubjectModule, LessonStep, StageProps, ChallengeItem
     registry.ts       the list of subjects + validateSubject()
     storage.ts        localStorage progress (guarded, sanitised)
-    route.ts          URL hash ⇄ subject/step/mode
+    route.ts          URL hash ⇄ course page / subject/step/mode
+    courseProgress.ts module status, course completion, resume target
     useKeyboardShortcuts.ts
-  components/         TopNav, StepControls, SplitWorkspace, ChallengeRunner, ui primitives
+  components/         AppHeader, CourseOverview, SyllabusDrawer, UpNextCard, StepControls, SplitWorkspace, ChallengeRunner, ui
   subjects/
     _template/        starter copied by the create-subject script
     01-intro-llms/ … one folder per built module: logic (+ tests), views/, steps.ts, challenges.ts

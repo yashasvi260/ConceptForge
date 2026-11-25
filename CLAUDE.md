@@ -17,7 +17,7 @@ Never hardcode a single subject into the layout, navigation, step scrubber, or q
 3. **Pluggable Interactive Stage (`renderStage`):** Renders a custom interactive simulator/diagram for that subject and responds to the current step, user parameter tweaks, and scenario/failure modes.
 4. **Practice / Challenge Set (`ChallengeItem[]`):** Scenario-based checks or parameter-tuning tasks tied to the subject's concepts.
 
-> **As implemented** (`src/core/types.ts`): metadata uses `accent` (not `accentColor`); steps use `summary`, `body` (the narrative), `tryIt`, optional `keyTakeaway`, and `view` (which visual the Stage draws) instead of `stepNumber`/`activeStageIds`/`controlsState`; the stage is a `Stage` component (`Stage.tsx`), not a `renderStage` function; challenges have an optional `hint`. Components live flat in `src/components/`.
+> **As implemented** (`src/core/types.ts`): metadata uses `accent` (not `accentColor`); steps use `summary`, `body` (the narrative), `tryIt`, optional `keyTakeaway`, and `view` (which visual the Stage draws) instead of `stepNumber`/`activeStageIds`/`controlsState`; the stage is a `Stage` component (`Stage.tsx`), not a `renderStage` function; challenges have an optional `hint`. Components live flat in `src/components/`. The shell (see `docs/superpowers/specs/2026-11-25-course-shell-design.md`): `#/` is the course overview (`CourseOverview`: completion, Resume, Parts and module cards), the player has `AppHeader` (breadcrumbs, Guided Steps / Practice Check tabs), a `SyllabusDrawer` instead of a dropdown, and an `UpNextCard`; completion maths live in `src/core/courseProgress.ts` (a module is complete when every step is viewed and its practice check attempted).
 
 ## Recommended Directory Structure
 ```text
@@ -28,7 +28,7 @@ src/
 │   └── storage.ts               # LocalStorage progress tracking (completed steps, quiz scores, custom notes)
 ├── components/
 │   ├── shell/
-│   │   ├── TopNav.tsx           # Subject switcher dropdown/modal, mode tabs (Learn | Sandbox | Practice), progress bar
+│   │   ├── AppHeader.tsx        # Breadcrumbs, Guided Steps | Practice Check tabs, Mastered x/14 (+ SyllabusDrawer, CourseOverview, UpNextCard)
 │   │   ├── StepControls.tsx     # Prev/Next step, Auto-Play toggle, speed selector, keyboard shortcuts (← / → / Space)
 │   │   └── SplitWorkspace.tsx   # Responsive desktop split-pane (left: step story & controls; right: live interactive stage)
 │   └── practice/
