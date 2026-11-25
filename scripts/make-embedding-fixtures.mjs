@@ -14,8 +14,9 @@ const SENTENCES = [
   "This is a positive review.", "This is a negative review.", "This movie was fantastic, I loved every minute!",
   "The bank approved the loan", "The river bank flooded", "I deposited cash at the bank", "We had a picnic on the river bank",
   "How do I reset my password?", "I forgot my login details", "What's the weather like tomorrow?", "Our quarterly revenue grew by 12%",
+  "I can't sign in to my account",
 ];
-const TOKEN_TEXTS = ["The bank approved the loan", "The river bank flooded", "I deposited cash at the bank", "We had a picnic on the river bank"];
+const TOKEN_TEXTS = ["The bank approved the loan", "The river bank flooded", "I deposited cash at the bank", "We had a picnic on the river bank", "bank"];
 
 const round = (v) => v.map((x) => Math.round(x * 1e6) / 1e6);
 const sentences = {};

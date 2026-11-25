@@ -14,6 +14,10 @@ const TERMS: [string, string][] = [
   ["Special token", "A reserved control token (`<|endoftext|>`, `[CLS]`, `<|eot_id|>`) that isn't ordinary text."],
   ["Chat template", "The recipe that turns a list of chat messages into one token stream with special tokens."],
   ["Context window", "The most tokens a model can handle at once, prompt plus answer."],
+  ["Embedding table", "A learned table with one vector per token ID; lookup = take row `token_id` (MiniLM: 30,522 × 384)."],
+  ["Contextual embedding", "A token's vector after the transformer layers, which depends on the surrounding words."],
+  ["Mean pooling", "Averaging token vectors into one sentence vector (MiniLM then normalises it to length 1)."],
+  ["Cosine similarity", "How closely two vectors point the same way: ≈1 similar, ≈0 unrelated."],
 ];
 
 const ALGORITHMS: { name: string; builds: string; tokenizes: string; unknown: string; usedBy: string }[] = [
@@ -51,6 +55,7 @@ const READING: [string, string][] = [
   ["OpenAI cookbook: How to count tokens with tiktoken", "https://developers.openai.com/cookbook/examples/how_to_count_tokens_with_tiktoken"],
   ["openai/tiktoken", "https://github.com/openai/tiktoken"],
   ["SolidGoldMagikarp (plus, prompt generation)", "https://www.lesswrong.com/posts/aPeJE8bSo6rAFoLqg"],
+  ["all-MiniLM-L6-v2 model card (the embedding model used here)", "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"],
 ];
 
 export function CheatSheetView() {

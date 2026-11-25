@@ -5,7 +5,9 @@ import { steps } from "./steps";
 
 const VIEW_ORDER = [
   "intro", "chop", "vocab", "bpe-train", "bpe-encode", "bytes", "wordpiece",
-  "unigram", "special", "playground", "languages", "quirks", "practice", "cheatsheet",
+  "unigram", "special", "playground", "languages", "quirks", "practice",
+  "lookup", "static-contextual", "bank-shift", "sentence-emb", "similarity", "search-preview",
+  "cheatsheet",
 ];
 
 function renderStep(view: string) {
@@ -14,8 +16,11 @@ function renderStep(view: string) {
 }
 
 describe("lesson steps", () => {
-  it("has the 14 planned steps in order, each with try-it and takeaway", () => {
+  it("has the planned steps in order (Tokens, then Embeddings, then the cheat sheet), each with try-it and takeaway", () => {
     expect(steps.map((s) => s.view)).toEqual(VIEW_ORDER);
+    expect(steps.slice(0, 13).every((s) => s.section === "Tokens")).toBe(true);
+    expect(steps.slice(13, 19).every((s) => s.section === "Embeddings")).toBe(true);
+    expect(steps.at(-1)!.section).toBe("Summary");
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();
       expect(s.keyTakeaway, s.id).toBeTruthy();
@@ -212,5 +217,48 @@ describe("step 14: cheat sheet", () => {
     const links = within(reading).getAllByRole("link");
     expect(links.length).toBeGreaterThanOrEqual(6);
     for (const a of links) expect(a.getAttribute("href")).toMatch(/^https:\/\//);
+  });
+});
+
+describe("playground presets", () => {
+  it("offers English, Code, Numbers and Multilingual presets", () => {
+    renderStep("playground");
+    for (const p of ["English", "Code", "Numbers", "Multilingual"]) {
+      fireEvent.click(screen.getByRole("button", { name: p }));
+      expect((screen.getByRole("textbox", { name: "Your text" }) as HTMLTextAreaElement).value.length).toBeGreaterThan(5);
+    }
+  });
+});
+
+describe("embeddings section", () => {
+  it("lookup table maps a real token id to a row of the table", async () => {
+    renderStep("lookup");
+    const row = await screen.findByTestId("lookup-ids");
+    await waitFor(() => expect(row).toHaveTextContent(/\d{3,5}/));
+    expect(screen.getByText(/30,522 rows × 384 numbers/)).toBeInTheDocument();
+  });
+
+  it("bank shift shows a real similarity, and explains when 'bank' is missing", async () => {
+    renderStep("bank-shift");
+    const stat = await screen.findByTestId("bank-sim");
+    await waitFor(() => expect(stat).toHaveTextContent("0.83"));
+    act(() => fireEvent.change(screen.getByRole("textbox", { name: "Sentence B" }), { target: { value: "The river flooded" } }));
+    expect(await screen.findByText(/type the word bank in both sentences/i)).toBeInTheDocument();
+    act(() => fireEvent.change(screen.getByRole("textbox", { name: "Sentence B" }), { target: { value: "The bank by the bank" } }));
+    expect(await screen.findByText(/first “bank”/)).toBeInTheDocument();
+  });
+
+  it("similarity matrix is n × n and caps at 8 sentences", async () => {
+    renderStep("similarity");
+    const box = screen.getByRole("textbox", { name: "Sentences" });
+    act(() => fireEvent.change(box, { target: { value: Array.from({ length: 9 }, (_, i) => `sentence ${i}`).join("\n") } }));
+    expect(await screen.findByText(/first 8 sentences/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByTestId("sim-cell")).toHaveLength(64));
+  });
+
+  it("semantic search ranks the password question first for a login query", async () => {
+    renderStep("search-preview");
+    const first = await screen.findByTestId("rank-1");
+    await waitFor(() => expect(first).toHaveTextContent("How do I reset my password?"));
   });
 });

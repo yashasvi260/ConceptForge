@@ -6,6 +6,7 @@ import { BpeEncodeView } from "./views/BpeEncodeView";
 import { BpeTrainView } from "./views/BpeTrainView";
 import { BytesView } from "./views/BytesView";
 import { CheatSheetView } from "./views/CheatSheetView";
+import { BankShiftView, LookupView, SearchPreviewView, SentenceEmbeddingsView, SimilarityView, StaticContextualView } from "./views/embeddingViews";
 import { ChopView } from "./views/ChopView";
 import { IntroView } from "./views/IntroView";
 import { LanguagesView } from "./views/LanguagesView";
@@ -53,6 +54,18 @@ export function Stage({ step }: StageProps) {
         return <QuirksView />;
       case "practice":
         return <PracticeView />;
+      case "lookup":
+        return <LookupView />;
+      case "static-contextual":
+        return <StaticContextualView />;
+      case "bank-shift":
+        return <BankShiftView />;
+      case "sentence-emb":
+        return <SentenceEmbeddingsView />;
+      case "similarity":
+        return <SimilarityView />;
+      case "search-preview":
+        return <SearchPreviewView />;
       case "cheatsheet":
         return <CheatSheetView />;
       default:

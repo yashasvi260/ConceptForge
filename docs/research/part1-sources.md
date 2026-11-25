@@ -18,6 +18,8 @@ Checked 2026-11-25 against the papers' own text (abstracts on arxiv.org, full te
 | Claim | Source |
 |---|---|
 | all-MiniLM-L6-v2 maps text to a 384-dimensional dense vector; mean pooling (usage code); input longer than 256 word pieces is truncated; intended as a sentence and short-paragraph encoder; Apache-2.0. | https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 |
+| MiniLM config: 6 layers, 12 heads, hidden size 384, 512 positions, vocab_size 30,522; its WordPiece vocabulary is BERT's (`bank` = 2924, `##ffa` = 20961 in both). | public/models/Xenova/all-MiniLM-L6-v2/config.json, tokenizer.json (checked) |
+| Measured (MiniLM): `bank` vectors loan↔river 0.826, river↔river 0.902, loan↔deposited 0.806; search "I can't sign in to my account" ranks password 0.561, login 0.513, others ≤ 0.18. | computed with the model (node) |
 | Browser copy: `Xenova/all-MiniLM-L6-v2`, `onnx/model_quantized.onnx` = 22,972,370 bytes, Apache-2.0. | Hugging Face API / file headers |
 
 ## Transformer internals (Module 03)

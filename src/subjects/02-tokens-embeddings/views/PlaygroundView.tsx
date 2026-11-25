@@ -40,6 +40,13 @@ function Column({ name, text, showIds }: { name: EncodingName; text: string; sho
   );
 }
 
+const PRESETS: { label: string; text: string }[] = [
+  { label: "English", text: "Tokenizers split everyday English into surprisingly few pieces." },
+  { label: "Code", text: "def mean(xs):\n    return sum(xs) / len(xs)  # average of a list" },
+  { label: "Numbers", text: "Order 1234567 costs $1,299.99 on 2026-11-25 (3.14159 × 2.71828)" },
+  { label: "Multilingual", text: "Hello · Hola · नमस्ते · こんにちは · 你好 · مرحبا · Привет" },
+];
+
 export function PlaygroundView() {
   const [text, setText] = useState(DEFAULT_TEXT);
   const [showIds, setShowIds] = useState(false);
@@ -58,6 +65,18 @@ export function PlaygroundView() {
           </button>
         }
       >
+        <div className="mb-3 flex flex-wrap gap-2">
+          {PRESETS.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => setText(p.text)}
+              className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:border-sky-500/60 hover:text-sky-100"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
         <TextBox label="Your text" value={text} onChange={setText} rows={5} maxLength={50_000} />
         <p className="mt-2 text-xs text-slate-500">
           Runs locally in your browser with OpenAI's open-source vocabularies. Nothing is sent anywhere. ␣ = space, ↵ = newline.
