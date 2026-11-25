@@ -111,6 +111,15 @@ describe("App shell: course overview", () => {
     expect(await screen.findByText(counter(2))).toBeInTheDocument();
   });
 
+  it("starts in the cream theme and the header switch toggles dark", async () => {
+    render(<App />);
+    expect(document.documentElement.dataset.theme).toBe("cream");
+    await userEvent.click(screen.getByRole("button", { name: "Switch to dark theme" }));
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    await userEvent.click(screen.getByRole("button", { name: "Switch to cream theme" }));
+    expect(document.documentElement.dataset.theme).toBe("cream");
+  });
+
   it("a deleted subject in the hash shows the course overview", () => {
     window.location.hash = "#/transformers/3";
     window.localStorage.setItem(LAST_SUBJECT_KEY, "transformers");
