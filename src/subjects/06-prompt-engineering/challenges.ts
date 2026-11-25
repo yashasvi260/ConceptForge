@@ -1,0 +1,58 @@
+import type { ChallengeItem } from "../../core/types";
+
+export const challenges: ChallengeItem[] = [
+  {
+    id: "few-shot",
+    prompt: "What is few-shot prompting?",
+    options: ["Training the model on a few examples", "Putting a few solved examples in the prompt so the model copies the pattern", "Asking the same question a few times", "Using a smaller model"],
+    correctIndex: 1,
+    hint: "Nothing about the weights changes.",
+    explanation: "The examples live in the prompt (in-context learning); the model's weights never change.",
+    relatedStepId: "few-shot",
+  },
+  {
+    id: "measure",
+    prompt: "A colleague says “adding a role made the answers better” after trying it on one ticket. What should you do?",
+    options: ["Trust it", "Run both prompts on a labelled test set, several samples each, and compare scores", "Make the role longer", "Switch models"],
+    correctIndex: 1,
+    hint: "One good-looking answer proves little.",
+    explanation: "Prompt changes must be measured on many inputs (and several samples at temperature > 0) to tell real gains from luck.",
+    relatedStepId: "builder",
+  },
+  {
+    id: "schema",
+    prompt: "What does passing a JSON schema as Ollama's `format` actually do?",
+    options: ["It asks politely for JSON", "It constrains decoding so only tokens that keep the output valid against the schema can be chosen", "It validates the answer afterwards", "It translates the answer to JSON"],
+    correctIndex: 1,
+    hint: "It acts while the tokens are being chosen.",
+    explanation: "Structured outputs restrict the next-token choices to those that fit the schema, so the result always parses.",
+    relatedStepId: "structured",
+  },
+  {
+    id: "cot-cost",
+    prompt: "Chain-of-thought prompting usually costs more. Why?",
+    options: ["It uses a bigger model", "The model writes its reasoning first, so it generates many more tokens", "It needs a GPU", "It disables caching"],
+    correctIndex: 1,
+    hint: "Count the output tokens.",
+    explanation: "Each reasoning token is a forward pass (Module 03), so latency and cost grow with the length of the reasoning.",
+    relatedStepId: "cot",
+  },
+  {
+    id: "logprob-hesitation",
+    prompt: "In the probability inspector, the amount token has only 55% probability. What does that suggest?",
+    options: ["The answer is definitely wrong", "The model was unsure at that point; worth checking or routing to review", "The tokenizer failed", "Temperature was too high"],
+    correctIndex: 1,
+    hint: "Low probability = the model saw strong alternatives.",
+    explanation: "A low-probability token marks hesitation. It doesn't prove an error, but it's a cheap signal for human review.",
+    relatedStepId: "inspector",
+  },
+  {
+    id: "chaining",
+    prompt: "Why split “extract the fields, then write a reply” into two prompts?",
+    options: ["It's always cheaper", "Each step is simpler, can be checked on its own, and the structured output of step 1 feeds step 2", "Models can't write replies", "To avoid tokens"],
+    correctIndex: 1,
+    hint: "Think about debugging and reuse.",
+    explanation: "Chains break a task into testable steps; step 1's JSON can also go to other systems.",
+    relatedStepId: "chain",
+  },
+];
