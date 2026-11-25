@@ -49,6 +49,23 @@ describe("SyllabusDrawer", () => {
     expect(screen.getByRole("button", { name: /^04\. Text Classification/ })).toBeDisabled();
   });
 
+  it("Tab and Shift+Tab stay inside the dialog", async () => {
+    render(
+      <>
+        <button type="button">outside</button>
+        <SyllabusDrawer {...props} />
+      </>,
+    );
+    const dialog = screen.getByRole("dialog");
+    const last = screen.getByRole("button", { name: "← Course overview" });
+    last.focus();
+    await userEvent.tab();
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    expect(screen.getByRole("button", { name: "Close syllabus" })).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    expect(last).toHaveFocus();
+  });
+
   it("has a way back to the course overview", async () => {
     const onHome = vi.fn();
     render(<SyllabusDrawer {...props} onHome={onHome} />);

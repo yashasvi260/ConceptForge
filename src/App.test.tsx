@@ -83,6 +83,34 @@ describe("App shell: course overview", () => {
     }
   });
 
+  it("opening a module adds one history entry; stepping inside it adds none", async () => {
+    render(<App />);
+    const before = window.history.length;
+    await userEvent.click(screen.getByRole("button", { name: "Start Module 01 →" }));
+    expect(window.history.length).toBe(before + 1);
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    expect(await screen.findByText(counter(3))).toBeInTheDocument();
+    expect(window.history.length).toBe(before + 1);
+  });
+
+  it("closing the syllabus returns focus to the syllabus button", async () => {
+    openFirst();
+    render(<App />);
+    await userEvent.click(screen.getByRole("button", { name: "Open syllabus" }));
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open syllabus" })).toHaveFocus();
+  });
+
+  it("arrow keys still step after clicking a mode tab", async () => {
+    openFirst();
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: "Guided Steps" }));
+    await userEvent.keyboard("{ArrowRight}");
+    expect(await screen.findByText(counter(2))).toBeInTheDocument();
+  });
+
   it("a deleted subject in the hash shows the course overview", () => {
     window.location.hash = "#/transformers/3";
     window.localStorage.setItem(LAST_SUBJECT_KEY, "transformers");

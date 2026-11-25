@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { moduleStatus } from "../core/courseProgress";
 import type { ProgressMap } from "../core/storage";
 import { COURSE, trackGroups } from "../core/track";
@@ -18,21 +18,51 @@ interface SyllabusDrawerProps {
 
 /** Side panel with every Part and module, so the learner can jump anywhere in the syllabus. */
 export function SyllabusDrawer({ open, subjects, progress, activeId, onClose, onOpenModule, onHome }: SyllabusDrawerProps) {
+  const panelRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
+    const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // Give focus back to whatever opened the drawer (the ☰ button) when it closes.
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    panelRef.current?.querySelector<HTMLElement>('[aria-label="Close syllabus"]')?.focus();
+    return () => {
+      if (opener?.isConnected) opener.focus();
+    };
+  }, [open]);
+
   if (!open) return null;
+
+  /** Keep Tab / Shift+Tab inside the dialog while it is open. */
+  const trapTab = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key !== "Tab" || !panelRef.current) return;
+    const focusable = [...panelRef.current.querySelectorAll<HTMLElement>("button:not([disabled])")];
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (!first || !last) return;
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
 
   return (
     <>
       <div data-testid="drawer-backdrop" onClick={onClose} className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm" />
       <aside
+        ref={panelRef}
+        onKeyDown={trapTab}
         role="dialog"
         aria-modal="true"
         aria-label="Course syllabus"
@@ -47,7 +77,6 @@ export function SyllabusDrawer({ open, subjects, progress, activeId, onClose, on
             type="button"
             onClick={onClose}
             aria-label="Close syllabus"
-            autoFocus
             className="rounded-lg bg-slate-800 p-1.5 text-slate-300 hover:bg-slate-700"
           >
             <X size={15} />

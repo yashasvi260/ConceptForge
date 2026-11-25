@@ -72,6 +72,8 @@ export function AppHeader({ crumb, tabs, mastered, onHome, onOpenSyllabus }: App
                     type="button"
                     role="tab"
                     aria-selected={selected}
+                    // Keep focus where it was, so ← → and Space keep working after a click.
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => tabs.onModeChange(value)}
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition ${
                       selected ? "bg-slate-800 font-semibold text-white" : "font-medium text-slate-400 hover:text-slate-200"
