@@ -31,3 +31,18 @@ Every number shown in these modules is computed by the site's own code, recorded
 - **Generative**: gemma4:12b via Ollama 0.40.18, temperature 0, `think: false`, recorded 2026-11-25 with
   `logprobs`/`top_logprobs: 5`; 20/20 correct. Latency is what the recording took on the owner's local GPU.
   Token counts (`prompt_eval_count` + `eval_count`) are gemma4's own.
+
+## Module 05 · clustering and topics
+
+- **Comments**: 78 short bank-customer comments written for this lesson (6 themes × 12–13, plus 5 off-topic).
+- **UMAP**: McInnes, Healy & Melville 2018 (https://arxiv.org/abs/1802.03426), via `umap-js` 1.4.0 (MIT,
+  https://github.com/PAIR-code/umap-js) with a seeded random source. Defaults chosen by measurement:
+  n_neighbors 12, min_dist 0.1, seed 42. The default layout is precomputed (data/default-layout.json) so the
+  browser shows exactly the clustering the topic names were recorded for.
+- **HDBSCAN**: Campello, Moulavi & Sander 2013 (https://doi.org/10.1007/978-3-642-37456-2_14); our
+  implementation follows scikit-learn's (https://scikit-learn.org/stable/modules/generated/sklearn.cluster.HDBSCAN.html)
+  and is compared with scikit-learn 1.5.2 on a fixed dataset (identical noise; at most one point on a tied
+  boundary differs). GLOSH outlier scores: Campello et al. 2015 (https://doi.org/10.1145/2733381).
+- **c-TF-IDF**: Grootendorst 2022, BERTopic (https://arxiv.org/abs/2203.05794), eq. tf(t,c) · log(1 + A / f(t)).
+- **Default result**: 6 clusters matching the 6 themes + 4 outliers; topic names recorded from gemma4:12b
+  (temperature 0, 2026-11-25).

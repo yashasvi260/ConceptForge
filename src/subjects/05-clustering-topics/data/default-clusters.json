@@ -1,0 +1,150 @@
+{
+ "groups": [
+  {
+   "key": "topic:mo01,mo02,mo04,mo05,mo06,mo07,mo08,mo09,mo10,mo11,mo12",
+   "ids": [
+    "mo01",
+    "mo02",
+    "mo04",
+    "mo05",
+    "mo06",
+    "mo07",
+    "mo08",
+    "mo09",
+    "mo10",
+    "mo11",
+    "mo12"
+   ],
+   "keywords": [
+    "mortgage",
+    "three",
+    "rates",
+    "payment",
+    "adviser"
+   ]
+  },
+  {
+   "key": "topic:ap01,ap02,ap03,ap04,ap05,ap06,ap07,ap08,ap09,ap10,ap11,ap12,ap13,ot02,se07",
+   "ids": [
+    "ap01",
+    "ap02",
+    "ap03",
+    "ap04",
+    "ap05",
+    "ap06",
+    "ap07",
+    "ap08",
+    "ap09",
+    "ap10",
+    "ap11",
+    "ap12",
+    "ap13",
+    "se07",
+    "ot02"
+   ],
+   "keywords": [
+    "app",
+    "balance",
+    "arrive",
+    "morning",
+    "new"
+   ]
+  },
+  {
+   "key": "topic:fe01,fe02,fe03,fe04,fe05,fe06,fe07,fe08,fe09,fe10,fe11,fe12,mo03,ot01,se12,tr03,tr05,tr10,tr11",
+   "ids": [
+    "fe01",
+    "fe02",
+    "fe03",
+    "fe04",
+    "fe05",
+    "fe06",
+    "fe07",
+    "fe08",
+    "fe09",
+    "fe10",
+    "fe11",
+    "fe12",
+    "mo03",
+    "se12",
+    "tr03",
+    "tr05",
+    "tr10",
+    "tr11",
+    "ot01"
+   ],
+   "keywords": [
+    "fee",
+    "fees",
+    "account",
+    "rate",
+    "travel"
+   ]
+  },
+  {
+   "key": "topic:se01,se02,se03,se04,se05,se06,se09,se10,se11",
+   "ids": [
+    "se01",
+    "se02",
+    "se03",
+    "se04",
+    "se05",
+    "se06",
+    "se09",
+    "se10",
+    "se11"
+   ],
+   "keywords": [
+    "fraud",
+    "asked",
+    "bank",
+    "payment",
+    "alert"
+   ]
+  },
+  {
+   "key": "topic:se08,tr01,tr02,tr04,tr07,tr08,tr09",
+   "ids": [
+    "se08",
+    "tr01",
+    "tr02",
+    "tr04",
+    "tr07",
+    "tr08",
+    "tr09"
+   ],
+   "keywords": [
+    "card",
+    "worked",
+    "abroad",
+    "before",
+    "cloned"
+   ]
+  },
+  {
+   "key": "topic:br01,br03,br04,br05,br06,br07,br08,br09,br10,br11,br12,ot03,ot05",
+   "ids": [
+    "br01",
+    "br03",
+    "br04",
+    "br05",
+    "br06",
+    "br07",
+    "br08",
+    "br09",
+    "br10",
+    "br11",
+    "br12",
+    "ot03",
+    "ot05"
+   ],
+   "keywords": [
+    "branch",
+    "out",
+    "accessible",
+    "advisor",
+    "answer"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1 @@
+{ "template": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: {keywords}.\n\nComments:\n{comments}\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only." }

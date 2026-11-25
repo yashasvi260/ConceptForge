@@ -1,0 +1,58 @@
+{
+ "model": "gemma4:12b",
+ "ollamaVersion": "0.40.18",
+ "recordedAt": "2026-11-25T21:31:21.897Z",
+ "options": {
+  "temperature": 0
+ },
+ "items": [
+  {
+   "key": "topic:mo01,mo02,mo04,mo05,mo06,mo07,mo08,mo09,mo10,mo11,mo12",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: mortgage, three, rates, payment, adviser.\n\nComments:\n- The mortgage application process took three months, way too long.\n- My mortgage adviser explained the fixed and variable rates clearly.\n- Why did my mortgage payment increase without notice?\n- The mortgage valuation came in lower than the agreed price.\n- I want to overpay my mortgage but the app won't let me.\n- Your mortgage rates are not competitive anymore.\n- First time buyer here, the mortgage team was really patient.\n- The mortgage documents asked for the same payslips three times.\n- Can I port my mortgage when I move house next year?\n- Mortgage offer expired while waiting for your underwriters.\n- Thanks for the payment holiday on my mortgage during illness.\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "Mortgage Services and Rates",
+   "durationMs": 283,
+   "evalCount": 6,
+   "promptEvalCount": 221
+  },
+  {
+   "key": "topic:ap01,ap02,ap03,ap04,ap05,ap06,ap07,ap08,ap09,ap10,ap11,ap12,ap13,ot02,se07",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: app, balance, arrive, morning, new.\n\nComments:\n- The mobile app crashes every time I open the payments screen.\n- Since the last update the app won't let me log in with my fingerprint.\n- The app is so slow to load my balance in the morning.\n- I love the new app design, transfers take two taps now.\n- App notifications arrive hours after the payment happened.\n- The banking app keeps asking me to update even after I updated.\n- Face ID login stopped working in the app this week.\n- The app shows the wrong balance until I refresh twice.\n- Dark mode in the app makes the numbers hard to read.\n- I can't find where to download statements in the new app.\n- The app froze while I was paying a bill and charged me twice.\n- Please add a widget so I can see my balance without opening the app.\n- The app logs me out every few minutes, very annoying.\n- Two-factor codes arrive too late to log in.\n- My cat knocked a glass off the table this morning.\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "Mobile App Issues",
+   "durationMs": 152,
+   "evalCount": 4,
+   "promptEvalCount": 294
+  },
+  {
+   "key": "topic:fe01,fe02,fe03,fe04,fe05,fe06,fe07,fe08,fe09,fe10,fe11,fe12,mo03,ot01,se12,tr03,tr05,tr10,tr11",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: fee, fees, account, rate, travel.\n\nComments:\n- Why am I paying a monthly fee on a basic account?\n- I was charged an overdraft fee for being one dollar short.\n- The fee for using another bank's ATM is far too high.\n- Foreign transaction fees on my card are higher than other banks.\n- You charged me a late fee even though I paid on time.\n- Hidden fees on wire transfers make your bank expensive.\n- I want the account maintenance fee refunded.\n- Paper statement fee is ridiculous in this day and age.\n- Why did the fee for international transfers go up again?\n- Please explain the fee schedule, it is confusing.\n- Got hit with a returned payment fee I never knew about.\n- Fees on my savings account eat all the interest I earn.\n- Remortgaging with you was smooth and the rate is good.\n- Please add stronger protection against account takeover.\n- Exchange rates on my travel card are better than airport kiosks.\n- Withdrawing euros cost me a fortune in fees and bad rates.\n- Travel money order arrived on time and the rate was fair.\n- Holiday spending in dollars showed a different rate than promised.\n- What is the capital of Australia?\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "Banking Fees and Rates",
+   "durationMs": 186,
+   "evalCount": 5,
+   "promptEvalCount": 328
+  },
+  {
+   "key": "topic:se01,se02,se03,se04,se05,se06,se09,se10,se11",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: fraud, asked, bank, payment, alert.\n\nComments:\n- Someone tried to log into my account from another country.\n- I received a scam text pretending to be from your bank.\n- Your fraud team blocked my card while I was on holiday.\n- Great job catching that fraudulent payment so quickly.\n- A caller claiming to be bank security asked for my PIN.\n- I got a phishing email with your logo asking for my password.\n- The fraud alert asked me to confirm a payment I made, good system.\n- How do I report a suspicious transaction on my statement?\n- Scammers spoofed your phone number to call me.\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "Fraud and Security Alerts",
+   "durationMs": 137,
+   "evalCount": 5,
+   "promptEvalCount": 200
+  },
+  {
+   "key": "topic:se08,tr01,tr02,tr04,tr07,tr08,tr09",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: card, worked, abroad, before, cloned.\n\nComments:\n- My card was cloned and used at petrol stations.\n- My card worked perfectly everywhere in Japan, thank you.\n- The card was declined at a hotel in Spain with no warning.\n- Do I need to tell you before travelling abroad with my card?\n- My card stopped working in the USA after the first day.\n- Contactless worked on the London underground with my card.\n- I couldn't use my card in Morocco, which countries are blocked?\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "International Card Usage",
+   "durationMs": 118,
+   "evalCount": 4,
+   "promptEvalCount": 175
+  },
+  {
+   "key": "topic:br01,br03,br04,br05,br06,br07,br08,br09,br10,br11,br12,ot03,ot05",
+   "prompt": "These customer comments to a bank were grouped together by a clustering algorithm.\nTheir most distinctive words (c-TF-IDF) are: branch, out, accessible, advisor, answer.\n\nComments:\n- The staff at the downtown branch were friendly and quick.\n- My local branch is closing, where am I supposed to go now?\n- Branch opening hours are too short for people who work.\n- The branch advisor helped me sort out my documents in minutes.\n- Only one teller was working at the branch on Saturday.\n- The branch ran out of cash at the counter, unbelievable.\n- Great service from the manager at the high street branch.\n- The branch was dirty and the card machine was broken.\n- Booking a branch appointment online was easy and fast.\n- Nobody at the branch could answer my question about my account.\n- The branch is not wheelchair accessible, please fix the ramp.\n- Recommend a good pizza place near the station.\n- How do I bake sourdough bread at home?\n\nGive this group a short topic name of 2 to 4 words. Answer with the name only.",
+   "output": "Branch Experience and Accessibility",
+   "durationMs": 146,
+   "evalCount": 5,
+   "promptEvalCount": 247
+  }
+ ]
+}
