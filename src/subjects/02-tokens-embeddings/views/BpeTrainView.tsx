@@ -84,7 +84,7 @@ export function BpeTrainView({ corpus, setCorpus }: { corpus: string; setCorpus:
                 value={p.count}
                 max={maxCount}
                 display={String(p.count)}
-                color={i === 0 ? "#38bdf8" : "#475569"}
+                color={i === 0 ? "var(--color-sky-400)" : "var(--color-slate-600)"}
               />
             ))}
             {current.pairCounts.length === 0 && <p className="text-sm text-slate-500">No adjacent pairs left.</p>}

@@ -27,7 +27,7 @@ export function AttentionArcs({ tokens, weights, focus, onFocus, causal }: { tok
             key={`${focus}-${j}`}
             d={`M ${x(focus)} ${baseY - 22} Q ${(x(focus) + x(j)) / 2} ${baseY - 22 - h} ${x(j)} ${baseY - 22}`}
             fill="none"
-            stroke="#34d399"
+            style={{ stroke: "var(--color-emerald-400)" }}
             strokeLinecap="round"
             strokeWidth={1 + 9 * w}
             initial={{ pathLength: 0, opacity: 0 }}
@@ -41,11 +41,11 @@ export function AttentionArcs({ tokens, weights, focus, onFocus, causal }: { tok
         const isFocus = j === focus;
         return (
           <g key={j} transform={`translate(${x(j)}, ${baseY})`} className="cursor-pointer" onClick={() => onFocus(j)} onMouseEnter={() => onFocus(j)} role="button" aria-label={`Focus token ${t}`}>
-            <rect x={-gap / 2 + 4} y={-20} width={gap - 8} height={30} rx={7} fill={isFocus ? "#10b981" : masked ? "#0f172a" : heat((weights[j] ?? 0) * 0.9)} stroke={isFocus ? "#6ee7b7" : "#1e293b"} strokeDasharray={masked ? "3 3" : undefined} />
-            <text y={0} textAnchor="middle" fontSize={13} fill={isFocus ? "#022c22" : masked ? "#475569" : "#e2e8f0"} className="font-mono">
+            <rect x={-gap / 2 + 4} y={-20} width={gap - 8} height={30} rx={7} style={{ fill: isFocus ? "var(--color-emerald-500)" : masked ? "var(--color-slate-900)" : heat((weights[j] ?? 0) * 0.9), stroke: isFocus ? "var(--color-emerald-300)" : "var(--color-slate-800)" }} strokeDasharray={masked ? "3 3" : undefined} />
+            <text y={0} textAnchor="middle" fontSize={13} style={{ fill: isFocus ? "var(--color-slate-950)" : masked ? "var(--color-slate-600)" : "var(--color-slate-200)" }} className="font-mono">
               {t.length > 8 ? `${t.slice(0, 7)}…` : t}
             </text>
-            <text y={28} textAnchor="middle" fontSize={10} fill="#64748b" className="font-mono">
+            <text y={28} textAnchor="middle" fontSize={10} style={{ fill: "var(--color-slate-500)" }} className="font-mono">
               {masked ? "masked" : isFocus ? "query" : `${((weights[j] ?? 0) * 100).toFixed(0)}%`}
             </text>
           </g>
@@ -84,7 +84,7 @@ export function Heatmap({ tokens, matrix, focus, compact = false }: { tokens: st
                   data-p={p}
                   title={`${tokens[i]} → ${tokens[j]}: ${(p * 100).toFixed(1)}%`}
                   className={`${cell} rounded-sm`}
-                  style={{ backgroundColor: p === 0 ? "#0b1220" : heat(p) }}
+                  style={{ backgroundColor: p === 0 ? "var(--color-slate-900)" : heat(p) }}
                 />
               ))}
             </tr>
@@ -103,13 +103,13 @@ export function Curves({ fns }: { fns: { name: string; color: string; f: (x: num
   const sy = (y: number) => H - ((y + 1) / 5) * H;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full max-w-md" role="img" aria-label="Activation functions">
-      <line x1={0} x2={W} y1={sy(0)} y2={sy(0)} stroke="#334155" />
-      <line x1={sx(0)} x2={sx(0)} y1={0} y2={H} stroke="#334155" />
+      <line x1={0} x2={W} y1={sy(0)} y2={sy(0)} style={{ stroke: "var(--color-slate-700)" }} />
+      <line x1={sx(0)} x2={sx(0)} y1={0} y2={H} style={{ stroke: "var(--color-slate-700)" }} />
       {fns.map((fn) => (
         <polyline
           key={fn.name}
           fill="none"
-          stroke={fn.color}
+          style={{ stroke: fn.color }}
           strokeWidth={2}
           points={Array.from({ length: 81 }, (_, i) => {
             const x = -4 + i * 0.1;

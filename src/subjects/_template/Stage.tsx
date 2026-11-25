@@ -8,7 +8,7 @@ export function Stage({ step }: StageProps) {
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_280px]">
       <Panel title={step.view === "intro" ? "Visual" : "Deeper visual"}>
-        <Bar label="intensity" value={scaled(intensity)} display={`${intensity}%`} color="#a78bfa" />
+        <Bar label="intensity" value={scaled(intensity)} display={`${intensity}%`} color="var(--color-violet-400)" />
       </Panel>
       <Panel title="Controls">
         <Slider label="Intensity" value={intensity} min={0} max={100} onChange={setIntensity} format={(v) => `${v}%`} />

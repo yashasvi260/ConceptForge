@@ -7,6 +7,43 @@
 
 :root {
   color-scheme: dark;
+  --page-bg: #020617;
+  --page-fg: #e2e8f0;
+  --stage-bg: #070b14;
+  --grid-line: rgba(51, 65, 85, 0.16);
+}
+
+/*
+ * Cream theme: Tailwind 4 builds every colour class from these variables, so remapping the palette here
+ * re-themes the whole app. Slate is inverted (950 = page, 50 = darkest ink) on warm paper tones, and the
+ * light accent shades used for text on dark panels become their deep shades so they stay readable.
+ */
+:root[data-theme="cream"] {
+  color-scheme: light;
+  --page-bg: #f7f2e7;
+  --page-fg: #2b251d;
+  --stage-bg: #fbf8f1;
+  --grid-line: rgba(120, 100, 70, 0.09);
+
+  --color-white: #1f1a14;
+  --color-slate-950: #f7f2e7;
+  --color-slate-900: #fdfaf3;
+  --color-slate-800: #e7dece;
+  --color-slate-700: #d4c8b3;
+  --color-slate-600: #a99c86;
+  --color-slate-500: #857762;
+  --color-slate-400: #675b4a;
+  --color-slate-300: #4e4437;
+  --color-slate-200: #3b3329;
+  --color-slate-100: #2c261e;
+  --color-slate-50: #1f1a14;
+
+  --color-cyan-100: #164e63; --color-cyan-200: #155e75; --color-cyan-300: #0e7490; --color-cyan-400: #0e7490; --color-cyan-500: #0e7490; --color-cyan-600: #155e75;
+  --color-sky-100: #0c4a6e; --color-sky-200: #075985; --color-sky-300: #0369a1; --color-sky-400: #0369a1; --color-sky-500: #0284c7; --color-sky-600: #0369a1;
+  --color-emerald-100: #064e3b; --color-emerald-200: #065f46; --color-emerald-300: #047857; --color-emerald-400: #047857; --color-emerald-500: #059669; --color-emerald-600: #047857;
+  --color-violet-100: #4c1d95; --color-violet-200: #5b21b6; --color-violet-300: #6d28d9; --color-violet-400: #6d28d9; --color-violet-500: #7c3aed; --color-violet-600: #6d28d9;
+  --color-amber-100: #78350f; --color-amber-200: #92400e; --color-amber-300: #b45309; --color-amber-400: #b45309; --color-amber-500: #d97706; --color-amber-600: #b45309;
+  --color-rose-100: #881337; --color-rose-200: #9f1239; --color-rose-300: #be123c; --color-rose-400: #be123c; --color-rose-500: #e11d48; --color-rose-600: #be123c;
 }
 
 html,
@@ -17,21 +54,21 @@ body,
 
 body {
   margin: 0;
-  background: #020617;
-  color: #e2e8f0;
+  background: var(--page-bg);
+  color: var(--page-fg);
   -webkit-font-smoothing: antialiased;
 }
 
 input[type="range"] {
-  accent-color: #22d3ee;
+  accent-color: var(--color-cyan-500);
 }
 
 /* Engineering grid behind the interactive stage. */
 .stage-grid {
-  background-color: #070b14;
+  background-color: var(--stage-bg);
   background-image:
-    linear-gradient(to right, rgba(51, 65, 85, 0.16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(51, 65, 85, 0.16) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 

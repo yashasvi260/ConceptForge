@@ -166,9 +166,9 @@ export function FfnView() {
       <Panel title="Activation functions">
         <Curves
           fns={[
-            { name: "ReLU", color: "#94a3b8", f: relu },
-            { name: "GELU", color: "#34d399", f: gelu },
-            { name: "SiLU / Swish", color: "#fbbf24", f: silu },
+            { name: "ReLU", color: "var(--color-slate-400)", f: relu },
+            { name: "GELU", color: "var(--color-emerald-400)", f: gelu },
+            { name: "SiLU / Swish", color: "var(--color-amber-400)", f: silu },
           ]}
         />
         <div className="mt-2 flex gap-4 text-xs">
@@ -252,7 +252,7 @@ export function SamplingView() {
       </div>
       <div className="mt-4 space-y-1.5" data-testid="sampling-bars">
         {r.map((c) => (
-          <Bar key={c.token} label={JSON.stringify(c.token)} value={c.finalProb} display={c.kept ? `${(c.finalProb * 100).toFixed(1)}%` : "cut"} dim={!c.kept} color="#34d399" />
+          <Bar key={c.token} label={JSON.stringify(c.token)} value={c.finalProb} display={c.kept ? `${(c.finalProb * 100).toFixed(1)}%` : "cut"} dim={!c.kept} color="var(--color-emerald-400)" />
         ))}
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -292,8 +292,8 @@ export function KvCacheView() {
         <Stat label="Cache memory" value={formatBytes(c.cacheBytes)} tone={on ? "warn" : "neutral"} />
       </div>
       <div className="mt-4 space-y-2">
-        <Bar label="compute OFF" value={off.attentionDots} max={off.attentionDots} display={formatCount(off.attentionDots)} color="#fb7185" />
-        <Bar label="compute ON" value={onC.attentionDots} max={off.attentionDots} display={formatCount(onC.attentionDots)} color="#34d399" />
+        <Bar label="compute OFF" value={off.attentionDots} max={off.attentionDots} display={formatCount(off.attentionDots)} color="var(--color-rose-400)" />
+        <Bar label="compute ON" value={onC.attentionDots} max={off.attentionDots} display={formatCount(onC.attentionDots)} color="var(--color-emerald-400)" />
       </div>
     </Panel>
   );

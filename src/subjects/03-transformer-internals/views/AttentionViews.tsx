@@ -45,7 +45,7 @@ export function QkvView({ s }: { s: AttentionState }) {
         <div className="mt-4 space-y-1.5">
           {s.tokens.map((t, j) => (
             <button key={j} type="button" onClick={() => s.setFocus(j)} className="block w-full text-left">
-              <Bar label={`${j}: ${t}`} value={weights[j] ?? 0} display={Number.isFinite(raw[j]!) ? `${((weights[j] ?? 0) * 100).toFixed(1)}%` : "masked"} dim={!Number.isFinite(raw[j]!)} color="#34d399" />
+              <Bar label={`${j}: ${t}`} value={weights[j] ?? 0} display={Number.isFinite(raw[j]!) ? `${((weights[j] ?? 0) * 100).toFixed(1)}%` : "masked"} dim={!Number.isFinite(raw[j]!)} color="var(--color-emerald-400)" />
             </button>
           ))}
         </div>

@@ -1,4 +1,5 @@
-import { BookOpen, Menu, Trophy } from "lucide-react";
+import { BookOpen, Menu, Moon, Sun, Trophy } from "lucide-react";
+import type { Theme } from "../core/theme";
 import type { PlayerMode } from "../core/types";
 import { COURSE } from "../core/track";
 import { num2 } from "./CourseOverview";
@@ -12,9 +13,11 @@ interface AppHeaderProps {
   mastered: { completed: number; total: number } | null;
   onHome: () => void;
   onOpenSyllabus: () => void;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
-export function AppHeader({ crumb, tabs, mastered, onHome, onOpenSyllabus }: AppHeaderProps) {
+export function AppHeader({ crumb, tabs, mastered, onHome, onOpenSyllabus, theme, onToggleTheme }: AppHeaderProps) {
   return (
     <header className="z-30 border-b border-slate-800/90 bg-slate-900/80 backdrop-blur-md lg:sticky lg:top-0">
       <div className="mx-auto flex min-h-16 max-w-[1500px] flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
@@ -92,6 +95,16 @@ export function AppHeader({ crumb, tabs, mastered, onHome, onOpenSyllabus }: App
               })}
             </div>
           )}
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            onMouseDown={(e) => e.preventDefault()}
+            aria-label={theme === "cream" ? "Switch to dark theme" : "Switch to cream theme"}
+            title={theme === "cream" ? "Dark theme" : "Cream theme"}
+            className="rounded-xl border border-slate-700 bg-slate-800/90 p-2 text-slate-200 transition hover:bg-slate-700"
+          >
+            {theme === "cream" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
           {mastered && (
             <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 font-mono text-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />

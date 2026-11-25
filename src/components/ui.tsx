@@ -197,7 +197,7 @@ export function Bar({
   label,
   value,
   max = 1,
-  color = "#38bdf8",
+  color = "var(--color-sky-400)",
   display,
   dim = false,
 }: {

@@ -23,6 +23,7 @@ import {
 import { trackEntry, type TrackEntry } from "./core/track";
 import type { PlayerMode } from "./core/types";
 import { useKeyboardShortcuts } from "./core/useKeyboardShortcuts";
+import { applyTheme, loadTheme, type Theme } from "./core/theme";
 
 export const AUTOPLAY_MS = 7000;
 
@@ -65,6 +66,8 @@ export default function App() {
   const [comingSoon, setComingSoon] = useState<TrackEntry | null>(() => unbuiltFromHash(window.location.hash));
   const [autoPlay, setAutoPlay] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => loadTheme());
+  useEffect(() => applyTheme(theme), [theme]);
   const isBuilt = useCallback((id: string) => getSubject(id) !== undefined, []);
   // Latest location for the hashchange handler, which is registered once.
   const locRef = useRef(loc);
@@ -218,6 +221,8 @@ export default function App() {
         tabs={inPlayer ? { mode: loc.mode, badge: quizBadge(subject, progress), onModeChange: setMode } : null}
         mastered={loc.view === "course" && !comingSoon ? { completed: summary.completed, total: summary.total } : null}
         onHome={goHome}
+        theme={theme}
+        onToggleTheme={() => setTheme((t) => (t === "cream" ? "dark" : "cream"))}
         onOpenSyllabus={() => {
           setAutoPlay(false);
           setDrawerOpen(true);
