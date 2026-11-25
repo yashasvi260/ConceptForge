@@ -1,0 +1,49 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import type { StageProps } from "../../core/types";
+import { ArchView } from "./views/ArchView";
+import { BowView } from "./views/BowView";
+import { ContextView } from "./views/ContextView";
+import { DenseView } from "./views/DenseView";
+import { EncDecView } from "./views/EncDecView";
+import { MapView } from "./views/MapView";
+import { RecapView } from "./views/RecapView";
+import { RepGenView } from "./views/RepGenView";
+import { TrainingView } from "./views/TrainingView";
+
+export const DEFAULT_SENTENCES = ["The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog"].join("\n");
+
+export function Stage({ step }: StageProps) {
+  const [sentences, setSentences] = useState(DEFAULT_SENTENCES);
+  const view = (() => {
+    switch (step.view) {
+      case "map":
+        return <MapView />;
+      case "bow":
+        return <BowView text={sentences} setText={setSentences} />;
+      case "dense":
+        return <DenseView text={sentences} setText={setSentences} />;
+      case "context":
+        return <ContextView />;
+      case "arch":
+        return <ArchView />;
+      case "encdec":
+        return <EncDecView />;
+      case "repgen":
+        return <RepGenView />;
+      case "training":
+        return <TrainingView />;
+      case "recap":
+        return <RecapView />;
+      default:
+        return null;
+    }
+  })();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div key={step.view} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="min-w-0 space-y-4">
+        {view}
+      </motion.div>
+    </AnimatePresence>
+  );
+}

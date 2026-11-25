@@ -1,16 +1,19 @@
 import tokensEmbeddings from "../subjects/02-tokens-embeddings";
+import s01IntroLlms from "../subjects/01-intro-llms";
 // @register-import — add new subject imports above this line
 import type { SubjectModule } from "./types";
 
 /**
- * Every subject the platform ships. Order here is the order in the subject switcher.
- * To add one: `node scripts/create-subject.mjs <id> "<Title>"`, then import it above
- * and append it to this array.
+ * Every module the platform ships. To add one: `node scripts/create-subject.mjs <id> "<Title>" --register`.
  */
-export const SUBJECTS: readonly SubjectModule[] = [
+const REGISTERED: SubjectModule[] = [
   tokensEmbeddings,
+  s01IntroLlms,
   // @register-subject — add new subjects above this line
 ];
+
+/** Registered modules in curriculum order (by module number). */
+export const SUBJECTS: readonly SubjectModule[] = [...REGISTERED].sort((a, b) => a.moduleNumber - b.moduleNumber);
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

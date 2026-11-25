@@ -4,6 +4,11 @@ import { SUBJECTS, getSubject, groupByCategory, validateSubject } from "./regist
 import { TRACK } from "./track";
 
 describe("registry", () => {
+  it("orders subjects by module number", () => {
+    const numbers = SUBJECTS.map((s) => s.moduleNumber);
+    expect(numbers).toEqual([...numbers].sort((a, b) => a - b));
+  });
+
   it("registers at least one subject, with unique ids", () => {
     expect(SUBJECTS.length).toBeGreaterThanOrEqual(1);
     expect(new Set(SUBJECTS.map((s) => s.id)).size).toBe(SUBJECTS.length);
