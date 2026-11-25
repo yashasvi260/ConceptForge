@@ -9,6 +9,26 @@ env.allowRemoteModels = false;
 env.localModelPath = `${process.cwd()}/public/models/`;
 const pipe = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", { dtype: "q8" });
 
+// Dataset mode: real MiniLM vectors for every row of a JSON dataset, in order (4-decimal rounding).
+//   node scripts/make-embedding-fixtures.mjs --dataset path.json [--field text] [--array items] --out path.json
+const argv = process.argv.slice(2);
+const opt = (name) => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : undefined; };
+if (opt("dataset")) {
+  const { readFileSync } = await import("node:fs");
+  const raw = JSON.parse(readFileSync(opt("dataset"), "utf8"));
+  const rows = opt("array") ? raw[opt("array")] : raw;
+  const field = opt("field") ?? "text";
+  const texts = rows.map((r) => r[field]);
+  const out = [];
+  for (let i = 0; i < texts.length; i += 16) {
+    const batch = (await pipe(texts.slice(i, i + 16), { pooling: "mean", normalize: true })).tolist();
+    out.push(...batch.map((v) => v.map((x) => Math.round(x * 1e4) / 1e4)));
+  }
+  writeFileSync(opt("out"), JSON.stringify({ model: "Xenova/all-MiniLM-L6-v2 q8", vectors: out }));
+  console.log(`wrote ${out.length} vectors to ${opt("out")}`);
+  process.exit(0);
+}
+
 const SENTENCES = [
   "The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog",
   "This is a positive review.", "This is a negative review.", "This movie was fantastic, I loved every minute!",
