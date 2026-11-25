@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import type { StageProps } from "../../core/types";
+import { AnatomyView } from "./views/AnatomyView";
 import { ArchView } from "./views/ArchView";
 import { BowView } from "./views/BowView";
 import { ContextView } from "./views/ContextView";
@@ -9,7 +10,9 @@ import { EncDecView } from "./views/EncDecView";
 import { MapView } from "./views/MapView";
 import { RecapView } from "./views/RecapView";
 import { RepGenView } from "./views/RepGenView";
+import { ScaleView } from "./views/ScaleView";
 import { TrainingView } from "./views/TrainingView";
+import { TrainUseView } from "./views/TrainUseView";
 
 export const DEFAULT_SENTENCES = ["The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog"].join("\n");
 
@@ -19,6 +22,12 @@ export function Stage({ step }: StageProps) {
     switch (step.view) {
       case "map":
         return <MapView />;
+      case "anatomy":
+        return <AnatomyView />;
+      case "scale":
+        return <ScaleView />;
+      case "trainuse":
+        return <TrainUseView />;
       case "bow":
         return <BowView text={sentences} setText={setSentences} />;
       case "dense":

@@ -2,6 +2,24 @@ import type { ChallengeItem } from "../../core/types";
 
 export const challenges: ChallengeItem[] = [
   {
+    id: "where-params",
+    prompt: "In Llama 3 8B, where do most of the 8 billion parameters live?",
+    options: ["In the tokenizer's vocabulary list", "In the stacked transformer layers (attention and feed-forward)", "In the context window", "In the output probabilities"],
+    correctIndex: 1,
+    hint: "Look at the parameter breakdown bars.",
+    explanation: "About 87% are in the 32 transformer layers; the embedding table and output head hold the rest. The tokenizer and context window have no learned weights.",
+    relatedStepId: "how-large",
+  },
+  {
+    id: "train-vs-infer",
+    prompt: "You chat with a model and it answers. What happens to its weights during your conversation?",
+    options: ["They are updated after every message", "Nothing: inference reads the frozen weights; only training changes them", "They are deleted and reloaded", "They grow as the conversation gets longer"],
+    correctIndex: 1,
+    hint: "Which phase writes the weights?",
+    explanation: "Training sets the weights once; inference only runs forward passes through them. (Memory of the chat lives in the context window, not the weights.)",
+    relatedStepId: "train-vs-use",
+  },
+  {
     id: "loop",
     prompt: "In one sentence, what does a generative LLM do with your prompt?",
     options: [

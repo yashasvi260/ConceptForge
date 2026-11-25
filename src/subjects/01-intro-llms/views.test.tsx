@@ -10,21 +10,46 @@ const renderStep = (view: string) => {
 };
 
 describe("Module 01 content", () => {
-  it("is a complete module: 9 steps, ≥ 4 hinted challenges, a bridge to Module 02", () => {
+  it("is a complete module: 12 steps, ≥ 6 hinted challenges, a bridge to Module 02", () => {
     expect(subject.moduleNumber).toBe(1);
-    expect(steps).toHaveLength(9);
-    expect(steps.map((s) => s.view)).toEqual(["map", "bow", "dense", "context", "arch", "encdec", "repgen", "training", "recap"]);
+    expect(steps).toHaveLength(12);
+    expect(steps.map((s) => s.view)).toEqual(["map", "anatomy", "scale", "trainuse", "bow", "dense", "context", "arch", "encdec", "repgen", "training", "recap"]);
+    expect(steps.slice(1, 4).map((s) => s.id)).toEqual(["anatomy", "how-large", "train-vs-use"]);
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();
       expect(s.keyTakeaway, s.id).toBeTruthy();
     }
-    expect(subject.challenges.length).toBeGreaterThanOrEqual(4);
+    expect(subject.challenges.length).toBeGreaterThanOrEqual(6);
     expect(subject.challenges.every((c) => c.hint && c.relatedStepId)).toBe(true);
     expect(subject.bridge.leadsTo).toMatch(/Module 02/);
   });
 });
 
 describe("Module 01 views", () => {
+  it("anatomy parts are clickable and each names the module that covers it", () => {
+    renderStep("anatomy");
+    const parts = screen.getAllByRole("button", { name: /^Part: / });
+    expect(parts.length).toBeGreaterThanOrEqual(5);
+    fireEvent.click(screen.getByRole("button", { name: /^Part: Embedding table/ }));
+    expect(screen.getByRole("region", { name: "Selected part" })).toHaveTextContent(/Module 02/);
+    fireEvent.click(screen.getByRole("button", { name: /^Part: Transformer blocks/ }));
+    expect(screen.getByRole("region", { name: "Selected part" })).toHaveTextContent(/Module 03/);
+  });
+
+  it("scale view switches configs and shows the parameter breakdown", () => {
+    renderStep("scale");
+    expect(screen.getByText("124,439,808")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Llama 3 8B/ }));
+    expect(screen.getByText("8,030,261,248")).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Configuration" })).toHaveTextContent("14,336");
+  });
+
+  it("training vs using contrasts the two phases", () => {
+    renderStep("trainuse");
+    expect(screen.getByRole("region", { name: "Training" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Using (inference)" })).toBeInTheDocument();
+  });
+
   it("map shows all four parts of the track", () => {
     renderStep("map");
     for (const part of ["Part I", "Part II", "Part III", "Part IV"]) expect(screen.getAllByText(new RegExp(part)).length).toBeGreaterThan(0);
