@@ -1,0 +1,387 @@
+{
+ "labels": [
+  {
+   "id": "card",
+   "description": "a problem or question about a debit or credit card"
+  },
+  {
+   "id": "transfer",
+   "description": "sending or receiving money, payments and wire transfers"
+  },
+  {
+   "id": "fraud",
+   "description": "suspicious activity, scams or payments the customer did not make"
+  },
+  {
+   "id": "account",
+   "description": "managing the bank account, login, personal details and statements"
+  },
+  {
+   "id": "loan",
+   "description": "borrowing money: loans, mortgages, interest and repayments"
+  }
+ ],
+ "promptTemplate": "You are a bank's support triage assistant. Classify the customer message into exactly one category: card, transfer, fraud, account, loan.\nAnswer with the category word only, in lowercase.\n\nMessage: {ticket}\nCategory:",
+ "tickets": [
+  {
+   "id": "ca01",
+   "text": "My debit card was declined at the supermarket even though I have money in my account.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca02",
+   "text": "The chip on my credit card stopped working, can you send a new one?",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca03",
+   "text": "I left my card in an ATM and now it is gone. Please block it.",
+   "label": "card",
+   "split": "test"
+  },
+  {
+   "id": "ca04",
+   "text": "How do I activate the new card that arrived today?",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca05",
+   "text": "Contactless payments keep failing with my card at the bus gate.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca06",
+   "text": "My card expires next month, when will the replacement arrive?",
+   "label": "card",
+   "split": "test"
+  },
+  {
+   "id": "ca07",
+   "text": "I want to raise the daily spending limit on my card.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca08",
+   "text": "The PIN for my new card never arrived in the post.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca09",
+   "text": "My card got bent and the terminal can't read it anymore.",
+   "label": "card",
+   "split": "test"
+  },
+  {
+   "id": "ca10",
+   "text": "Can I add my card to Apple Pay? It keeps showing an error.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca11",
+   "text": "The ATM swallowed my card and the branch is closed.",
+   "label": "card",
+   "split": "train"
+  },
+  {
+   "id": "ca12",
+   "text": "I need a card that works abroad without extra fees.",
+   "label": "card",
+   "split": "test"
+  },
+  {
+   "id": "tr01",
+   "text": "I sent money to my landlord yesterday and it still hasn't arrived.",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr02",
+   "text": "How long does an international wire to India take?",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr03",
+   "text": "I typed the wrong account number on a transfer, can it be reversed?",
+   "label": "transfer",
+   "split": "test"
+  },
+  {
+   "id": "tr04",
+   "text": "What is the cutoff time for same-day transfers?",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr05",
+   "text": "My standing order to my savings account did not run this month.",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr06",
+   "text": "Why was a fee charged on my SEPA transfer?",
+   "label": "transfer",
+   "split": "test"
+  },
+  {
+   "id": "tr07",
+   "text": "The recipient says the payment shows as pending for three days.",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr08",
+   "text": "Can I schedule a recurring payment for my rent on the 1st?",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr09",
+   "text": "I need the SWIFT code to receive a transfer from Germany.",
+   "label": "transfer",
+   "split": "test"
+  },
+  {
+   "id": "tr10",
+   "text": "A transfer I made was returned to my account without explanation.",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr11",
+   "text": "Is there a limit on how much I can send through the app in one day?",
+   "label": "transfer",
+   "split": "train"
+  },
+  {
+   "id": "tr12",
+   "text": "How do I cancel a payment I set up for next week?",
+   "label": "transfer",
+   "split": "test"
+  },
+  {
+   "id": "fr01",
+   "text": "There are three payments on my statement that I never made.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr02",
+   "text": "Someone called pretending to be the bank and asked for my code.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr03",
+   "text": "I got a text with a link saying my account is locked. Is it real?",
+   "label": "fraud",
+   "split": "test"
+  },
+  {
+   "id": "fr04",
+   "text": "My card was used in another country while I was at home.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr05",
+   "text": "I think someone has logged into my online banking without me.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr06",
+   "text": "A merchant charged me twice and I don't recognise the company.",
+   "label": "fraud",
+   "split": "test"
+  },
+  {
+   "id": "fr07",
+   "text": "I gave my details to a fake website, what should I do now?",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr08",
+   "text": "Unknown direct debit taken from my account this morning.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr09",
+   "text": "An email asked me to confirm my password for a security check.",
+   "label": "fraud",
+   "split": "test"
+  },
+  {
+   "id": "fr10",
+   "text": "Small test charges of 1 dollar appeared from a shop I never visited.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr11",
+   "text": "My elderly father was talked into sending money to a scammer.",
+   "label": "fraud",
+   "split": "train"
+  },
+  {
+   "id": "fr12",
+   "text": "Someone opened a credit line in my name using my documents.",
+   "label": "fraud",
+   "split": "test"
+  },
+  {
+   "id": "ac01",
+   "text": "How do I change the address on my account?",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac02",
+   "text": "I forgot my online banking password and can't log in.",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac03",
+   "text": "Can I open a joint account with my partner online?",
+   "label": "account",
+   "split": "test"
+  },
+  {
+   "id": "ac04",
+   "text": "Please send me a statement for the last six months.",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac05",
+   "text": "I want to close my savings account and move the money.",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac06",
+   "text": "How do I update my phone number for security codes?",
+   "label": "account",
+   "split": "test"
+  },
+  {
+   "id": "ac07",
+   "text": "What documents do I need to open a business account?",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac08",
+   "text": "The app logs me out every time I open it.",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac09",
+   "text": "I changed my name after getting married, how do I update it?",
+   "label": "account",
+   "split": "test"
+  },
+  {
+   "id": "ac10",
+   "text": "Why is there a monthly maintenance fee on my current account?",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac11",
+   "text": "How can I get an overdraft added to my account?",
+   "label": "account",
+   "split": "train"
+  },
+  {
+   "id": "ac12",
+   "text": "I need a letter confirming my account details for my employer.",
+   "label": "account",
+   "split": "test"
+  },
+  {
+   "id": "lo01",
+   "text": "What interest rate would I get on a personal loan of 10,000?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo02",
+   "text": "Can I pay off my car loan early without a penalty?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo03",
+   "text": "I missed a mortgage payment, what happens now?",
+   "label": "loan",
+   "split": "test"
+  },
+  {
+   "id": "lo04",
+   "text": "How long does a loan application decision take?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo05",
+   "text": "I want to borrow more on my existing mortgage for a new kitchen.",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo06",
+   "text": "My loan repayment went up this month, why?",
+   "label": "loan",
+   "split": "test"
+  },
+  {
+   "id": "lo07",
+   "text": "Can I get a payment holiday on my personal loan?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo08",
+   "text": "What credit score do I need for a home loan?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo09",
+   "text": "I would like to consolidate my credit card debts into one loan.",
+   "label": "loan",
+   "split": "test"
+  },
+  {
+   "id": "lo10",
+   "text": "Is the student loan repayment taken from my salary automatically?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo11",
+   "text": "My mortgage fixed rate ends soon, what are my options?",
+   "label": "loan",
+   "split": "train"
+  },
+  {
+   "id": "lo12",
+   "text": "Do you offer loans for buying a used car?",
+   "label": "loan",
+   "split": "test"
+  }
+ ]
+}
