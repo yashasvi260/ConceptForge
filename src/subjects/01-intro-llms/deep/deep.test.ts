@@ -83,6 +83,29 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
   });
 });
 
+const LOCAL_SRC = import.meta.glob("./local/*.py", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+const CAPTURED = import.meta.glob("./local-outputs.json", { import: "default", eager: true }) as Record<string, Record<string, { code: string; output: string; packages: Record<string, string> }>>;
+
+describe("run-it-locally listings", () => {
+  const captured = CAPTURED["./local-outputs.json"] ?? {};
+  const listings = steps.flatMap((s) => (s.deep?.local ?? []).map((l) => [s.id, l] as const));
+
+  it("the four planned listings are attached", () => {
+    expect(listings.map(([, l]) => l.id).sort()).toEqual(["context", "dense", "encdec", "repgen"]);
+  });
+
+  it.each(listings.map(([sid, l]) => [`${sid}/${l.id}`, l] as const))("%s shows code that was actually run, with its real output", (_k, l) => {
+    const cap = captured[l.id];
+    expect(cap, `no captured run for ${l.id}: run scripts/capture-local-outputs.mjs`).toBeDefined();
+    expect(LOCAL_SRC[`./local/${l.id}.py`]).toBe(cap!.code);
+    expect(l.code).toBe(cap!.code);
+    expect(l.output).toBe(cap!.output);
+    expect(l.output.trim().length).toBeGreaterThan(0);
+    const named = l.install.replace(/^pip install /, "").split(" ").map((t) => t.split("==") as [string, string]);
+    for (const [pkg, v] of named) expect(v, `${pkg} pin`).toBe(cap!.packages[pkg]);
+  });
+});
+
 describe("Module 01 coverage", () => {
   it("every step is a deep lesson, and each exercise id is unique", () => {
     expect(DEEP_STEPS).toEqual(steps.map((s) => s.id));

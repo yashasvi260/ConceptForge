@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const context: DeepLesson = {
   why: [
@@ -124,7 +124,7 @@ export const context: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("context", "transformers: static vs contextual “bank”", ["torch", "transformers"])],
   checks: [
     {
       id: "cx-static",

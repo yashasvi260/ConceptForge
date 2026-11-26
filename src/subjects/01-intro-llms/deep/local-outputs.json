@@ -1,0 +1,50 @@
+{
+  "dense": {
+    "code": "# Dense sentence embeddings with the same model this page uses (full precision here).\nfrom sentence_transformers import SentenceTransformer\n\nmodel = SentenceTransformer(\"sentence-transformers/all-MiniLM-L6-v2\")\nsentences = [\"The film was great\", \"The movie was excellent\", \"Interest rates rose today\", \"Dog bites man\", \"Man bites dog\"]\n\nemb = model.encode(sentences, normalize_embeddings=True)   # one 384-number vector per sentence, length 1\nprint(\"shape:\", emb.shape)\n\nsims = emb @ emb.T                                          # cosine similarity of every pair\nfor s, row in zip(sentences, sims):\n    print(f\"{s:<26}\", \" \".join(f\"{x:5.2f}\" for x in row))\n",
+    "output": "shape: (5, 384)\nThe film was great          1.00  0.92  0.00  0.14  0.04\nThe movie was excellent     0.92  1.00 -0.01  0.13  0.05\nInterest rates rose today   0.00 -0.01  1.00  0.06  0.04\nDog bites man               0.14  0.13  0.06  1.00  0.91\nMan bites dog               0.04  0.05  0.04  0.91  1.00",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3"
+    }
+  },
+  "context": {
+    "code": "# Static vs contextual vectors for \"bank\", straight from the model's layers.\nimport torch\nfrom transformers import AutoModel, AutoTokenizer\n\nname = \"sentence-transformers/all-MiniLM-L6-v2\"\ntok, model = AutoTokenizer.from_pretrained(name), AutoModel.from_pretrained(name)\nsentences = [\"I deposited cash at the bank\", \"The river bank flooded\", \"We had a picnic on the river bank\"]\n\ndef bank_vectors(text):\n    enc = tok(text, return_tensors=\"pt\")\n    i = enc.input_ids[0].tolist().index(tok.convert_tokens_to_ids(\"bank\"))\n    with torch.no_grad():\n        out = model(**enc)\n    static = model.embeddings.word_embeddings.weight[enc.input_ids[0, i]]   # the lookup-table row\n    return static, out.last_hidden_state[0, i]                              # after all 6 blocks\n\nvecs = [bank_vectors(s) for s in sentences]\ncos = torch.nn.functional.cosine_similarity\nfor a in range(3):\n    for b in range(a + 1, 3):\n        s, c = cos(vecs[a][0], vecs[b][0], dim=0), cos(vecs[a][1], vecs[b][1], dim=0)\n        print(f\"{sentences[a]!r} vs {sentences[b]!r}\\n    static {s:.3f}   contextual {c:.3f}\")\n",
+    "output": "'I deposited cash at the bank' vs 'The river bank flooded'\n    static 1.000   contextual 0.758\n'I deposited cash at the bank' vs 'We had a picnic on the river bank'\n    static 1.000   contextual 0.772\n'The river bank flooded' vs 'We had a picnic on the river bank'\n    static 1.000   contextual 0.914",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3"
+    }
+  },
+  "encdec": {
+    "code": "# An encoder-decoder model (T5-small, about 60 million parameters) translating with a task prefix.\nfrom transformers import AutoTokenizer, T5ForConditionalGeneration\n\ntok = AutoTokenizer.from_pretrained(\"google-t5/t5-small\")\nmodel = T5ForConditionalGeneration.from_pretrained(\"google-t5/t5-small\")\nprint(f\"parameters: {sum(p.numel() for p in model.parameters()):,}\")\n\nfor text in [\"translate English to French: The cat sleeps.\", \"translate English to German: The house is wonderful.\"]:\n    ids = tok(text, return_tensors=\"pt\").input_ids              # the encoder reads this once\n    out = model.generate(ids, max_new_tokens=20, do_sample=False)   # the decoder writes token by token\n    print(f\"{text}\\n  -> {tok.decode(out[0], skip_special_tokens=True)}\")\n",
+    "output": "parameters: 60,506,624\ntranslate English to French: The cat sleeps.\n  -> Le chat dorme.\ntranslate English to German: The house is wonderful.\n  -> Das Haus ist wunderbar.",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3"
+    }
+  },
+  "repgen": {
+    "code": "# The same ticket, two ways: a vector classifier (MiniLM) and a generative model (gemma4:12b via Ollama).\nimport json, os, urllib.request\nfrom sentence_transformers import SentenceTransformer\n\nticket = \"I can't sign in to my account\"\nexamples = {\n    \"login\": [\"How do I reset my password?\", \"I forgot my login details\"],\n    \"payments\": [\"My card was charged twice\"],\n    \"movies\": [\"The film was great\"],\n}\n\nmodel = SentenceTransformer(\"sentence-transformers/all-MiniLM-L6-v2\")\nv = model.encode(ticket, normalize_embeddings=True)\nfor label, texts in examples.items():\n    c = model.encode(texts, normalize_embeddings=True).mean(axis=0)\n    print(f\"{label:<9} cosine {float(v @ c / (c @ c) ** 0.5):.3f}\")\n\nurl = os.environ.get(\"OLLAMA_URL\", \"http://localhost:11434\")\nbody = {\n    \"model\": \"gemma4:12b\",\n    \"prompt\": f\"Classify this support ticket as login, payments or movies. Answer with one word.\\nTicket: {ticket}\",\n    \"stream\": False,\n    \"think\": False,\n    \"options\": {\"num_ctx\": 32768, \"temperature\": 0},\n}\nreq = urllib.request.Request(f\"{url}/api/generate\", json.dumps(body).encode(), {\"Content-Type\": \"application/json\"})\nreply = json.load(urllib.request.urlopen(req))\nprint(\"gemma4:12b says:\", reply[\"response\"].strip())\nprint(\"tokens read:\", reply[\"prompt_eval_count\"], \" tokens written:\", reply[\"eval_count\"])\n",
+    "output": "login     cosine 0.598\npayments  cosine 0.226\nmovies    cosine -0.031\ngemma4:12b says: login\ntokens read: 42  tokens written: 2",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3"
+    }
+  }
+}

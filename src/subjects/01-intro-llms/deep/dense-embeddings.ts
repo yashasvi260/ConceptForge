@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const denseEmbeddings: DeepLesson = {
   why: [
@@ -104,7 +104,7 @@ export const denseEmbeddings: DeepLesson = {
     {
       heading: "Embedding models vs LLMs",
       paragraphs: [
-        "An embedding model and a generative LLM are built from the same parts (tokenizer, embedding table, transformer blocks), but they are trained for different outputs: one vector per text, versus a probability for every next token. Embedding models are small and fast (MiniLM runs in this page in milliseconds), which is why real systems use them to search millions of documents and then pass only the best few to an LLM. Step 10 of this module compares the two kinds side by side.",
+        "The \"Run it locally\" listing below runs the same MiniLM at full precision and gets 0.92 for film vs movie, where this page's 8-bit copy gives 0.891: compressing the weights moves scores in the second decimal, not the ranking. An embedding model and a generative LLM are built from the same parts (tokenizer, embedding table, transformer blocks), but they are trained for different outputs: one vector per text, versus a probability for every next token. Embedding models are small and fast (MiniLM runs in this page in milliseconds), which is why real systems use them to search millions of documents and then pass only the best few to an LLM. Step 10 of this module compares the two kinds side by side.",
       ],
     },
   ],
@@ -130,7 +130,7 @@ export const denseEmbeddings: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("dense", "sentence-transformers: the same model at full precision", ["sentence-transformers"])],
   checks: [
     {
       id: "de-synonyms",

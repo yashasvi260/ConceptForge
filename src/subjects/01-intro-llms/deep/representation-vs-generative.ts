@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const representationVsGenerative: DeepLesson = {
   why: [
@@ -112,7 +112,7 @@ export const representationVsGenerative: DeepLesson = {
       part("representation-vs-generative", "p3", "Write `forward_flops(n_params, n_tokens)` and compare embedding against asking an 8B model.", ["About 2 operations per parameter per token.", "`2 * n_params * n_tokens`."]),
     ],
   },
-  local: [],
+  local: [localListing("repgen", "MiniLM and gemma4:12b on the same ticket", ["sentence-transformers"])],
   checks: [
     {
       id: "rg-dedupe",

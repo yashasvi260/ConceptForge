@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const encoderDecoder: DeepLesson = {
   why: [
@@ -82,7 +82,7 @@ export const encoderDecoder: DeepLesson = {
     {
       heading: "Seeing it in practice",
       paragraphs: [
-        "T5 frames every task as text to text: the input starts with a task prefix such as `translate English to German:` or `summarize:` and the decoder writes the answer. Running the small 60-million-parameter T5 locally (the \"Run it locally\" listing below) shows the whole design in a few lines of code: the tokenizer, the encoder reading once, and the decoder generating with cross-attention.",
+        "T5 frames every task as text to text: the input starts with a task prefix such as `translate English to German:` or `summarize:` and the decoder writes the answer. Running the small 60-million-parameter T5 locally (the \"Run it locally\" listing below) shows the whole design in a few lines of code: the tokenizer, the encoder reading once, and the decoder generating with cross-attention. Its real output is a useful reality check: it gets the German sentence right (`Das Haus ist wunderbar.`) but writes `Le chat dorme.` for the French, a grammar slip (the right form is `dort`). Small models make small mistakes, which is why model size and evaluation matter.",
       ],
     },
   ],
@@ -103,7 +103,7 @@ export const encoderDecoder: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("encdec", "transformers: T5-small translating", ["transformers", "sentencepiece", "torch"])],
   checks: [
     {
       id: "ed-shape",
