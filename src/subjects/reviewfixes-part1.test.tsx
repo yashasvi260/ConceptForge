@@ -86,7 +86,7 @@ describe("F4 + copy accuracy", () => {
 describe("F16 + F19: modules agree with each other", () => {
   it("Module 01's illustrative probabilities match Module 03's computation", () => {
     const i = at(m01Steps, "map");
-    render(<M01Stage step={m01Steps[i]!} stepIndex={i} />);
+    render(<M01Stage step={{ ...m01Steps[i]!, view: "map" }} stepIndex={i} />);
     const top = applySampling(NEXT, { temperature: 1, topK: 0, topP: 1 })[0]!;
     expect(screen.getByText(new RegExp(`mat ${Math.round(top.finalProb * 100)}%`))).toBeInTheDocument();
   });

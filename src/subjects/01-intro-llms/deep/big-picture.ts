@@ -105,7 +105,7 @@ export const bigPicture: DeepLesson = {
     },
   ],
   guided:
-    "Before you look, predict: how many steps does the loop below have, and which one is the only step that involves randomness? Then follow the loop and check your answer against the probabilities step.",
+    "In the **Generation loop lab**, pick \"Once upon a time, there was a\" and predict gemma4's first word before pressing anything. Step through one token with **Next micro-step**, watching which stage costs a forward pass. Then set temperature to 0 and press **Full token** until the reply ends, reset, raise temperature to 1.5 and run it again: what changed, and what didn't? Finally try \"The capital of France is\" and explain why temperature makes no difference there.",
   build: {
     id: "01-big-picture-bigram",
     title: "Build the loop: a bigram language model",

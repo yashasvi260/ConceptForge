@@ -7,6 +7,7 @@ import { BowView } from "./views/BowView";
 import { ContextView } from "./views/ContextView";
 import { DenseView } from "./views/DenseView";
 import { EncDecView } from "./views/EncDecView";
+import { GenerationLabView } from "./views/GenerationLabView";
 import { MapView } from "./views/MapView";
 import { RecapView } from "./views/RecapView";
 import { RepGenView } from "./views/RepGenView";
@@ -20,6 +21,8 @@ export function Stage({ step }: StageProps) {
   const [sentences, setSentences] = useState(DEFAULT_SENTENCES);
   const view = (() => {
     switch (step.view) {
+      case "loop-lab":
+        return <GenerationLabView />;
       case "map":
         return <MapView />;
       case "anatomy":

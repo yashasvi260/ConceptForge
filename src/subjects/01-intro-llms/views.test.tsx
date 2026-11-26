@@ -4,16 +4,17 @@ import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
+/** Renders a view, including the second view of a step that offers several (steps list them in `views`). */
 const renderStep = (view: string) => {
-  const i = steps.findIndex((s) => s.view === view);
-  return render(<Stage step={steps[i]!} stepIndex={i} />);
+  const i = steps.findIndex((s) => s.view === view || s.views?.some((v) => v.view === view));
+  return render(<Stage step={{ ...steps[i]!, view }} stepIndex={i} />);
 };
 
 describe("Module 01 content", () => {
   it("is a complete module: 12 steps, ≥ 6 hinted challenges, a bridge to Module 02", () => {
     expect(subject.moduleNumber).toBe(1);
     expect(steps).toHaveLength(12);
-    expect(steps.map((s) => s.view)).toEqual(["map", "anatomy", "scale", "trainuse", "bow", "dense", "context", "arch", "encdec", "repgen", "training", "recap"]);
+    expect(steps.map((s) => s.view)).toEqual(["loop-lab", "anatomy", "scale", "trainuse", "bow", "dense", "context", "arch", "encdec", "repgen", "training", "recap"]);
     expect(steps.slice(1, 4).map((s) => s.id)).toEqual(["anatomy", "how-large", "train-vs-use"]);
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();

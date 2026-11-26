@@ -13,7 +13,11 @@ export const steps: LessonStep[] = [
     ],
     tryIt: "Follow the loop on the right, then open the module list to see the whole journey.",
     keyTakeaway: "An LLM is a next-token predictor: text → tokens → vectors → transformer → probabilities → next token, repeated.",
-    view: "map",
+    view: "loop-lab",
+    views: [
+      { view: "loop-lab", label: "Generation loop lab" },
+      { view: "map", label: "Loop & learning map" },
+    ],
     deep: true,
   },
   {
