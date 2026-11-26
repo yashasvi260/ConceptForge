@@ -3,14 +3,15 @@ import { part } from "./files";
 
 export const bpeEncoding: DeepLesson = {
   why: [
-    "Training produced an ordered list of merges. Now the tokenizer has to use it on text it has never seen: a user's question, a new product name, a typo. The rule is simple and strict. Split the word into characters, then replay the learned merges **in the order they were learned**, wherever they fit. Whatever is left is the word's tokens.",
+    "Training gave us an ordered list of merges. Now the tokenizer has to use it on text it's never seen: a user's question, a new product name, a typo. How?",
+    "The rule is simple and strict. Split the word into characters, then replay the learned merges **in the order they were learned**, wherever they fit. Whatever's left is the word's tokens.",
     "This is where BPE earns its keep. `lowest` never appeared in the training text, yet it comes out as two familiar pieces, `low` and `est</w>`, because both were learned from other words. A frequent word collapses to a single token; a rare one keeps a few pieces; something truly new falls back to single characters. Nothing is ever lost, and common text stays short.",
-    "Encoding is also where many surprising model behaviours start. Because merges are replayed mechanically, small changes in spelling, capitalisation or spacing can produce completely different tokens for what a human reads as the same word. This step encodes words by hand, then writes the fast version real tokenizers use, so you can predict a tokenizer's output instead of being surprised by it.",
+    "It's also where many surprising model behaviours begin. Because merges are replayed mechanically, small changes in spelling, capitals or spacing can produce completely different tokens for what you'd read as the same word. In this step you'll encode words by hand, write the fast version real tokenizers use, and learn to predict a tokenizer's output instead of being surprised by it.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Use the ten merges learned in step 3 (`e+s`, `es+t`, `est+</w>`, `l+o`, `lo+w`, `n+e`, `ne+w`, `new+est</w>`, `low+</w>`, `w+i`). Encode `lowest` by applying each merge in order; merges that find no match are skipped:",
+      text: "Let's try it. Use the ten merges learned in step 3 (`e+s`, `es+t`, `est+</w>`, `l+o`, `lo+w`, `n+e`, `ne+w`, `new+est</w>`, `low+</w>`, `w+i`). Encode `lowest` by applying each merge in order; merges that find no match are skipped:",
     },
     {
       kind: "table",
@@ -45,16 +46,16 @@ export const bpeEncoding: DeepLesson = {
     },
     {
       kind: "text",
-      text: "`newest` was frequent in training, so it is a single token. `slowly` reuses `low` from the middle of the word, and keeps `s`, `l`, `y` as characters because no merge covers them. The token count tells you how familiar a word is to this tokenizer.",
+      text: "See the pattern? `newest` was frequent in training, so it's a single token. `slowly` reuses `low` from the middle of the word, and keeps `s`, `l`, `y` as characters because no merge covers them. The token count tells you how familiar a word is to this tokenizer.",
     },
   ],
   concept: [
     {
       heading: "Replaying the merges",
       paragraphs: [
-        "Encoding starts exactly like training did: split the word into its base symbols (characters here, bytes in real tokenizers) and add the word-end marker. Then go through the merge list from first to last, and for each merge glue every adjacent occurrence of that pair. Nothing is counted and nothing is learned; the tokenizer only repeats decisions made during training.",
-        "The result is always valid. Every merge produces a vocabulary entry, and every base symbol is in the vocabulary, so the final pieces are all known IDs. A word that contains only frequent patterns shrinks to one or two tokens; a word built from rare combinations stays in many small pieces. That graceful degradation is the whole point of subwords: no unknown tokens, and short sequences for common text.",
-        "Text is encoded word by word (after pre-tokenization, step 3), and the pieces are concatenated. Decoding reverses it: join the pieces and turn each word-end marker back into a space. In GPT-style tokenizers the space is stored at the start of the next word instead, but the principle is the same.",
+        "Encoding starts exactly like training did: split the word into its base symbols (characters here, bytes in real tokenizers) and add the word-end marker. Then go through the merge list from first to last, and for each merge, glue every place that pair appears. Nothing is counted, nothing is learned. The tokenizer just repeats decisions made during training.",
+        "And the result is always valid. Every merge produces a vocabulary entry, and every base symbol is in the vocabulary, so the final pieces are all known IDs. A word full of frequent patterns shrinks to one or two tokens; a word built from rare combinations stays in many small pieces. That graceful fallback is the whole point of subwords: no unknown tokens, and short sequences for common text.",
+        "Text is encoded word by word (after pre-tokenization, step 3), and the pieces are joined together. Decoding reverses it: join the pieces and turn each word-end marker back into a space. GPT-style tokenizers store the space at the start of the next word instead, but the principle is identical.",
       ],
       formula: {
         expr: "symbols ← chars(word) + [</w>]\nfor (a, b) in merges, in learned order:  replace every adjacent a b in symbols with ab",
@@ -65,12 +66,17 @@ export const bpeEncoding: DeepLesson = {
         ],
         example: "lowest → l o w e s t </w> → (e+s, es+t, est+</w>, l+o, lo+w) → low est</w>.",
       },
+      lab: {
+        view: "bpe-encode",
+        label: "Encode",
+        task: "Before typing, predict the tokens for `lowest`, `newer` and `slowly` using the ten merges. Then type each one and watch which merges fire. Why does `lower` keep `e r </w>` as separate pieces?",
+      },
     },
     {
       heading: "Order matters, and ranks make it fast",
       paragraphs: [
-        "The same merges in a different order can give a different split. Reverse the ten merges and `lowest` becomes `lo w es t </w>`: `lo+w` is tried before `l+o` has created `lo`, so it finds nothing, and `est+</w>` and `es+t` are tried before `e+s` has created `es`. That is why a tokenizer ships its merges as an ordered list (each merge's position is its **rank**) and why you cannot rebuild a tokenizer from its vocabulary alone.",
-        "Walking through 50,000 merges for every word would be slow. Real tokenizers turn it around: look at the word's current adjacent pairs, find the one with the lowest rank (the merge learned earliest), merge it, and repeat until no pair has a rank. Because earlier merges always take priority, this gives the same result as replaying the whole list, but it only does as many steps as the word actually has merges. GPT-2's original `encoder.py` is exactly this loop, plus a cache so each distinct word is only encoded once.",
+        "Does the order of the merges really matter? Try reversing them. `lowest` becomes `lo w es t </w>`: `lo+w` is tried before `l+o` has created `lo`, so it finds nothing, and `est+</w>` and `es+t` are tried before `e+s` has created `es`. That's why a tokenizer ships its merges as an *ordered* list (each merge's position is its **rank**), and why you can't rebuild a tokenizer from its vocabulary alone.",
+        "Walking through 50,000 merges for every word would be slow. So real tokenizers turn it around: look at the word's current neighbouring pairs, find the one with the lowest rank (the merge learned earliest), merge it, and repeat until no pair has a rank. Because earlier merges always take priority, this gives the same result as replaying the whole list, but only does as many steps as the word actually has merges. GPT-2's original `encoder.py` is exactly this loop, plus a cache so each distinct word is only encoded once.",
       ],
       formula: {
         expr: "rank(a, b) = position of (a, b) in the merge list\nrepeat: (a, b) ← the adjacent pair with the smallest rank;  stop if no adjacent pair has a rank",
@@ -80,26 +86,42 @@ export const bpeEncoding: DeepLesson = {
         ],
         example: "In `n e w e s t </w>` the pair `e s` has rank 0 (the first merge), so it is merged first.",
       },
-      mistake: "Assuming BPE finds the split with the fewest tokens. It does not search; it replays merges greedily in training order. A shorter split can exist and still not be chosen. (Unigram, step 7, does search for the most probable split.)",
+      mistake:
+        "Assuming BPE finds the split with the fewest tokens. It does not search; it replays merges greedily in training order. A shorter split can exist and still not be chosen. (Unigram, step 7, does search for the most probable split.)",
+      lab: {
+        view: "merge-order",
+        label: "Merge order",
+        task: "Encode `lowest` with the merges as learned, then reversed, then shuffled a few times. How many different splits can the same ten merges produce?",
+      },
     },
     {
       heading: "What happens to anything new",
       paragraphs: [
-        "A new word is split as far as the learned merges allow, and the rest stays as base symbols. That is why unusual words cost more tokens: a misspelling, a long product code or a word from a language the tokenizer saw little of all break into many small pieces. The number of tokens for a word ranges from 1 (a frequent word) up to one per base symbol (nothing applies).",
-        "You can turn this into a measurement. Encode a sample of your own documents and compute tokens per word. If it is much higher than for ordinary English text, the tokenizer is poorly matched to your domain (chemical names, legal citations, a language it saw little of). You then pay more per request and fit less into the context window, and it is worth comparing other models' tokenizers or, when fine-tuning, adding a few frequent domain terms as tokens (step 2).",
-        "If the base symbols are characters, there is one hole left: a character never seen in training (an emoji, a rare script) has no base symbol at all. Starting from the 256 byte values instead closes that hole, since every character is made of bytes. That is the subject of step 5, and it is what GPT-2 and every later GPT tokenizer do.",
+        "A new word is split as far as the learned merges allow, and the rest stays as base symbols. That's why unusual words cost more tokens: a misspelling, a long product code, or a word from a language the tokenizer saw little of all break into many small pieces. A word can take anywhere from 1 token (a frequent word) up to one per base symbol (nothing applies).",
+        "You can turn this into a measurement. Encode a sample of your own documents and compute tokens per word. If it's much higher than for ordinary English, the tokenizer is poorly matched to your domain (chemical names, legal citations, a language it saw little of). You'll pay more per request and fit less into the context window, so it's worth comparing other models' tokenizers, or, when fine-tuning, adding a few frequent domain terms as tokens (step 2).",
+        "If the base symbols are characters, there's one hole left: a character never seen in training (an emoji, a rare script) has no base symbol at all. Starting from the 256 byte values instead closes that hole, because every character is made of bytes. That's step 5, and it's what GPT-2 and every later GPT tokenizer does.",
       ],
+      lab: {
+        view: "fertility",
+        label: "Fertility",
+        task: "Compare `slowly` with its typo `slowwly`, then add a word from your own field. Which costs the most GPT-4o tokens? What would that mean for a document full of such words?",
+      },
     },
     {
       heading: "Deterministic, and sensitive",
       paragraphs: [
-        "Encoding is deterministic: the same text always gives the same tokens. But it is not robust to small edits. In GPT-4o's tokenizer `strawberry` is `st` + `raw` + `berry`, ` strawberry` with a leading space is a single token, and `STRAWBERRY` is four pieces. To the model these are different inputs that it has to learn are related, which is part of why models struggle with spelling tasks (step 10).",
-        "Spacing matters in practice. A prompt that ends with a trailing space leaves the next word's leading space stranded, and the model has rarely seen a word without its space in training, which can subtly hurt the continuation. Library functions that build prompts for you, such as chat templates, handle these boundaries consistently; hand-built prompts should be checked with the real tokenizer.",
+        "Encoding is deterministic: the same text always gives the same tokens. But it isn't robust to small edits. In GPT-4o's tokenizer `strawberry` is `st` + `raw` + `berry`, ` strawberry` with a leading space is a single token, and `STRAWBERRY` is four pieces. To the model these are different inputs that it has to learn are related, which is part of why models struggle with spelling tasks (step 10).",
+        "Spacing matters in practice too. A prompt that ends with a trailing space leaves the next word's leading space stranded, and the model has rarely seen a word without its space in training, which can subtly hurt the continuation. Functions that build prompts for you, like chat templates, handle these boundaries consistently; hand-built prompts are worth checking with the real tokenizer.",
       ],
+      lab: {
+        view: "variants",
+        label: "Variants",
+        task: "Type a word you use often and compare its four forms. Which form is a single token? What does that tell you about how the word usually appears in text?",
+      },
     },
   ],
   guided:
-    "Before typing, predict the tokens for `lowest`, `newer` and `slowly` using the ten merges. Then type each one in the encoder and compare, watching which merges fire. Try `lower` and explain why it keeps `e r </w>` as separate pieces.",
+    "Before typing in **Encode**, predict the tokens for `lowest`, `newer` and `slowly`. Then open **Merge order** and find out what reversing the merges does to `lowest`.",
   build: {
     id: "m02-bpe-encoding",
     title: "Encode and decode with learned merges",

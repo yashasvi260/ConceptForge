@@ -27,8 +27,8 @@ need full deep conversion as well).
 | 01 | (all) | Module 01 complete: 68 labs, browser pass 75 views 0 problems; Stage lazy (main bundle 203 KB gz) | | cfe6056 |
 | 02 | why-numbers | yes | 4/4 (intro, oov, seq-length, chop) | (this commit) |
 | 02 | vocabulary | yes | 4/4 (vocab, vocab-cost, vocab-buys, add-tokens) | (this commit) |
-| 02 | bpe-training | | | |
-| 02 | bpe-encoding | | | |
+| 02 | bpe-training | yes | 4/4 (bpe-train, bpe-compress, pretokenize, merges-curve) | (this commit) |
+| 02 | bpe-encoding | yes | 4/4 (bpe-encode, merge-order, fertility, variants) | (this commit) |
 | 02 | bytes | | | |
 | 02 | wordpiece | | | |
 | 02 | sentencepiece | | | |

@@ -15,6 +15,7 @@ import { PracticeView } from "./views/PracticeView";
 import { QuirksView } from "./views/QuirksView";
 import { SpecialTokensView } from "./views/SpecialTokensView";
 import { UnigramView } from "./views/UnigramView";
+import { BpeCompressLab, FertilityLab, MergeOrderLab, MergesCurveLab, PretokenizeLab, VariantsLab } from "./views/labs/BpeLabs";
 import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
@@ -79,6 +80,18 @@ export function Stage({ step }: StageProps) {
         return <VocabBuysLab />;
       case "add-tokens":
         return <AddTokensLab />;
+      case "bpe-compress":
+        return <BpeCompressLab />;
+      case "pretokenize":
+        return <PretokenizeLab />;
+      case "merges-curve":
+        return <MergesCurveLab />;
+      case "merge-order":
+        return <MergeOrderLab />;
+      case "fertility":
+        return <FertilityLab />;
+      case "variants":
+        return <VariantsLab />;
       default:
         return (
           <Panel>
