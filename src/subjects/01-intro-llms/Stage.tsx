@@ -21,6 +21,7 @@ import { RecapView } from "./views/RecapView";
 import { CentroidLab, ChooseLab, CombineLab, CostGapLab, GenClassifyLab, TwoOutputsLab } from "./views/RepGenLabs";
 import { RepGenView } from "./views/RepGenView";
 import { ScaleView } from "./views/ScaleView";
+import { BaseToAssistantLab, DataPerStageLab, FinetuneFormatLab, ForgettingLab, TransferLab } from "./views/PretrainLabs";
 import { TrainingView } from "./views/TrainingView";
 import { ComputeLab, FrozenLab, GradientLab, LossLab } from "./views/TrainUseLabs";
 import { TrainUseView } from "./views/TrainUseView";
@@ -153,6 +154,16 @@ export function Stage({ step }: StageProps) {
         return <CombineLab />;
       case "training":
         return <TrainingView />;
+      case "finetune-format":
+        return <FinetuneFormatLab />;
+      case "transfer":
+        return <TransferLab />;
+      case "forgetting":
+        return <ForgettingLab />;
+      case "data-per-stage":
+        return <DataPerStageLab />;
+      case "base-to-assistant":
+        return <BaseToAssistantLab />;
       case "recap":
         return <RecapView />;
       default:
