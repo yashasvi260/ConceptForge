@@ -212,6 +212,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "static-vs-contextual",
+    deep: true,
     title: "Static vs contextual: watching “bank” shift",
     summary: "The table gives every word one fixed vector. The transformer then reshapes it to fit the sentence.",
     body: [

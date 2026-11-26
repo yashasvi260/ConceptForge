@@ -8,6 +8,7 @@ import { playground } from "./playground";
 import { quirks } from "./quirks";
 import { sentencepiece } from "./sentencepiece";
 import { specialTokens } from "./special-tokens";
+import { staticVsContextual } from "./static-vs-contextual";
 import { vocabulary } from "./vocabulary";
 import { whyNumbers } from "./why-numbers";
 import { wordpiece } from "./wordpiece";
@@ -26,6 +27,7 @@ export const content: DeepContent = {
     playground,
     quirks,
     "lookup-table": lookupTable,
+    "static-vs-contextual": staticVsContextual,
   },
   data: deepData,
 };
