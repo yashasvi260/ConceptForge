@@ -2,7 +2,7 @@
 // Real GPT-4 (cl100k_base) and GPT-4o (o200k_base) token data for Module 02's deep lessons:
 // counts for the language samples, and the pieces of a few numbers and words. Re-run after changing the lists:
 //   node scripts/make-m02-token-data.mjs
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { Tiktoken } from "js-tiktoken/lite";
 import cl100k from "js-tiktoken/ranks/cl100k_base";
 import o200k from "js-tiktoken/ranks/o200k_base";
@@ -20,7 +20,13 @@ const PIECES = ["1234567", "2026", "3.14159", "strawberry", " strawberry", "STRA
 
 const enc = { cl100k_base: new Tiktoken(cl100k), o200k_base: new Tiktoken(o200k) };
 const pieces = (e, text) => e.encode(text).map((id) => ({ id, text: e.decode([id]) }));
+/** n_vocab as tiktoken defines it: the highest token id (a special token) + 1. */
+const nVocab = (ranks) => Math.max(...Object.values(ranks.special_tokens)) + 1;
+const bertVocab = readFileSync("src/subjects/02-tokens-embeddings/data/bert-base-uncased-vocab.txt", "utf8").split("\n").filter((l, i, a) => i < a.length - 1 || l);
+const BERT_WORDS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", "the", "bank", "river", "loan", "cat", "cats", "token", "##izer", "##s", "un", "##able", "##ably"];
 const out = {
+  vocab_sizes: { cl100k_base: nVocab(cl100k), o200k_base: nVocab(o200k), bert_base_uncased: bertVocab.length },
+  bert_ids: Object.fromEntries(BERT_WORDS.map((w) => [w, bertVocab.indexOf(w)])),
   source: "js-tiktoken 1.0.21 (OpenAI tiktoken vocabularies)",
   languages: LANGUAGES.map(([label, text]) => ({
     label, text, chars: [...text].length, utf8_bytes: Buffer.byteLength(text, "utf8"),

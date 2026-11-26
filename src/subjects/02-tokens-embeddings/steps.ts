@@ -35,6 +35,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "vocabulary",
+    deep: true,
     title: "The vocabulary",
     summary: "The vocabulary is the tokenizer's phrasebook: every entry has a number, and the ID is just its position.",
     body: [
