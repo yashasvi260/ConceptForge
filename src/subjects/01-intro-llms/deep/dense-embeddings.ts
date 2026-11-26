@@ -3,14 +3,14 @@ import { localListing, part } from "./files";
 
 export const denseEmbeddings: DeepLesson = {
   why: [
-    "Bag-of-Words failed because every word got its own private column: `film` and `movie` had nothing in common. What we want instead is a representation where **meaning is geometry**: texts that mean similar things sit close together, whatever words they use.",
-    "The idea that unlocked this is old, from linguistics: *you shall know a word by the company it keeps* (J. R. Firth, 1957). `film` and `movie` appear next to the same words (`watched`, `director`, `great`, `cinema`), so a system that learns from co-occurrence should give them similar numbers. In 2013, **word2vec** showed that a small neural network trained on billions of words does exactly that, and its vectors even support arithmetic like king − man + woman ≈ queen.",
-    "Modern models go further and embed whole sentences. A sentence-embedding model such as **all-MiniLM-L6-v2** (the one running in this page) reads a sentence and outputs 384 numbers. Every sentence, whatever its length, becomes a point in the same 384-dimensional space, and similar meanings land near each other. This is the foundation of semantic search, clustering, classification and retrieval for LLMs (Modules 04, 05 and 08). This step uses MiniLM's real vectors to show what works, and the one thing that still doesn't.",
+    "Remember why Bag-of-Words failed? Every word got its own private column, so `film` and `movie` had nothing in common. What we really want is a representation where **meaning is geometry**: texts that mean similar things sit close together, whatever words they use.",
+    "How could a computer possibly learn what words mean? The idea that unlocked it is old, from linguistics: *you shall know a word by the company it keeps* (J. R. Firth, 1957). Think about it: `film` and `movie` show up next to the same words (`watched`, `director`, `great`, `cinema`). So a system that learns from which words appear together should end up giving them similar numbers. In 2013, **word2vec** showed that a small neural network trained on billions of words does exactly that, and its vectors even support arithmetic like king − man + woman ≈ queen.",
+    "Modern models go a step further and embed whole sentences. A sentence-embedding model like **all-MiniLM-L6-v2**, the one running in this page, reads a sentence and outputs 384 numbers. Every sentence, short or long, becomes a point in the same 384-dimensional space, and similar meanings land near each other. That's the foundation of semantic search, clustering, classification and retrieval in the rest of this course. In this step you'll look at real MiniLM vectors, search with them, and find out what they still get wrong.",
   ],
   worked: [
     {
       kind: "text",
-      text: "MiniLM turns `The film was great` into a list of 384 numbers. Here are the first six; on their own they mean nothing, and only their positions relative to other sentences matter. The vector's length is exactly 1 (the model **normalises** it), so cosine similarity is just the dot product.",
+      text: "Let's look at a real one. MiniLM turns `The film was great` into a list of 384 numbers. Here are the first six. On their own they mean nothing; and only their positions relative to other sentences matter. The vector's length is exactly 1 (the model **normalises** it), so cosine similarity is just the dot product.",
     },
     {
       kind: "table",
@@ -28,7 +28,7 @@ export const denseEmbeddings: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Now compare pairs with both methods: Bag-of-Words cosine (counts) and the cosine of MiniLM's real vectors.",
+      text: "Now the real test. Compare the same pairs with both methods: Bag-of-Words cosine (counts) and the cosine of MiniLM's real vectors.",
     },
     {
       kind: "table",
@@ -45,15 +45,16 @@ export const denseEmbeddings: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Rows 1–3 are the win: same meaning, few or no shared words, and MiniLM still scores them as related. The card-charge pair shares **no** words at all (Bag-of-Words 0) and MiniLM sees the connection (0.395). Row 4 is a good **unrelated** score (0.023). Row 5 is the warning: opposite meanings, and MiniLM still says 0.906. Dense vectors fixed *meaning*; they did not fully fix *order*.",
+      text: "What do you notice? Rows 1–3 are the win: same meaning, few or no shared words, and MiniLM still scores them as related. The card-charge pair shares **no** words at all (Bag-of-Words 0) and MiniLM sees the connection (0.395). Row 4 is a good **unrelated** score (0.023). Row 5 is the warning: opposite meanings, and MiniLM still says 0.906. Dense vectors fixed *meaning*; they did not fully fix *order*.",
     },
   ],
   concept: [
     {
       heading: "Dense vs sparse",
       paragraphs: [
-        "A Bag-of-Words vector is **sparse**: as long as the vocabulary (tens of thousands of entries) and almost all zeros, with each position tied to one word. A dense embedding is short (384 numbers for MiniLM, 768–4,096 for bigger models) and almost every number is non-zero. No single position means anything you can name; meaning is spread across all of them, and only distances and directions between vectors carry information.",
-        "That spreading is what lets similar meanings share structure. `film` and `movie` don't need to share a column; they just need vectors pointing in similar directions. A model learns to put them there because doing so helps it with its training task.",
+        "A Bag-of-Words vector is **sparse**: as long as the vocabulary (tens of thousands of entries), almost all zeros, and each position tied to one word. A dense embedding is the opposite. It's short (384 numbers for MiniLM, 768 to 4,096 for bigger models), and almost every number is non-zero.",
+        "Here's the strange part: no single position means anything you could name. There's no \"movie dimension\". Meaning is spread across all of them, and only the distances and directions between vectors carry information.",
+        "That spreading is exactly what lets similar meanings share structure. `film` and `movie` don't need to share a column; they just need vectors pointing in similar directions. And a model learns to put them there, because it helps with its training task.",
       ],
       formula: {
         expr: "embed(text) → v ∈ ℝ³⁸⁴,   |v| = 1,   similarity = v₁ · v₂",
@@ -65,22 +66,33 @@ export const denseEmbeddings: DeepLesson = {
         ],
         example: "film vs movie: v₁ · v₂ = 0.891; film vs interest rates: 0.023.",
       },
+      lab: {
+        view: "dense-vs-sparse",
+        label: "Sparse vs dense",
+        task: "Pick a sentence and compare its two vectors. How many numbers are non-zero in each? Hover over a few dense dimensions: can you find one that means anything on its own?",
+      },
     },
     {
       heading: "Where dense vectors come from",
       paragraphs: [
-        "**Word embeddings** (word2vec, 2013; GloVe, 2014) learn one vector per word. word2vec slides a small window over billions of words and trains a shallow network to predict a word from its neighbours (or the neighbours from the word). Words that appear in similar company get pushed to similar vectors. The result is a lookup table, much like the embedding table inside an LLM, which is in fact learned for the same reason.",
-        "**Sentence embeddings** need more, because a sentence's meaning depends on all its words together. MiniLM is a small transformer (6 layers, 384 wide, about 22.7 million weights). It reads the sentence's tokens, produces a vector for each, and then **mean-pools**: averages the token vectors into one. It was trained on over a billion pairs of related sentences (questions and their answers, titles and their posts) to put related pairs close together and unrelated ones far apart. That training is what makes its cosine scores meaningful for search.",
+        "**Word embeddings** came first (word2vec, 2013; GloVe, 2014), with one vector per word. word2vec slides a small window over billions of words and trains a shallow network to predict a word from its neighbours (or the other way round). Words that keep similar company get pushed to similar vectors. The result is a lookup table, much like the embedding table inside an LLM, which is learned for the very same reason.",
+        "**Sentence embeddings** need more, because a sentence's meaning depends on all its words together. MiniLM is a small transformer: 6 layers, 384 wide, about 22.7 million weights. It reads the sentence, produces a vector for each token, then **mean-pools**: averages those token vectors into one.",
+        "And how does it learn which sentences belong together? It was trained on over a billion pairs of related sentences (questions and their answers, titles and their posts), pulling related pairs close and pushing unrelated ones apart. That training is what makes its cosine scores meaningful for search.",
       ],
       mistake:
         "Comparing vectors from two different embedding models. Each model invents its own space; dimension 17 of MiniLM and dimension 17 of another model are unrelated, so similarities across models are meaningless. Always embed everything you compare with the same model.",
+      lab: {
+        view: "contrastive",
+        label: "Training the space",
+        task: "Press **Train 5 steps** a few times and watch related pairs drift together while unrelated sentences drift apart. That's the idea behind MiniLM's training, in 2 dimensions instead of 384.",
+      },
     },
     {
       heading: "Using embeddings: nearest neighbours",
       paragraphs: [
-        "Once every text is a point, most tasks become geometry. **Semantic search**: embed the query, find the stored texts with the highest cosine. **Clustering**: group points that sit close together (Module 07). **Classification**: put a text in the class whose examples it is nearest to (Module 06). **Duplicate detection**: flag pairs above a similarity threshold. In every case the expensive model runs once per text; comparisons afterwards are just dot products, millions per second.",
-        "Storing vectors is cheap enough to plan on the back of an envelope: one million documents × 384 numbers × 4 bytes = 1.54 GB. Comparing a query against all of them is one matrix multiplication. Past tens of millions of vectors, systems switch to **approximate nearest-neighbour** indexes (the engines inside vector databases) that skip most comparisons and still find almost all of the true nearest neighbours.",
-        "Scores are relative, not absolute. 0.395 for the card-charge pair is not \"39.5% similar\". What matters is that it is far above the unrelated 0.023. Each model has its own typical range, so set thresholds by looking at real examples from your data, not by picking a round number.",
+        "Once every text is a point, most tasks turn into geometry. **Semantic search**: embed the query, find the stored texts with the highest cosine. **Clustering**: group points that sit close together (Module 07). **Classification**: put a text in the class whose examples it's nearest to (Module 06). **Duplicate detection**: flag pairs above a similarity threshold. And notice the economics: the expensive model runs once per text; every comparison afterwards is just a dot product, millions per second.",
+        "Storage is cheap enough to plan on the back of an envelope. One million documents × 384 numbers × 4 bytes = 1.54 GB. Comparing a query against all of them is one matrix multiplication. Past tens of millions of vectors, systems switch to **approximate nearest-neighbour** indexes (the engines inside vector databases), which skip most comparisons and still find almost all of the true nearest neighbours.",
+        "One warning: scores are relative, not absolute. 0.395 for the card-charge pair doesn't mean \"39.5% similar\". What matters is that it's far above the unrelated 0.023. Every model has its own typical range, so set thresholds by looking at real examples from your own data, not by picking a round number.",
       ],
       formula: {
         expr: "nearest(q) = argmaxₓ  embed(q) · embed(x)",
@@ -91,25 +103,42 @@ export const denseEmbeddings: DeepLesson = {
         ],
         example: "q = `How do I reset my password?`: the top results are `I forgot my login details` (0.587) and `I can't sign in to my account`, neither of which contains `password`.",
       },
+      lab: {
+        view: "neighbours",
+        label: "Nearest neighbours",
+        task: "Search from `How do I reset my password?`. Do the top results share its words? Now pick `My card was charged twice`: what does MiniLM think it's closest to?",
+      },
     },
     {
       heading: "What mean pooling loses",
       paragraphs: [
-        "`Dog bites man` and `Man bites dog` score 0.906. Why? MiniLM's token vectors *do* depend on order (it is a transformer, so each token's vector is computed from its context), but averaging them into one sentence vector washes most of that difference out, and its training data rarely rewarded telling such pairs apart. Single sentence vectors are good at *topic* and *intent*, and weak at *who did what to whom*, negation and exact numbers.",
-        "That is a fundamental trade-off, not a bug in MiniLM: squeezing a whole text into one point must throw information away. When order and detail matter you need the full sequence of token vectors and a model that reads them together, which is what a generative LLM does. The next step shows how token vectors change with context.",
+        "Here's a puzzle. `Dog bites man` and `Man bites dog` score 0.906. Why so high, when they mean such different things?",
+        "MiniLM's token vectors *do* depend on order (it's a transformer, so each token's vector comes from its context). But averaging them into one sentence vector washes most of that difference out, and its training data rarely rewarded telling such pairs apart. So single sentence vectors are great at *topic* and *intent*, and weak at *who did what to whom*, negation, and exact numbers.",
+        "That's a fundamental trade-off, not a bug in MiniLM. Squeeze a whole text into one point and you *must* throw information away. When order and detail matter, you need the full sequence of token vectors and a model that reads them together, which is what a generative LLM does. The next step shows how token vectors change with context.",
       ],
       mistake:
         "Trusting a high embedding score to mean \"says the same thing\". `The payment was approved` and `The payment was not approved` usually score very high. Embeddings find texts *about* the same thing; checking what they *say* needs a model that reads both, or a human.",
+      lab: {
+        view: "pooling-loses",
+        label: "Averaging",
+        task: "Swap the word order and watch the average. Did it change at all? Then try weighting the first word more heavily. Why might that help a little?",
+      },
     },
     {
       heading: "Embedding models vs LLMs",
       paragraphs: [
-        "The \"Run it locally\" listing below runs the same MiniLM at full precision and gets 0.92 for film vs movie, where this page's 8-bit copy gives 0.891: compressing the weights moves scores in the second decimal, not the ranking. An embedding model and a generative LLM are built from the same parts (tokenizer, embedding table, transformer blocks), but they are trained for different outputs: one vector per text, versus a probability for every next token. Embedding models are small and fast (MiniLM runs in this page in milliseconds), which is why real systems use them to search millions of documents and then pass only the best few to an LLM. Step 10 of this module compares the two kinds side by side.",
+        "An embedding model and a generative LLM are built from the same parts: tokenizer, embedding table, transformer blocks. So what's different? What they're trained to output. One vector per text, versus a probability for every next token.",
+        "And size makes a huge practical difference. MiniLM runs in this page in milliseconds. That's why real systems use embedding models to search millions of documents, then pass only the best few to an LLM. (The \"Run it locally\" listing runs the same MiniLM at full precision and gets 0.92 for film vs movie, where this page's 8-bit copy gives 0.891: compressing the weights moves scores in the second decimal, not the ranking.) Step 10 of this module compares the two kinds side by side.",
       ],
+      lab: {
+        view: "embed-vs-llm",
+        label: "Small vs large",
+        task: "Compare MiniLM with gemma4. Then set 10 million documents: how much more compute would reading them all with gemma4 take?",
+      },
     },
   ],
   guided:
-    "Predict first: will `The film was great` vs `The movie was excellent` score higher here than its 0.5 with Bag-of-Words? Type sentences into the box below and compare. Then try `Dog bites man` vs `Man bites dog` and explain the result.",
+    "Predict first: will `The film was great` vs `The movie was excellent` score higher with MiniLM than its 0.5 with Bag-of-Words? Check in the **Overview**, then try `Dog bites man` vs `Man bites dog` and explain what you see.",
   build: {
     id: "01-dense-embeddings",
     title: "Semantic search with real MiniLM vectors",

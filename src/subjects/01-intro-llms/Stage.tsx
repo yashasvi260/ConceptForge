@@ -8,6 +8,7 @@ import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./vi
 import { BridgeLab, CosineLab, KeywordWinsLab, TfIdfLab, WordOrderLab } from "./views/BowLabs";
 import { BowView } from "./views/BowView";
 import { ContextView } from "./views/ContextView";
+import { ContrastiveLab, DenseSparseLab, EmbedVsLlmLab, NeighboursLab, PoolingLossLab } from "./views/DenseLabs";
 import { DenseView } from "./views/DenseView";
 import { EncDecView } from "./views/EncDecView";
 import { GenerationLabView } from "./views/GenerationLabView";
@@ -84,6 +85,16 @@ export function Stage({ step }: StageProps) {
         return <BridgeLab />;
       case "dense":
         return <DenseView text={sentences} setText={setSentences} />;
+      case "dense-vs-sparse":
+        return <DenseSparseLab />;
+      case "contrastive":
+        return <ContrastiveLab />;
+      case "neighbours":
+        return <NeighboursLab />;
+      case "pooling-loses":
+        return <PoolingLossLab />;
+      case "embed-vs-llm":
+        return <EmbedVsLlmLab />;
       case "context":
         return <ContextView />;
       case "arch":

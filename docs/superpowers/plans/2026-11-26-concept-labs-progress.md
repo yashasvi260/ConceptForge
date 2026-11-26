@@ -17,7 +17,7 @@ need full deep conversion as well).
 | 01 | how-large | yes | 5/5 (neuron, param-calc, scale, data-vs-size, memory) | (this commit) |
 | 01 | train-vs-use | yes | 5/5 (loss, gradient, frozen, compute, map) | (this commit) |
 | 01 | bag-of-words | yes | 6/6 (bow, cosine, word-order, tfidf, keyword-wins, bridge) | (this commit) |
-| 01 | dense-embeddings | | | |
+| 01 | dense-embeddings | yes | 5/5 (dense-vs-sparse, contrastive, neighbours, pooling-loses, embed-vs-llm) | (this commit) |
 | 01 | context | | | |
 | 01 | architectures | | | |
 | 01 | encoder-decoder | | | |
