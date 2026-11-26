@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import type { StageProps } from "../../core/types";
+import { AttentionLab, LogitsLab, NormResidualLab, PositionLab, TokenLookupLab } from "./views/AnatomyLabs";
 import { AnatomyView } from "./views/AnatomyView";
 import { ArchView } from "./views/ArchView";
 import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./views/BigPictureLabs";
@@ -36,6 +37,16 @@ export function Stage({ step }: StageProps) {
         return <MapView />;
       case "anatomy":
         return <AnatomyView />;
+      case "token-lookup":
+        return <TokenLookupLab />;
+      case "positions":
+        return <PositionLab />;
+      case "attention":
+        return <AttentionLab />;
+      case "norm-residual":
+        return <NormResidualLab />;
+      case "logits":
+        return <LogitsLab />;
       case "scale":
         return <ScaleView />;
       case "trainuse":
