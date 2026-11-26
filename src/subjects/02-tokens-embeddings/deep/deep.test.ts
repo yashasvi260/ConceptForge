@@ -50,6 +50,11 @@ describe("Module 02 deep lessons are wired", () => {
     expect(deepSteps.length).toBe(Object.keys(content.lessons).length);
   });
 
+  it("all 14 steps are deep lessons", () => {
+    expect(steps).toHaveLength(14);
+    expect(steps.every((s) => s.deep === true)).toBe(true);
+  });
+
   it("each exercise id is unique", () => {
     const ids = Object.values(content.lessons).map((d) => d.build.id);
     expect(new Set(ids).size).toBe(ids.length);

@@ -2,6 +2,7 @@ import type { DeepContent } from "../../../core/types";
 import { bpeEncoding } from "./bpe-encoding";
 import { bpeTraining } from "./bpe-training";
 import { bytesLesson } from "./bytes";
+import { cheatSheet } from "./cheat-sheet";
 import { deepData } from "./data";
 import { lookupTable } from "./lookup-table";
 import { playground } from "./playground";
@@ -30,6 +31,7 @@ export const content: DeepContent = {
     "lookup-table": lookupTable,
     "static-vs-contextual": staticVsContextual,
     "sentence-embeddings": sentenceEmbeddings,
+    "cheat-sheet": cheatSheet,
   },
   data: deepData,
 };

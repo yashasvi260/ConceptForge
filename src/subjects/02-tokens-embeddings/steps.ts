@@ -270,6 +270,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "cheat-sheet",
+    deep: true,
     title: "Recap: build a semantic search",
     summary: "Embed the question, embed the documents, return the closest ones: that's semantic search.",
     body: [
