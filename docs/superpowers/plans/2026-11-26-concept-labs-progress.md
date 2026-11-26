@@ -33,8 +33,8 @@ need full deep conversion as well).
 | 02 | wordpiece | yes | 4/4 (wordpiece, wp-unk, wp-score, wp-fertility) | (this commit) |
 | 02 | sentencepiece | yes | 4/4 (sp-normalize, unigram, viterbi-table, unigram-prune) | (this commit) |
 | 02 | special-tokens | yes | 4/4 (special-ids, chat-template, special, padding-mask) | (this commit) |
-| 02 | playground | | | |
-| 02 | quirks | | | |
+| 02 | playground | yes | 4/4 (languages, pretokenize, number-chunks, playground) | (this commit) |
+| 02 | quirks | yes | 4/4 (quirks, glitch, practice, chunker) | (this commit) |
 | 02 | lookup-table | | | |
 | 02 | static-vs-contextual | | | |
 | 02 | sentence-embeddings | | | |

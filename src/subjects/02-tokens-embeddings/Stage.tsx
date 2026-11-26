@@ -18,6 +18,7 @@ import { UnigramView } from "./views/UnigramView";
 import { BpeCompressLab, FertilityLab, MergeOrderLab, MergesCurveLab, PretokenizeLab, VariantsLab } from "./views/labs/BpeLabs";
 import { ByteStandinsLab, ByteTaxLab, StreamDecodeLab, WpFertilityLab, WpScoreLab, WpUnkLab } from "./views/labs/BytesWordPieceLabs";
 import { ChatTemplateLab, PaddingMaskLab, SpNormalizeLab, SpecialIdsLab, UnigramPruneLab, ViterbiTableLab } from "./views/labs/SpSpecialLabs";
+import { ChunkerLab, GlitchLab, NumberChunksLab } from "./views/labs/PlaygroundQuirksLabs";
 import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
@@ -118,6 +119,12 @@ export function Stage({ step }: StageProps) {
         return <ChatTemplateLab />;
       case "padding-mask":
         return <PaddingMaskLab />;
+      case "number-chunks":
+        return <NumberChunksLab />;
+      case "glitch":
+        return <GlitchLab />;
+      case "chunker":
+        return <ChunkerLab />;
       default:
         return (
           <Panel>

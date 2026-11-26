@@ -3,14 +3,14 @@ import { localListing, part } from "./files";
 
 export const playground: DeepLesson = {
   why: [
-    "Steps 3 to 8 built tokenizers from first principles. Real tokenizers are those same algorithms trained on huge, uneven text collections, and their behaviour on your text is something you can measure rather than guess. This step works with the real tokenizers of GPT-4 (`cl100k_base`, about 100k entries) and GPT-4o (`o200k_base`, about 200k), which run in this page through OpenAI's open-source tiktoken vocabularies.",
-    "Three kinds of text behave very differently. **Languages**: English is cheap, and other languages pay a \"token tax\" that depends heavily on which tokenizer you use. **Code**: brackets, operators and indentation tokenize into many small pieces, so source files cost more tokens than prose of the same length. **Numbers**: modern GPT tokenizers cut digit runs into chunks of up to three, from the left, which is efficient for storage but awkward for arithmetic.",
-    "These differences turn into money, speed and fairness. A support team serving Hindi-speaking customers pays several times more per message with one tokenizer than another; a code assistant fills its context window faster than a chat assistant; and a model that sees `1234567` as `123`, `456`, `7` has to learn arithmetic across chunks that do not line up with place values. This step measures each effect on real counts and rebuilds the rules behind them.",
+    "Steps 3 to 8 built tokenizers from first principles. Real tokenizers are those same algorithms, trained on huge, uneven text collections, and you don't have to guess how they treat your text: you can measure it. This step works with the real tokenizers of GPT-4 (`cl100k_base`, about 100k entries) and GPT-4o (`o200k_base`, about 200k), running right in this page through OpenAI's open-source tiktoken vocabularies.",
+    "Three kinds of text behave very differently. **Languages**: English is cheap, and other languages pay a \"token tax\" that depends heavily on which tokenizer you use. **Code**: brackets, operators and indentation break into many small pieces, so source files cost more tokens than prose of the same length. **Numbers**: modern GPT tokenizers cut digit runs into chunks of up to three, from the left, which is efficient but awkward for arithmetic.",
+    "And these differences turn into money, speed and fairness. A support team serving Hindi-speaking customers can pay several times more per message with one tokenizer than another. A code assistant fills its context window faster than a chat assistant. A model that sees `1234567` as `123`, `456`, `7` has to learn arithmetic across chunks that don't line up with place value. In this step you'll measure each effect on real counts, and rebuild the rules behind them.",
   ],
   worked: [
     {
       kind: "text",
-      text: "The Languages view's six sample texts (one sentence in four languages, a line of code, and an arithmetic expression), counted with the real GPT-4 and GPT-4o tokenizers. The last two columns use GPT-4o: characters covered per token, and tokens relative to the English sentence.",
+      text: "Let's measure. The Languages view's six sample texts (one sentence in four languages, a line of code, and an arithmetic expression), counted with the real GPT-4 and GPT-4o tokenizers. The last two columns use GPT-4o: characters covered per token, and tokens relative to the English sentence.",
     },
     {
       kind: "table",
@@ -28,7 +28,7 @@ export const playground: DeepLesson = {
     },
     {
       kind: "text",
-      text: "GPT-4o's larger vocabulary cut Hindi from 45 tokens to 14 and Spanish from 16 to 12, but code and numbers did not change at all. Japanese packs fewer characters per token (1.41) because each Japanese character carries more meaning than a Latin letter; comparing tokens for the same sentence, as the last column does, is the fair measure. Now look inside the numbers:",
+      text: "Spot anything surprising? GPT-4o's larger vocabulary cut Hindi from 45 tokens to 14 and Spanish from 16 to 12, but code and numbers did not change at all. Japanese packs fewer characters per token (1.41) because each Japanese character carries more meaning than a Latin letter; comparing tokens for the same sentence, as the last column does, is the fair measure. Now look inside the numbers:",
     },
     {
       kind: "table",
@@ -49,9 +49,9 @@ export const playground: DeepLesson = {
     {
       heading: "The token tax",
       paragraphs: [
-        "A tokenizer spends its vocabulary where its training text was dense. Text in languages that were rare in that collection is split into shorter pieces, so the same meaning costs more tokens. Researchers have measured differences of several times between languages for the same content, and called it a source of unfairness: speakers of those languages pay more per request, wait longer for answers, and fit less of their text into the context window.",
-        "The size of the tax is a property of the tokenizer, not the language. With GPT-4's tokenizer our Hindi sentence costs 3.5 times as many tokens as the English one (45 vs 13); with GPT-4o's it costs 1.17 times (14 vs 12). Doubling the vocabulary and rebalancing the training text toward more languages removed most of the gap for this sentence. When you choose a model for users who do not write in English, measure the token counts of their real text with each candidate's tokenizer.",
-        "A fair measurement needs parallel text: the same messages in each language, ideally real ones from your users translated by people rather than made up. Count tokens for each version with each candidate tokenizer, divide by the English count, and multiply by the price per token to get a cost per message for every language you support. A few hundred messages per language is enough to see the pattern; single sentences, like the ones here, only illustrate it.",
+        "A tokenizer spends its vocabulary where its training text was dense. So text in languages that were rare in that collection gets split into shorter pieces, and the same meaning costs more tokens. Researchers have measured differences of several times between languages for the same content, and called it a source of unfairness: speakers of those languages pay more per request, wait longer, and fit less of their text into the context window.",
+        "Here's the key insight: the size of the tax belongs to the tokenizer, not the language. With GPT-4's tokenizer, our Hindi sentence costs 3.5 times as many tokens as the English one (45 vs 13). With GPT-4o's, it costs 1.17 times (14 vs 12). Doubling the vocabulary and rebalancing the training text removed most of the gap for this sentence. So when you choose a model for users who don't write in English, measure the token counts of their real text with each candidate's tokenizer.",
+        "A fair measurement needs parallel text: the same messages in each language, ideally real ones from your users translated by people, not made up. Count tokens for each version with each candidate tokenizer, divide by the English count, and multiply by the price per token to get a cost per message for every language you support. A few hundred messages per language shows the pattern; single sentences, like the ones here, only illustrate it.",
       ],
       formula: {
         expr: "token tax(language) = tokens(text in language) / tokens(same text in English), same tokenizer",
@@ -61,20 +61,31 @@ export const playground: DeepLesson = {
         ],
         example: "GPT-4: Hindi 45 / English 13 = 3.46.   GPT-4o: 14 / 12 = 1.17.",
       },
+      lab: {
+        view: "languages",
+        label: "Token tax",
+        task: "Compare the rows: which language pays the biggest tax with GPT-4, and how much does GPT-4o shrink it? Then edit a sentence in a language you know.",
+      },
     },
     {
       heading: "Pre-tokenization: the rules before BPE",
       paragraphs: [
-        "Before BPE runs, GPT-style tokenizers cut text into chunks with a regular expression, and merges never cross chunk boundaries. The pattern separates letters, digits, punctuation and whitespace, attaches a single leading space to the word after it (that is why tokens look like ` cat`), and splits English contractions such as `'m` and `'s` off the word. Part 3 builds a simplified version; the real patterns are longer, and GPT-2's also keeps the last space of a run attached to the next word, but the idea is the same.",
-        "Pre-tokenization explains many \"why is this split here?\" questions. A word and its punctuation can never become one token. A word at the start of a text (no leading space) is a different token from the same word mid-sentence, which is why `strawberry` is three pieces but ` strawberry` is one. Changing the case changes the letters, so `STRAWBERRY` falls back to pieces learned from much rarer upper-case text.",
+        "Before BPE runs, GPT-style tokenizers cut text into chunks with a regular expression, and merges never cross a chunk boundary. The pattern separates letters, digits, punctuation and whitespace, attaches a single leading space to the word after it (that's why tokens look like ` cat`), and splits English contractions like `'m` and `'s` off the word. Part 3 builds a simplified version; the real patterns are longer, and GPT-2's also keeps the last space of a run attached to the next word, but the idea is the same.",
+        "Pre-tokenization answers a lot of \"why is this split here?\" questions. A word and its punctuation can never become one token. A word at the very start of a text (no leading space) is a different token from the same word mid-sentence, which is why `strawberry` is three pieces but ` strawberry` is one. And changing the case changes the letters, so `STRAWBERRY` falls back to pieces learned from much rarer upper-case text.",
       ],
-      mistake: "Assuming the same word is always the same token. Position (leading space or not), case and surrounding punctuation all change the pieces, so test with the real text you will send, not with a word on its own.",
+      mistake:
+        "Assuming the same word is always the same token. Position (leading space or not), case and surrounding punctuation all change the pieces, so test with the real text you will send, not with a word on its own.",
+      lab: {
+        view: "pretokenize",
+        label: "Pre-tokenizer",
+        task: "Type a sentence starting with a word you also use mid-sentence. Which chunks keep a leading space? Why does that make the first word a different token?",
+      },
     },
     {
       heading: "Numbers",
       paragraphs: [
-        "GPT-4, GPT-4o and Llama 3 cut every run of digits into chunks of at most three, counted from the left: `1234567` is `123`, `456`, `7`. This keeps the number of numeric tokens small (there are only 1,110 possible chunks of one to three digits) and stops the vocabulary filling up with specific long numbers. Older choices differ: GPT-2 had no rule and learned arbitrary numeric pieces, while Llama 1 and 2 split numbers into single digits.",
-        "Counting from the left means chunks do not line up with place value. `1000` is `100` + `0` but `10000` is `100` + `00`, so the digit in the thousands place sits in a different chunk depending on the length of the number. To add two numbers the model has to work out which chunks correspond, something a person aligning digits on paper never has to think about. This is one reason models make arithmetic mistakes that look silly, and why tools such as a calculator or code execution (Module 10) are the reliable route for exact arithmetic.",
+        "GPT-4, GPT-4o and Llama 3 cut every run of digits into chunks of at most three, counted from the left: `1234567` is `123`, `456`, `7`. That keeps the number of numeric tokens small (there are only 1,110 possible chunks of one to three digits), and stops the vocabulary filling up with specific long numbers. Older choices differ: GPT-2 had no rule and learned arbitrary numeric pieces, while Llama 1 and 2 split numbers into single digits.",
+        "But counting from the left means chunks don't line up with place value. `1000` is `100` + `0`, while `10000` is `100` + `00`, so the thousands digit sits in a different chunk depending on how long the number is. To add two numbers, the model has to work out which chunks correspond, something you never have to think about when you line digits up on paper. That's one reason models make arithmetic slips that look silly, and why tools like a calculator or code execution (Module 10) are the reliable route for exact arithmetic.",
       ],
       formula: {
         expr: "digit chunks = re.findall(r\"\\d{1,3}\", digit run), taken from the left",
@@ -83,17 +94,27 @@ export const playground: DeepLesson = {
         ],
         example: "3.14159 → 3 | . | 141 | 59: the fractional part is chunked from its own left end.",
       },
+      lab: {
+        view: "number-chunks",
+        label: "Numbers",
+        task: "Compare `1000` and `10000` in GPT-4o's real tokenizer. Now try a phone number and a price with decimals. Where would a model have to work hardest to add two of them?",
+      },
     },
     {
       heading: "Code and whitespace",
       paragraphs: [
-        "Code mixes short identifiers, operators, brackets and indentation, so it tokenizes densely: our one line of JavaScript, 48 characters, takes 21 tokens with either tokenizer, about 2.3 characters per token against 4.3 for English prose. Newer tokenizers include entries for runs of spaces so that indentation does not cost one token per space, and common keywords (` return`, ` function`) are single tokens.",
-        "For a code assistant this means the context window fills two or more times faster than the same number of characters of prose, and that long files need chunking sooner. Minified code, long hexadecimal strings and base64 blobs are worse still, since nothing in them matches learned pieces. Counting with the real tokenizer before you send a file is the only reliable estimate.",
+        "Code mixes short names, operators, brackets and indentation, so it tokenizes densely. Our one line of JavaScript, 48 characters, takes 21 tokens with either tokenizer: about 2.3 characters per token, against 4.3 for English prose. Newer tokenizers include entries for runs of spaces, so indentation doesn't cost one token per space, and common keywords (` return`, ` function`) are single tokens.",
+        "For a code assistant, that means the context window fills two or more times faster than the same amount of prose, and long files need chunking sooner. Minified code, long hexadecimal strings and base64 blobs are worse still, because nothing in them matches learned pieces. Counting with the real tokenizer before you send a file is the only reliable estimate.",
       ],
+      lab: {
+        view: "playground",
+        label: "Playground",
+        task: "Paste a paragraph of an email, then a block of code, then a long hex string. Which costs the most tokens per character? Compare GPT-4 with GPT-4o for each.",
+      },
     },
   ],
   guided:
-    "In the Playground, paste a paragraph of an email, then a block of code, then a long number, and predict which costs the most tokens per character. Switch to **Languages** and check which language gains most from GPT-4o, then type a sentence in a language you know.",
+    "Predict which costs more tokens per character: an email paragraph, a block of code, or a long number. Check in **Playground**. Then open **Token tax** and find the language that gains most from GPT-4o.",
   build: {
     id: "m02-playground",
     title: "Measure real tokenizers and rebuild their rules",

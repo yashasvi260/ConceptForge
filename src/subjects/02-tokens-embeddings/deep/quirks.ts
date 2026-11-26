@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const quirks: DeepLesson = {
   why: [
-    "Tokens are the unit everything around a model is measured in. You pay per token, separately for what you send and what comes back. The **context window**, the most a model can handle at once, is counted in tokens and holds the prompt and the answer together. Long documents are cut into token-sized **chunks** before they are searched (Module 09). If you estimate tokens badly, requests fail at the limit, bills surprise you, and retrieval quietly drops text.",
-    "Tokens also explain a family of failures that look like the model being careless. Asked how many r's are in strawberry, a model sees one or three tokens, not ten letters, and has to remember the spelling of each token rather than read it. Reversing a word, counting characters, rhyming, and doing long arithmetic all ask the model to work below the level it actually sees. A few tokens are worse still: entries that were in the tokenizer's vocabulary but almost never in the model's training text, which make models behave erratically.",
-    "This step collects the practical side of tokenization: why the popular \"4 characters per token\" rule only works for English, how to price a request, how to fit a long conversation into a fixed window, and how to chunk a document with overlap so nothing important is cut in half. Each is a few lines of code you will reuse.",
+    "Tokens are the unit everything around a model is measured in. You pay per token, separately for what you send and what comes back. The **context window**, the most a model can handle at once, is counted in tokens, and it holds the prompt *and* the answer together. Long documents are cut into token-sized **chunks** before they're searched (Module 09). Estimate tokens badly, and requests fail at the limit, bills surprise you, and retrieval quietly drops text.",
+    "Tokens also explain a family of failures that look like the model being careless. Ask a model how many r's are in strawberry, and it sees one or three tokens, not ten letters; it has to *remember* each token's spelling instead of reading it. Reversing a word, counting characters, rhyming and long arithmetic all ask the model to work below the level it actually sees. And a few tokens are stranger still: entries that were in the tokenizer's vocabulary but almost never in the model's training text, which make models behave erratically.",
+    "So this step collects the practical side of tokenization: why the popular \"4 characters per token\" rule only works for English, how to price a request, how to fit a long conversation into a fixed window, and how to chunk a document with overlap so nothing important gets cut in half. Each one is a few lines of code you'll reuse.",
   ],
   worked: [
     {
       kind: "text",
-      text: "The common rule of thumb says one token is about 4 characters of text. Test it against the real GPT-4o counts for the six sample texts (positive error = the rule overestimates):",
+      text: "You've probably heard the rule of thumb: one token is about 4 characters of text. Does it hold? Test it against the real GPT-4o counts for the six sample texts (positive error = the rule overestimates):",
     },
     {
       kind: "table",
@@ -28,7 +28,7 @@ export const quirks: DeepLesson = {
     },
     {
       kind: "text",
-      text: "For English and Spanish the rule is within 10%. For Japanese, code and numbers it undercounts by half or more, exactly the kinds of text that need care. Now chunking: split a 1,000-token document into windows, with and without overlap between neighbours.",
+      text: "So, does it hold? For English and Spanish the rule is within 10%. For Japanese, code and numbers it undercounts by half or more, exactly the kinds of text that need care. Now chunking: split a 1,000-token document into windows, with and without overlap between neighbours.",
     },
     {
       kind: "table",
@@ -51,24 +51,35 @@ export const quirks: DeepLesson = {
     {
       heading: "Why models fumble letters, digits and spelling",
       paragraphs: [
-        "In GPT-4o's tokenizer, ` strawberry` with its leading space is one token, `strawberry` without it is `st` + `raw` + `berry`, and `STRAWBERRY` is four pieces. None of these exposes the individual letters. To count the r's, the model has to have learned, from training text, how each of those tokens is spelled, and then count across token boundaries. It often can, but it is recalling rather than reading, and the error rate is far higher than for tasks at the level of whole tokens.",
-        "The same applies to reversing a word, counting characters, finding rhymes, and anagrams. Numbers suffer the related problem from step 9: digits are grouped in chunks of three that do not line up with place value. Practical fixes work around the tokenizer: ask for the word spelled out with spaces first (each letter becomes its own token), or hand the job to code, which sees characters directly.",
+        "In GPT-4o's tokenizer, ` strawberry` with its leading space is one token, `strawberry` without it is `st` + `raw` + `berry`, and `STRAWBERRY` is four pieces. None of these shows the individual letters. So to count the r's, the model has to have learned how each of those tokens is spelled, then count across token boundaries. It often can, but it's *recalling* rather than reading, and the error rate is far higher than for tasks at the level of whole tokens.",
+        "The same goes for reversing a word, counting characters, finding rhymes and solving anagrams. Numbers have the related problem from step 9: digits come in chunks of three that don't line up with place value. The practical fixes work around the tokenizer: ask for the word spelled out with spaces first (so each letter becomes its own token), or hand the job to code, which sees characters directly.",
       ],
-      mistake: "Concluding that a model \"can't count\" or \"is careless\" from letter-level tasks. It is answering a question about units it never sees; restate the task at the token level, or use a tool.",
+      mistake:
+        "Concluding that a model \"can't count\" or \"is careless\" from letter-level tasks. It is answering a question about units it never sees; restate the task at the token level, or use a tool.",
+      lab: {
+        view: "quirks",
+        label: "Quirks",
+        task: "Open each card and predict the tokens before revealing them. Then type a tricky word of your own: how many letters can the model actually \"see\"?",
+      },
     },
     {
       heading: "Glitch tokens",
       paragraphs: [
-        "A tokenizer is trained on one text collection and the model on another. If a string was common in the first and almost absent from the second, it gets its own vocabulary entry whose embedding row barely moves during training. In 2023, Rumbelow and Watkins found such entries in the GPT-2/GPT-3 vocabulary, the best-known being ` SolidGoldMagikarp` (a Reddit username): prompted with them, GPT-3-era models evaded, insulted, or replied with unrelated words.",
-        "Glitch tokens are rare in modern tokenizers, which are usually trained on text closer to the model's, but the lesson generalises: every vocabulary entry needs enough training examples to be useful, which is the hidden cost of very large vocabularies from step 2.",
+        "A tokenizer is trained on one text collection, and the model on another. What happens if a string was common in the first, but almost absent from the second? It gets its own vocabulary entry whose embedding row barely moves during training. In 2023, Rumbelow and Watkins found such entries in the GPT-2/GPT-3 vocabulary, the best-known being ` SolidGoldMagikarp` (a Reddit username). Prompted with them, GPT-3-era models evaded, insulted, or replied with unrelated words.",
+        "Glitch tokens are rare in modern tokenizers, which are usually trained on text closer to the model's. But the lesson generalises: every vocabulary entry needs enough training examples to be useful, and that's the hidden cost of very large vocabularies from step 2.",
       ],
+      lab: {
+        view: "glitch",
+        label: "Glitch token",
+        task: "Check ` SolidGoldMagikarp` in GPT-2's real vocabulary, then in GPT-4o's. Try ` petertodd` too. Why would one token that almost never appeared in training behave so strangely?",
+      },
     },
     {
       heading: "Cost and the context window",
       paragraphs: [
-        "API prices are quoted per million tokens, usually with a higher price for output than for input, and sometimes with discounts for input the provider has cached from an earlier request. The cost of a request is input tokens times the input price plus output tokens times the output price. Because chat applications resend the whole conversation every turn, input tokens grow with the conversation's length, and long chats get steadily more expensive per message.",
-        "The growth is faster than it looks. If every turn adds about 200 tokens and the whole history is resent each time, turn k sends 200 × k input tokens, so a 20-turn chat sends 200 × (1 + 2 + … + 20) = 200 × 210 = 42,000 input tokens in total, more than ten times the 4,000 tokens the conversation actually contains. Total input grows with the square of the number of turns, which is why long-running assistants trim, summarise or cache their history.",
-        "The context window caps prompt and answer **together**. A model with a 128,000-token window that receives a 120,000-token prompt can write at most 8,000 tokens back, however high you set the output limit (`max_tokens` in many APIs). When a conversation outgrows the window, something has to go. The simplest policy keeps the system message and the most recent turns that fit, dropping the oldest; summarising old turns (Module 10) keeps more information at the cost of an extra model call.",
+        "API prices are quoted per million tokens, usually with a higher price for output than for input, and sometimes with discounts for input the provider has cached from an earlier request. A request costs input tokens times the input price, plus output tokens times the output price. And since chat applications resend the whole conversation every turn, input grows with the conversation's length, so long chats get steadily more expensive per message.",
+        "The growth is faster than it looks. If every turn adds about 200 tokens and the whole history is resent each time, turn k sends 200 × k input tokens. So a 20-turn chat sends 200 × (1 + 2 + … + 20) = 200 × 210 = 42,000 input tokens in total, more than ten times the 4,000 tokens the conversation actually contains. Total input grows with the *square* of the number of turns, which is why long-running assistants trim, summarise or cache their history.",
+        "The context window caps prompt and answer **together**. A model with a 128,000-token window that gets a 120,000-token prompt can write at most 8,000 tokens back, however high you set the output limit (`max_tokens` in many APIs). When a conversation outgrows the window, something has to go. The simplest policy keeps the system message and the most recent turns that fit, dropping the oldest; summarising old turns (Module 10) keeps more information, at the cost of an extra model call.",
         "For anything that matters (billing estimates, limits, batching), count with the model's own tokenizer: tiktoken for OpenAI models, the Hugging Face tokenizer for open models. The rule of thumb is for rough English estimates only, as the worked example shows.",
       ],
       formula: {
@@ -79,12 +90,17 @@ export const quirks: DeepLesson = {
         ],
         example: "With made-up example prices of $2.50 in and $10.00 out per million: 1,000 in + 500 out = 0.0025 + 0.0050 = $0.0075.",
       },
+      lab: {
+        view: "practice",
+        label: "Cost & context",
+        task: "Paste a long text, set a price and a context window, and change the chunk size and overlap. How many requests would it take to read the whole document?",
+      },
     },
     {
       heading: "Chunking with overlap",
       paragraphs: [
-        "Retrieval systems (Module 09) store documents as chunks of a fixed number of tokens, because embedding models have input limits (256 word pieces for MiniLM) and because smaller pieces match questions more precisely. A hard cut every N tokens will sometimes split the one sentence that answers a question across two chunks, and neither half matches well.",
-        "**Overlap** fixes that: each chunk starts `size − overlap` tokens after the previous one, so the last `overlap` tokens of a chunk are repeated at the start of the next and any sentence shorter than the overlap appears whole somewhere. The price is storage and search work: with 200-token chunks and 50 tokens of overlap, a 1,000-token document becomes 7 chunks and 1,300 stored tokens instead of 5 and 1,000. Real systems often cut on sentence or paragraph boundaries first and use token counts only as a limit, which Module 09 compares.",
+        "Retrieval systems (Module 09) store documents as chunks with a fixed number of tokens, because embedding models have input limits (256 word pieces for MiniLM), and because smaller pieces match questions more precisely. But a hard cut every N tokens will sometimes split the very sentence that answers a question across two chunks, and then neither half matches well.",
+        "**Overlap** fixes that. Each chunk starts `size − overlap` tokens after the previous one, so the last `overlap` tokens of a chunk repeat at the start of the next, and any sentence shorter than the overlap appears whole somewhere. The price is storage and search work: with 200-token chunks and 50 tokens of overlap, a 1,000-token document becomes 7 chunks and 1,300 stored tokens, instead of 5 and 1,000. Real systems often cut on sentence or paragraph boundaries first and use token counts only as a limit, which Module 09 compares.",
       ],
       formula: {
         expr: "start_k = k × (size − overlap)        chunk_k = ids[start_k : start_k + size]",
@@ -94,10 +110,15 @@ export const quirks: DeepLesson = {
         ],
         example: "size 500, overlap 100: chunks start at 0, 400, 800, giving 3 chunks and 1,200 stored tokens for 1,000 tokens.",
       },
+      lab: {
+        view: "chunker",
+        label: "Chunker",
+        task: "Set chunk size 16 and overlap 0, then raise the overlap to 4. Which sentences were cut in half before, and which now appear whole in some chunk? What does it cost?",
+      },
     },
   ],
   guided:
-    "In **Quirks**, open each card and predict the tokens before revealing them, then try your own tricky word. Switch to **Cost & context**, paste a long text, set a price and a window, and change the chunk size and overlap: watch the number of chunks and the stored tokens move as in the table.",
+    "Before opening **Quirks**, predict how many GPT-4o tokens ` strawberry` (with a leading space) takes. Then use **Chunker** to find the smallest overlap that keeps every sentence of the sample whole somewhere.",
   build: {
     id: "m02-quirks",
     title: "Estimate, budget and chunk with tokens",
