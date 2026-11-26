@@ -98,7 +98,7 @@ export const architectures: DeepLesson = {
       heading: "Why decoders took over",
       paragraphs: [
         "Three properties made decoder-only models the default for LLMs. **Generality**: any task phrased as text in, text out can be done by continuing text, from translation to code. **Efficient training**: every token is a training example, and training data is just raw text, which exists in near-limitless quantities. **Scaling**: research such as GPT-3 showed that larger decoders trained on more text get steadily better and pick up abilities (few-shot learning from examples in the prompt) that smaller ones lack.",
-        "Encoders did not disappear. They moved into roles where a vector is the product: search, retrieval, classification, deduplication. Real systems routinely use both: an encoder to find the right documents, a decoder to write the answer from them. That is the RAG pattern of Module 08.",
+        "Encoders did not disappear. They moved into roles where a vector is the product: search, retrieval, classification, deduplication. Real systems routinely use both: an encoder to find the right documents, a decoder to write the answer from them. That is the RAG pattern of Module 09.",
       ],
     },
     {

@@ -16,10 +16,10 @@ const renderStep = (view: string) => {
   );
 };
 
-describe("Module 04 content", () => {
-  it("is a complete module with bridges from 03 and to 05", () => {
-    expect(subject.id).toBe("04-text-classification");
-    expect(subject.moduleNumber).toBe(4);
+describe("Module 06 content", () => {
+  it("is a complete module with bridges from Part I and to 07", () => {
+    expect(subject.id).toBe("06-text-classification");
+    expect(subject.moduleNumber).toBe(6);
     expect(subject.part).toBe(2);
     expect(steps.length).toBeGreaterThanOrEqual(8);
     for (const s of steps) {
@@ -29,7 +29,7 @@ describe("Module 04 content", () => {
     expect(subject.challenges.length).toBeGreaterThanOrEqual(4);
     expect(subject.challenges.every((c) => c.hint && c.relatedStepId && steps.some((s) => s.id === c.relatedStepId))).toBe(true);
     expect(subject.bridge.buildsOn).toMatch(/Module 0[123]/);
-    expect(subject.bridge.leadsTo).toMatch(/Module 05/);
+    expect(subject.bridge.leadsTo).toMatch(/Module 07/);
   });
 });
 

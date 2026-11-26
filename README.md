@@ -4,7 +4,7 @@ An interactive, visual learning platform for technical concepts. Each **subject*
 (explanation on the left, live interactive stage on the right) plus a challenge quiz. Subjects plug
 into a shared engine, so adding a new one doesn't touch the player.
 
-Content follows the **LLM Mastery** track (`docs/curriculum.md`): 4 parts, 14 modules. Every module shows
+Content follows the **LLM Mastery** track (`docs/curriculum.md`, v2): 4 parts, 18 modules. Every module shows
 where it fits in the whole LLM picture, what it builds on and what comes next. Unbuilt modules appear in the
 menu as "coming soon".
 
@@ -12,13 +12,14 @@ menu as "coming soon".
 | --- | --- | --- |
 | I · Understanding Language Models | **01 Introduction to Language Models** | **Deep lessons**: 12 long-form steps (why → worked example → concept with the live view → **Build it** in Python in the page → check → one sentence), ending in a mini-project that builds a tiny language model end to end. Covers the LLM loop, anatomy, exact parameter counts (GPT-2, Llama 3 8B, GPT-3), training vs using, Bag-of-Words, real MiniLM embeddings, context, the three families, cross-attention, representation vs generative, pre-training vs fine-tuning |
 | | **02 Tokens and Embeddings** | Real GPT-4o/GPT-4 tokenizers, BPE trainer, real BERT WordPiece, SentencePiece, special tokens, token tax; embedding lookup, contextual "bank" shift, mean pooling, similarity matrix, semantic search |
-| | **03 Looking Inside LLMs** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
-| II · Using Pretrained Language Models | **04 Text Classification** | 60 bank tickets: a classifier head trained live on MiniLM vectors, zero-shot with editable label descriptions, gemma4 by prompting (recorded, with real token probabilities); 3-way comparator |
-| | **05 Clustering & Topics** | 78 comments: real UMAP (umap-js) → HDBSCAN (tested against scikit-learn) → c-TF-IDF keywords → topic names recorded from gemma4; sliders and add-your-own |
-| | **06 Prompt Engineering** | 16 prompt combinations × 8 tickets × 4 samples, recorded from gemma4:12b and qwen2.5-coder:1.5b: builder, probability inspector, chaining |
-| | 07–09 | coming soon |
-| III · Training and Fine-Tuning | 10–12 | coming soon |
-| IV · Production Inference & Guardrails | 13–14 | coming soon |
+| | **03 Inside the Transformer Block** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
+| | 04 How LLMs Generate · 05 How Models Learn | coming soon (Module 03's decoding and KV cache steps move to 04 when it is built) |
+| II · Using Pretrained Language Models | **06 Text Classification** | 60 bank tickets: a classifier head trained live on MiniLM vectors, zero-shot with editable label descriptions, gemma4 by prompting (recorded, with real token probabilities); 3-way comparator |
+| | **07 Clustering & Topics** | 78 comments: real UMAP (umap-js) → HDBSCAN (tested against scikit-learn) → c-TF-IDF keywords → topic names recorded from gemma4; sliders and add-your-own |
+| | **08 Prompt Engineering** | 16 prompt combinations × 8 tickets × 4 samples, recorded from gemma4:12b and qwen2.5-coder:1.5b: builder, probability inspector, chaining |
+| | 09 Semantic Search & RAG · 10 Agents & Tools · 11 Multimodal | coming soon |
+| III · Training and Fine-Tuning | 12–15 (embeddings, encoders, generation, reasoning & distillation) | coming soon |
+| IV · Production, Guardrails & Capstone | 16 Serving · 17 Evals & Guardrails · 18 Capstone | coming soon |
 
 **Real models, in your browser, for free.** Embedding steps run **all-MiniLM-L6-v2** (Apache-2.0, ~23 MB, served by
 this site and cached after the first load) through transformers.js; tokenizer steps run OpenAI's open-source
@@ -100,12 +101,12 @@ src/
     01-intro-llms/ … one folder per built module: logic (+ tests), views/, steps.ts, challenges.ts
     02-tokens-embeddings/   tokenizers (bpe, wordpiece, unigram, real GPT) + embedding views, data/ (BERT vocab)
     03-transformer-internals/  positional, attention, norms, ffn, sampling, kvcache maths + views
-    04-text-classification/    tickets, classifier head, zero-shot, recorded gemma4 answers
-    05-clustering-topics/      UMAP wrapper, HDBSCAN, c-TF-IDF, precomputed default layout
-    06-prompt-engineering/     prompt builder (buildPrompt.mjs shared with the recording job), scoring, 2 recorded experiments
+    06-text-classification/    tickets, classifier head, zero-shot, recorded gemma4 answers
+    07-clustering-topics/      UMAP wrapper, HDBSCAN, c-TF-IDF, precomputed default layout
+    08-prompt-engineering/     prompt builder (buildPrompt.mjs shared with the recording job), scoring, 2 recorded experiments
   llm/                recording format, Ollama client, "Connect my Ollama" live mode, GenerationPanel
   ml/                 MiniLM embedding engine (transformers.js), useEmbeddings, vector maths
-  core/track.ts       the 14-module curriculum, parts, legacy-id redirects
+  core/track.ts       the 18-module curriculum (v2), parts, legacy-id redirects
   smoke.test.tsx      every subject × step × control × challenge, failing on any console error
 scripts/
   create-subject.mjs  scaffold a new subject

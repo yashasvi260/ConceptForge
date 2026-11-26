@@ -1,4 +1,4 @@
-/** The BERTopic-style pipeline used by Module 05: vectors → UMAP 2-D → HDBSCAN → c-TF-IDF keywords. */
+/** The BERTopic-style pipeline used by Module 07: vectors → UMAP 2-D → HDBSCAN → c-TF-IDF keywords. */
 import { cTfIdf } from "./ctfidf";
 import { hdbscan } from "./hdbscan";
 import { project2d } from "./umap";

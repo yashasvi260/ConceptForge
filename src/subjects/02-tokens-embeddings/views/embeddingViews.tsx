@@ -290,7 +290,7 @@ export function SearchPreviewView() {
           </ol>
         </ModelStatus>
       </div>
-      <p className="mt-3 text-xs text-slate-500">Module 08 builds this into a full retrieval-augmented generation (RAG) pipeline.</p>
+      <p className="mt-3 text-xs text-slate-500">Module 09 builds this into a full retrieval-augmented generation (RAG) pipeline.</p>
     </Panel>
   );
 }

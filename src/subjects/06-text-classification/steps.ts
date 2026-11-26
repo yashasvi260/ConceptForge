@@ -22,7 +22,7 @@ export const steps: LessonStep[] = [
     body: [
       "A representation model like MiniLM already turns a ticket into a 384-number vector that captures its meaning. A **classification head** is a small layer on top: one weight per (label, number) pair plus a bias per label, followed by softmax.",
       "Only the head is trained, here **1,925** weights. The 22.7 million weights inside MiniLM stay frozen, so training is fast and needs few examples.",
-      "Updating the encoder's own weights too is **fine-tuning**, which Module 11 covers.",
+      "Updating the encoder's own weights too is **fine-tuning**, which Module 13 covers.",
     ],
     tryIt: "Follow the pipeline from text to five probabilities.",
     keyTakeaway: "Embedding + classifier head: frozen encoder, small trained layer, softmax over labels.",
@@ -115,9 +115,9 @@ export const steps: LessonStep[] = [
     summary: "Classification needs labels. Clustering finds groups in the vectors when you don't have any.",
     body: [
       "You can now classify text three ways and compare them honestly.",
-      "But what if you don't know the categories yet: a pile of customer comments and no idea what people complain about? **Module 05** clusters the vectors to discover the topics.",
+      "But what if you don't know the categories yet: a pile of customer comments and no idea what people complain about? **Module 07** clusters the vectors to discover the topics.",
     ],
-    tryIt: "Take the practice check, then continue to Module 05.",
+    tryIt: "Take the practice check, then continue to Module 07.",
     keyTakeaway: "Head, zero-shot or prompt: three tools, chosen by data, cost and nuance.",
     view: "recap",
   },

@@ -50,7 +50,7 @@ export const representationVsGenerative: DeepLesson = {
     {
       heading: "Classifying with vectors",
       paragraphs: [
-        "The worked example used the simplest vector classifier: **nearest centroid**. It needs only a few labelled examples per class and no training, and new classes can be added by adding examples. With more data you would train a small classifier on top of the vectors (a logistic-regression head, Module 04), which learns which directions in the vector space matter for your labels and is usually more accurate.",
+        "The worked example used the simplest vector classifier: **nearest centroid**. It needs only a few labelled examples per class and no training, and new classes can be added by adding examples. With more data you would train a small classifier on top of the vectors (a logistic-regression head, Module 06), which learns which directions in the vector space matter for your labels and is usually more accurate.",
         "Either way the heavy model (the encoder) is frozen and reused; only a tiny piece on top is fitted to your task. That is cheap, fast to update, and easy to inspect: you can look at which examples a ticket was closest to and see why it was routed where it was.",
       ],
       formula: {
@@ -67,7 +67,7 @@ export const representationVsGenerative: DeepLesson = {
       heading: "Classifying with a generative model",
       paragraphs: [
         "A generative model classifies by being asked. You describe the labels in the prompt (**zero-shot**) or include a few labelled examples (**few-shot**), and it writes the label. This needs no training data, handles labels that are hard to define by examples (\"tickets where the customer sounds like they might leave\"), and can return a reason along with the label.",
-        "The costs are real. Every ticket runs a billion-parameter model over a long prompt. The output is text, so you must parse it and handle answers that don't match any label. And probabilities are less direct: you get a confidence only by reading the token probabilities, which Module 04 does with real recorded outputs.",
+        "The costs are real. Every ticket runs a billion-parameter model over a long prompt. The output is text, so you must parse it and handle answers that don't match any label. And probabilities are less direct: you get a confidence only by reading the token probabilities, which Module 06 does with real recorded outputs.",
       ],
       mistake:
         "Reaching for the biggest generative model for every task because it is the most capable. For high-volume tasks whose output is a label, a score or a match, an embedding model plus a small classifier is usually faster, far cheaper and easier to audit, and often just as accurate.",
@@ -83,13 +83,13 @@ export const representationVsGenerative: DeepLesson = {
       heading: "Choosing in practice",
       paragraphs: [
         "Four questions settle most cases. **What is the output?** A label, score, match or ranking points to vectors; words for a person point to generation. **How many items?** Thousands per hour or more favours vectors; a few dozen interactive requests can afford an LLM. **Do you have examples?** A few labelled examples per class is enough for a centroid classifier, and a few hundred for a trained head; with none, a zero-shot prompt is the quickest start. **Must it explain itself?** If every decision needs a written justification, generation earns its cost.",
-        "A good habit is to prototype with an LLM prompt (fast to try, no data needed), measure its accuracy on a small labelled set, and then check whether an embedding classifier matches it for a fraction of the cost. Module 04 runs exactly that comparison on real banking tickets.",
+        "A good habit is to prototype with an LLM prompt (fast to try, no data needed), measure its accuracy on a small labelled set, and then check whether an embedding classifier matches it for a fraction of the cost. Module 06 runs exactly that comparison on real banking tickets.",
       ],
     },
     {
       heading: "Combining them",
       paragraphs: [
-        "Real systems use both, each where it is strong. **Retrieval-augmented generation** (Module 08) embeds a question, uses vectors to find the few most relevant documents out of millions, and only then asks a generative model to write an answer from those documents. **Cascades** route the easy, confident cases with a cheap classifier and send only the uncertain ones to an LLM. **Labelling** uses an LLM once to label a training set, then trains a small fast classifier on those labels. The pattern is always the same: vectors for scale, generation for language.",
+        "Real systems use both, each where it is strong. **Retrieval-augmented generation** (Module 09) embeds a question, uses vectors to find the few most relevant documents out of millions, and only then asks a generative model to write an answer from those documents. **Cascades** route the easy, confident cases with a cheap classifier and send only the uncertain ones to an LLM. **Labelling** uses an LLM once to label a training set, then trains a small fast classifier on those labels. The pattern is always the same: vectors for scale, generation for language.",
       ],
     },
   ],
@@ -131,7 +131,7 @@ export const representationVsGenerative: DeepLesson = {
       prompt: "A customer needs a personalised explanation of why a payment was declined. Which kind of model must write it?",
       options: ["A representation model: it returns the closest explanation vector", "A generative model: only it can produce new text", "Either, they are interchangeable", "Neither; use Bag-of-Words"],
       correctIndex: 1,
-      explanation: "Representation models output vectors, not text. Writing requires a generative model, which can be combined with vectors that first retrieve the relevant policy (Module 08).",
+      explanation: "Representation models output vectors, not text. Writing requires a generative model, which can be combined with vectors that first retrieve the relevant policy (Module 09).",
     },
   ],
   oneSentence:

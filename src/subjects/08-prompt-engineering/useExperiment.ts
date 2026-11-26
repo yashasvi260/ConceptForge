@@ -18,7 +18,7 @@ export interface ExperimentState {
   retry: () => void;
 }
 
-/** 512 recorded runs per model (a few MB), loaded only when Module 06 needs them. */
+/** 512 recorded runs per model (a few MB), loaded only when Module 08 needs them. */
 export function useExperiment(model: ModelChoice = "gemma", load: Loader = MODELS[model].load): ExperimentState {
   const [, rerender] = useState(0);
   const [failed, setFailed] = useState<ModelChoice | null>(null);

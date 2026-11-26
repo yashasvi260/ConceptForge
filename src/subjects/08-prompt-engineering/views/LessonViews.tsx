@@ -105,7 +105,7 @@ export function RecapView() {
         <li>Split a job into a chain of smaller prompts.</li>
       </ul>
       <p className="mt-3 text-sm text-slate-400">
-        Module 07 goes further: models that remember conversations, run in smaller precision, and call tools in a loop (agents).
+        Module 09 goes further: retrieving the right passages from your own documents and making the model answer from them, with citations (RAG).
       </p>
     </Panel>
   );

@@ -21,9 +21,9 @@ const renderStep = (view: string) => {
 };
 const slider = (name: RegExp) => screen.getByRole("slider", { name });
 
-describe("Module 05 content", () => {
-  it("is a complete module with bridges from 04 and to 06", () => {
-    expect(subject.moduleNumber).toBe(5);
+describe("Module 07 content", () => {
+  it("is a complete module with bridges from 06 and to 08", () => {
+    expect(subject.moduleNumber).toBe(7);
     expect(steps.length).toBeGreaterThanOrEqual(8);
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();
@@ -31,8 +31,8 @@ describe("Module 05 content", () => {
     }
     expect(subject.challenges.length).toBeGreaterThanOrEqual(4);
     expect(subject.challenges.every((c) => c.hint && steps.some((s) => s.id === c.relatedStepId))).toBe(true);
-    expect(subject.bridge.buildsOn).toMatch(/Module 04/);
-    expect(subject.bridge.leadsTo).toMatch(/Module 06/);
+    expect(subject.bridge.buildsOn).toMatch(/Module 06/);
+    expect(subject.bridge.leadsTo).toMatch(/Module 08/);
   });
 
   it("default clusters fixture matches the pipeline on the shipped layout", () => {

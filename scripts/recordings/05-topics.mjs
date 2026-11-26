@@ -1,7 +1,7 @@
 // Module 05: gemma4 names each default cluster from its comments and c-TF-IDF keywords (temperature 0).
 import { readFileSync } from "node:fs";
 
-const dir = "src/subjects/05-clustering-topics/data";
+const dir = "src/subjects/07-clustering-topics/data";
 const docs = JSON.parse(readFileSync(`${dir}/docs.json`, "utf8")).docs;
 const { groups } = JSON.parse(readFileSync(`${dir}/default-clusters.json`, "utf8"));
 const { template } = JSON.parse(readFileSync(`${dir}/topicPrompt.json`, "utf8"));

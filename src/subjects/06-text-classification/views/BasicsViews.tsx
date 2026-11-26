@@ -73,7 +73,7 @@ export function HeadView() {
         <Stat label="Training time here" value="< 1 s" sub="in your browser" />
       </div>
       <p className="mt-3 text-xs text-slate-500">
-        This is “embedding + classifier”: MiniLM stays frozen. Updating MiniLM's own weights too (full fine-tuning) comes in Module 11.
+        This is “embedding + classifier”: MiniLM stays frozen. Updating MiniLM's own weights too (full fine-tuning) comes in Module 13.
       </p>
     </Panel>
   );
@@ -127,7 +127,7 @@ export function RecapView() {
         <li>Weigh accuracy, latency, cost and flexibility when choosing between them.</li>
       </ul>
       <p className="mt-3 text-sm text-slate-400">
-        Next, Module 05 drops the labels altogether: what if you don't know the categories yet? Clustering finds them from the vectors.
+        Next, Module 07 drops the labels altogether: what if you don't know the categories yet? Clustering finds them from the vectors.
       </p>
     </Panel>
   );

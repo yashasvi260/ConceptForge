@@ -5,7 +5,7 @@ export const steps: LessonStep[] = [
   {
     id: "no-labels",
     title: "When nobody has labelled the data",
-    summary: "Module 04 sorted tickets into categories someone defined. Often you first need to discover what the categories are.",
+    summary: "Module 06 sorted tickets into categories someone defined. Often you first need to discover what the categories are.",
     body: [
       "A bank collects thousands of comments from surveys, app reviews and chats. Before you can route or count them, you need to know **what people talk about**.",
       "Reading them all doesn't scale. **Topic modelling** groups similar texts automatically and describes each group. No labels needed.",
@@ -107,12 +107,12 @@ export const steps: LessonStep[] = [
   {
     id: "recap",
     title: "Up next: the prompt itself",
-    summary: "You've used LLMs with one-line prompts. Module 06 shows how much the prompt's wording and structure change the answer.",
+    summary: "You've used LLMs with one-line prompts. Module 08 shows how much the prompt's wording and structure change the answer.",
     body: [
       "You can now discover topics in unlabelled text: embed, reduce, cluster, describe, name.",
-      "Twice now (classification and topic naming) a short prompt did the LLM's part. **Module 06** opens up prompt engineering: roles, examples, step-by-step reasoning and structured outputs, measured on real model runs.",
+      "Twice now (classification and topic naming) a short prompt did the LLM's part. **Module 08** opens up prompt engineering: roles, examples, step-by-step reasoning and structured outputs, measured on real model runs.",
     ],
-    tryIt: "Take the practice check, then continue to Module 06.",
+    tryIt: "Take the practice check, then continue to Module 08.",
     keyTakeaway: "Embed → UMAP → HDBSCAN → c-TF-IDF (→ LLM names) is the BERTopic pipeline.",
     view: "recap",
   },

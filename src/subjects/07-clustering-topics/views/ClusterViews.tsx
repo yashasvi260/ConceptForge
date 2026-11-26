@@ -189,7 +189,7 @@ export function RecapView() {
         <li>Optionally, let an LLM turn the words into a readable name</li>
       </ol>
       <p className="mt-3 text-sm text-slate-400">
-        So far every model call has used a tiny prompt. Module 06 is about the prompt itself: how its wording, examples and structure change what an LLM gives
+        So far every model call has used a tiny prompt. Module 08 is about the prompt itself: how its wording, examples and structure change what an LLM gives
         back.
       </p>
     </Panel>

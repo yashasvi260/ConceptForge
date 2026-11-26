@@ -14,11 +14,11 @@ const completeOf = (id: string): ProgressMap => {
 const card = (title: string) => screen.getByRole("button", { name: new RegExp(`^Module \\d\\d.*${title}`) });
 
 describe("CourseOverview", () => {
-  it("shows 0 / 14 and Start Module 01 when new", () => {
+  it("shows 0 / 18 and Start Module 01 when new", () => {
     render(<CourseOverview subjects={SUBJECTS} progress={{}} onOpenModule={vi.fn()} />);
     expect(screen.getByRole("heading", { level: 1, name: "LLM Mastery" })).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Course completion" })).toHaveAttribute("aria-valuenow", "0");
-    expect(screen.getByText("0 / 14 modules · 0%")).toBeInTheDocument();
+    expect(screen.getByText("0 / 18 modules · 0%")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start Module 01 →" })).toBeInTheDocument();
   });
 
@@ -31,14 +31,14 @@ describe("CourseOverview", () => {
     expect(within(card(m1!.title)).getByText("✓ Completed")).toBeInTheDocument();
     expect(within(card(m2!.title)).getByText("▶ Up next")).toBeInTheDocument();
     expect(within(card(SUBJECTS[2]!.title)).getByText(`1/${SUBJECTS[2]!.steps.length} steps`)).toBeInTheDocument();
-    expect(screen.getByText("1 / 14 modules · 7%")).toBeInTheDocument();
+    expect(screen.getByText("1 / 18 modules · 6%")).toBeInTheDocument();
   });
 
   it("shows coming soon for unbuilt modules without a button", () => {
     render(<CourseOverview subjects={SUBJECTS} progress={{}} onOpenModule={vi.fn()} />);
     expect(screen.queryByRole("button", { name: /Evals, Guardrails/ })).not.toBeInTheDocument();
     const part4 = screen.getByRole("region", { name: PART_TITLES[4] });
-    expect(within(part4).getAllByText("Coming soon")).toHaveLength(2);
+    expect(within(part4).getAllByText("Coming soon")).toHaveLength(3);
   });
 
   it("Resume opens the up-next module", async () => {
@@ -57,7 +57,7 @@ describe("CourseOverview", () => {
 
   it("part counts", () => {
     render(<CourseOverview subjects={SUBJECTS} progress={completeOf(m1!.id)} onOpenModule={vi.fn()} />);
-    expect(within(screen.getByRole("region", { name: PART_TITLES[1] })).getByText("1 / 3 modules completed")).toBeInTheDocument();
-    expect(within(screen.getByRole("region", { name: PART_TITLES[4] })).getByText("0 / 2 modules completed")).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: PART_TITLES[1] })).getByText("1 / 5 modules completed")).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: PART_TITLES[4] })).getByText("0 / 3 modules completed")).toBeInTheDocument();
   });
 });

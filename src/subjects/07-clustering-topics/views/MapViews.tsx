@@ -16,7 +16,7 @@ export function IntroView() {
         ))}
       </ul>
       <p className="mt-2 text-xs text-slate-500">
-        Short comments written for this lesson. Unlike Module 04, nobody has said what the categories are: the pipeline has to find them.
+        Short comments written for this lesson. Unlike Module 06, nobody has said what the categories are: the pipeline has to find them.
       </p>
     </Panel>
   );

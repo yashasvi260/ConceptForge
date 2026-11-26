@@ -23,10 +23,10 @@ describe("Module 03 content", () => {
     expect(subject.challenges.every((c) => c.hint && c.relatedStepId)).toBe(true);
   });
 
-  it("ends with an up-next card pointing to Module 04", () => {
+  it("ends with an up-next card pointing to Module 04, How LLMs Generate", () => {
     window.location.hash = `#/03-transformer-internals/${steps.length}`;
     render(<App />);
-    expect(screen.getByRole("note", { name: "Up next" })).toHaveTextContent(/Module 04: Text Classification/);
+    expect(screen.getByRole("note", { name: "Up next" })).toHaveTextContent(/Module 04: How LLMs Generate/);
   });
 });
 

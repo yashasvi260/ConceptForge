@@ -75,7 +75,7 @@ export const pretrainingFinetuning: DeepLesson = {
         "Practitioners guard against it with low learning rates, few passes (often one to three), mixing some general data into the fine-tuning set, and **parameter-efficient** methods such as LoRA that train a small number of extra weights and leave the original weights frozen. Part III builds these and measures the trade-off.",
       ],
       mistake:
-        "Treating fine-tuning as a way to add knowledge, such as this month's policy changes. Fine-tuning is good at changing *behaviour and style*; it is unreliable for adding facts and is expensive to redo whenever they change. For facts that change, retrieval (Module 08) is usually the right tool.",
+        "Treating fine-tuning as a way to add knowledge, such as this month's policy changes. Fine-tuning is good at changing *behaviour and style*; it is unreliable for adding facts and is expensive to redo whenever they change. For facts that change, retrieval (Module 09) is usually the right tool.",
     },
     {
       heading: "How much data each stage needs",

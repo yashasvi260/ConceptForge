@@ -83,7 +83,7 @@ export const bigPicture: DeepLesson = {
       heading: "Choosing the next token",
       paragraphs: [
         "Step (3) of the loop is a choice, and the choice matters. **Greedy decoding** always takes the highest-probability token. It is simple and repeatable, but as the worked example shows, it can get stuck repeating itself, and it never surprises you.",
-        "The alternative is **sampling**: pick a token at random, weighted by the probabilities, so `cat` is chosen a third of the time and `mat`, `fish`, `dog` and `rug` the rest. A setting called **temperature** sharpens or flattens the list before sampling: low temperature behaves almost like greedy, high temperature makes rare tokens more likely. Module 03 lets you play with temperature, top-k and top-p on a real model.",
+        "The alternative is **sampling**: pick a token at random, weighted by the probabilities, so `cat` is chosen a third of the time and `mat`, `fish`, `dog` and `rug` the rest. A setting called **temperature** sharpens or flattens the list before sampling: low temperature behaves almost like greedy, high temperature makes rare tokens more likely. Module 06 lets you play with temperature, top-k and top-p on a real model.",
       ],
     },
     {

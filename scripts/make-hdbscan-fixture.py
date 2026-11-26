@@ -1,4 +1,4 @@
-"""Reference labels from scikit-learn's HDBSCAN for src/subjects/05-clustering-topics/hdbscan.test.ts.
+"""Reference labels from scikit-learn's HDBSCAN for src/subjects/07-clustering-topics/hdbscan.test.ts.
 
     docker run --rm -v "$PWD":/w -w /w python:3.12-slim sh -c "pip -q install scikit-learn==1.5.2 && python scripts/make-hdbscan-fixture.py"
 """
@@ -16,5 +16,5 @@ for mcs, ms in [(5, None), (10, None), (5, 3), (15, None)]:
     model = HDBSCAN(min_cluster_size=mcs, min_samples=ms).fit(X)
     cases.append({"minClusterSize": mcs, "minSamples": ms, "labels": model.labels_.tolist()})
 json.dump({"points": X.tolist(), "cases": cases, "sklearn": __import__("sklearn").__version__},
-          open("src/subjects/05-clustering-topics/data/hdbscan-reference.json", "w"))
+          open("src/subjects/07-clustering-topics/data/hdbscan-reference.json", "w"))
 print("cases", [(c["minClusterSize"], c["minSamples"], max(c["labels"]) + 1, c["labels"].count(-1)) for c in cases])

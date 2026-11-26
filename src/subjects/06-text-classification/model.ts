@@ -1,4 +1,4 @@
-/** Module 04 data: tickets, their real MiniLM vectors, the recorded gemma4 answers, and helpers on top. */
+/** Module 06 data: tickets, their real MiniLM vectors, the recorded gemma4 answers, and helpers on top. */
 import { findRecording, type RecordedGeneration, type RecordingFile } from "../../llm/recordings";
 import { argmax, predictProba, trainSoftmax, type SoftmaxModel } from "./classifier";
 import data from "./data/tickets.json";

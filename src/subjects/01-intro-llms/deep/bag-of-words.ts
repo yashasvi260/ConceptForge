@@ -4,7 +4,7 @@ import { part } from "./files";
 export const bagOfWords: DeepLesson = {
   why: [
     "Long before LLMs, people needed computers to compare texts. Which support tickets are about the same problem? Which documents match a search? Which reviews are positive? Each of these needs text turned into numbers you can compare, and the first approach that worked well enough to power real search engines and spam filters was astonishingly blunt: **ignore everything except which words appear, and how often**.",
-    "That is **Bag-of-Words**. Pour a sentence's words into a bag, shake it so the order is lost, and count. Two texts are similar if their counts are similar. It is fast, needs no training, and is easy to inspect, which is why ideas from it (such as BM25, a refined word-count score) still sit inside modern search systems; Module 08 uses one.",
+    "That is **Bag-of-Words**. Pour a sentence's words into a bag, shake it so the order is lost, and count. Two texts are similar if their counts are similar. It is fast, needs no training, and is easy to inspect, which is why ideas from it (such as BM25, a refined word-count score) still sit inside modern search systems; Module 09 uses one.",
     "It is also the clearest way to see what an LLM has to do better. Bag-of-Words cannot tell `Dog bites man` from `Man bites dog`, and it thinks `film` and `movie` have nothing in common. Every later idea in this module (dense embeddings, context, attention) is a fix for one of those two failures. This step builds Bag-of-Words from scratch so you can see both.",
   ],
   worked: [
@@ -112,7 +112,7 @@ export const bagOfWords: DeepLesson = {
     {
       heading: "Where it still wins",
       paragraphs: [
-        "Bag-of-Words is not obsolete. For **exact terms** (product codes, error messages, names, legal clauses), counting the literal word beats any fuzzy notion of meaning: if a customer searches `ERR-4021`, you want documents containing `ERR-4021`. Modern retrieval systems usually combine a word-count score (BM25) with dense embeddings, and get the best of both. Module 08 builds that hybrid and measures it.",
+        "Bag-of-Words is not obsolete. For **exact terms** (product codes, error messages, names, legal clauses), counting the literal word beats any fuzzy notion of meaning: if a customer searches `ERR-4021`, you want documents containing `ERR-4021`. Modern retrieval systems usually combine a word-count score (BM25) with dense embeddings, and get the best of both. Module 09 builds that hybrid and measures it.",
       ],
     },
     {

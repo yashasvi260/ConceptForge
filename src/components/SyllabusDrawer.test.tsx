@@ -14,11 +14,11 @@ describe("SyllabusDrawer", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("lists 4 parts and 14 modules", () => {
+  it("lists 4 parts and 18 modules", () => {
     render(<SyllabusDrawer {...props} />);
     const dialog = screen.getByRole("dialog", { name: "Course syllabus" });
     expect(within(dialog).getAllByRole("group")).toHaveLength(4);
-    expect(within(dialog).getAllByRole("button", { name: /^\d\d\./ })).toHaveLength(14);
+    expect(within(dialog).getAllByRole("button", { name: /^\d\d\./ })).toHaveLength(18);
   });
 
   it("highlights the active module and marks completed ones", () => {
@@ -46,7 +46,7 @@ describe("SyllabusDrawer", () => {
 
   it("unbuilt modules are disabled", () => {
     render(<SyllabusDrawer {...props} />);
-    expect(screen.getByRole("button", { name: /^14\. Evals, Guardrails/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^17\. Evals, Guardrails/ })).toBeDisabled();
   });
 
   it("Tab and Shift+Tab stay inside the dialog", async () => {

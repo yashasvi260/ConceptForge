@@ -6,16 +6,16 @@ import { challenges } from "./challenges";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
-  id: "06-prompt-engineering",
+  id: "08-prompt-engineering",
   title: "Prompt Engineering",
   shortTitle: "Prompting",
   tagline: "Roles, examples, step-by-step reasoning and JSON schemas, measured on 512 real gemma4 runs.",
   category: PART_TITLES[2],
   part: 2,
-  moduleNumber: 6,
+  moduleNumber: 8,
   bridge: {
-    buildsOn: "Module 04's classification prompt and Module 05's topic-naming prompt, plus Module 03's decoding and token probabilities.",
-    leadsTo: "Module 07 adds memory, smaller (quantized) models and tools: LLMs that act in a loop, not just answer once.",
+    buildsOn: "Module 06's classification prompt and Module 07's topic-naming prompt, plus Module 06's decoding and token probabilities.",
+    leadsTo: "Module 09 grounds answers in your own documents: semantic search and retrieval-augmented generation (RAG), with citations.",
   },
   difficulty: "intermediate",
   estimatedMinutes: 50,

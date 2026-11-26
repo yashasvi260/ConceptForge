@@ -55,7 +55,7 @@ Answer:`}
           </p>
         </Panel>
       </div>
-      <p className="text-xs text-slate-500">Module 04 compares these approaches properly: fine-tuned heads, zero-shot embeddings and prompting.</p>
+      <p className="text-xs text-slate-500">Module 06 compares these approaches properly: fine-tuned heads, zero-shot embeddings and prompting.</p>
     </>
   );
 }

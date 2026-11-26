@@ -141,7 +141,7 @@ export const steps: LessonStep[] = [
     summary: "Past tokens' keys and values never change, so generation stores them instead of recomputing them.",
     body: [
       "Generating token 500 needs the keys and values of tokens 1–499. Without a cache, every step recomputes all of them; with the **KV cache**, each token's K and V are computed once and reused.",
-      "The price is memory that grows with context length, layers and KV heads, which is why GQA (step 6) matters and why long contexts are expensive to serve (Module 13 goes further).",
+      "The price is memory that grows with context length, layers and KV heads, which is why GQA (step 6) matters and why long contexts are expensive to serve (Module 16 goes further).",
     ],
     tryIt: "Toggle the cache and push the generated tokens up.",
     keyTakeaway: "KV cache = trade memory for compute: each token's K/V is computed once per generation.",
@@ -154,10 +154,10 @@ export const steps: LessonStep[] = [
     summary: "From token IDs to the next token: every piece of the forward pass, and the knobs you'll use in practice.",
     body: [
       "Recap: embeddings plus position; blocks of attention (multi-head, maybe GQA) and feed-forward networks with residuals and normalisation; logits; a decoding rule; and the KV cache to make generation fast.",
-      "That completes Part I. Part II puts these models to work: first classifying text (Module 04), where you'll compare a fine-tuned encoder, zero-shot embeddings and a prompted LLM.",
+      "Next, Module 04 looks closely at generation (sampling, the KV cache, long context), and Module 05 shows how the weights got their values: training. Then Part II puts these models to work, starting with classifying text (Module 06).",
     ],
     tryIt: "Explain the forward pass in your own words, then take the Challenge.",
-    keyTakeaway: "Every LLM you use runs this loop; Part II is about using it well.",
+    keyTakeaway: "Every LLM you use runs this loop.",
     view: "recap",
   },
 ];

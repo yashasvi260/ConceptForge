@@ -68,7 +68,7 @@ export const steps: LessonStep[] = [
     body: [
       "Imagine tipping a sentence's words into a bag and counting them. Every text becomes a row of counts over a shared vocabulary, and two texts are \"similar\" if they share words.",
       "Two big problems: `film` and `movie` are as unrelated to it as `film` and `banana`, because they're just different columns. And `Dog bites man` and `Man bites dog` produce identical bags, because word order is gone.",
-      "Bag-of-Words still powers some search systems (it's the idea behind keyword search, which you'll meet again in Module 08), but it can't understand language.",
+      "Bag-of-Words still powers some search systems (it's the idea behind keyword search, which you'll meet again in Module 09), but it can't understand language.",
     ],
     tryIt: "Edit the sentences and watch the count table and similarity scores update.",
     keyTakeaway: "Bag-of-Words counts words: fast and simple, but it ignores meaning and word order.",
@@ -140,7 +140,7 @@ export const steps: LessonStep[] = [
     body: [
       "A **representation model** turns your text into a vector. You then compute with it: compare it with label descriptions, train a small classifier on it, search with it. On the right, MiniLM really does this: it scores your text against \"positive\" and \"negative\" descriptions.",
       "A **generative model** is given an instruction and writes an answer. It's flexible (any task you can describe) but slower and more expensive per call.",
-      "Part II uses both: classification (Module 04), clustering (05), prompting (06), agents (07), search and RAG (08).",
+      "Part II uses both: classification (Module 06), clustering (07), prompting (08), search and RAG (09), agents (10).",
     ],
     tryIt: "Type a review and see which description MiniLM finds closer. Then read the generative version.",
     keyTakeaway: "Representation models give vectors to compute with; generative models give text. Many systems use both.",

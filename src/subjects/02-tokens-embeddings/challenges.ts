@@ -305,7 +305,7 @@ export const challenges: ChallengeItem[] = [
     ],
     correctIndex: 1,
     hint: "What is being compared: words or vectors?",
-    explanation: "Semantic search ranks by embedding similarity, which captures meaning beyond exact keywords (Module 08 builds on this).",
+    explanation: "Semantic search ranks by embedding similarity, which captures meaning beyond exact keywords (Module 09 builds on this).",
     relatedStepId: "semantic-search-preview",
   },
 ];

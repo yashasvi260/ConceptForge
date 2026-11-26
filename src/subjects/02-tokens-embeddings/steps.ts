@@ -263,7 +263,7 @@ export const steps: LessonStep[] = [
     summary: "Embed the question, embed the documents, return the closest ones: that's semantic search.",
     body: [
       "Type “I can't sign in to my account”: it shares no keywords with any document (only small words like “I” and “my”), yet the password and login questions rank first because their vectors point the same way.",
-      "This is the retrieval half of RAG (Module 08), and the same vectors power classification (Module 04) and clustering (Module 05).",
+      "This is the retrieval half of RAG (Module 09), and the same vectors power classification (Module 06) and clustering (Module 07).",
     ],
     tryIt: "Search for something that uses different words from the documents.",
     keyTakeaway: "Semantic search ranks documents by embedding similarity to the query, not by shared keywords.",

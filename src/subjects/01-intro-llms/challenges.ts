@@ -67,7 +67,7 @@ export const challenges: ChallengeItem[] = [
     ],
     correctIndex: 0,
     hint: "Understanding vs generating: which does tagging need?",
-    explanation: "Encoders see the whole text bidirectionally and produce vectors that are cheap to classify, cluster or search (Module 04 compares the options).",
+    explanation: "Encoders see the whole text bidirectionally and produce vectors that are cheap to classify, cluster or search (Module 06 compares the options).",
     relatedStepId: "representation-vs-generative",
   },
   {

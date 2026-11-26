@@ -41,6 +41,6 @@ src/
 │   │   ├── steps.ts
 │   │   ├── challenges.ts
 │   │   └── StageView.tsx
-│   ├── 01-intro-llms/ … 14-evals-guardrails/   # LLM Mastery modules (ids from docs/curriculum.md; see src/core/track.ts)
+│   ├── 01-intro-llms/ … 18-capstone/   # LLM Mastery modules (v2: Modules 04–06 became 06–08; old ids redirect via LEGACY_IDS) (ids from docs/curriculum.md; see src/core/track.ts)
 │   └── 02-tokens-embeddings/    # Module 02 (Tokens section = former Tokenization topic)
 └── App.tsx

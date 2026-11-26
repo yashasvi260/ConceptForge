@@ -2,10 +2,10 @@
 // the first run records step 1 (extract with role + few-shot + schema); the second records step 2 (reply),
 // whose prompt contains step 1's recorded JSON.
 import { existsSync, readFileSync } from "node:fs";
-import { buildPrompt } from "../../src/subjects/06-prompt-engineering/buildPrompt.mjs";
+import { buildPrompt } from "../../src/subjects/08-prompt-engineering/buildPrompt.mjs";
 
-const task = JSON.parse(readFileSync("src/subjects/06-prompt-engineering/data/task.json", "utf8"));
-const out = "src/subjects/06-prompt-engineering/data/recordings/chain.json";
+const task = JSON.parse(readFileSync("src/subjects/08-prompt-engineering/data/task.json", "utf8"));
+const out = "src/subjects/08-prompt-engineering/data/recordings/chain.json";
 const done = existsSync(out) ? new Map(JSON.parse(readFileSync(out, "utf8")).items.map((i) => [i.key, i])) : new Map();
 const step1Combo = { role: true, fewShot: true, cot: false, schema: true };
 

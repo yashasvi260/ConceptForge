@@ -102,7 +102,7 @@ export const context: DeepLesson = {
     {
       heading: "Why this matters for everything else",
       paragraphs: [
-        "Contextual vectors are why modern models handle ambiguity, pronouns, sarcasm and long-range references at all. They are also why the same word can be split across modules: Module 02 looks at the static table (where `bank` has one vector), Module 03 opens the blocks that make it contextual, and Module 08 relies on contextual sentence vectors to search documents by meaning.",
+        "Contextual vectors are why modern models handle ambiguity, pronouns, sarcasm and long-range references at all. They are also why the same word can be split across modules: Module 02 looks at the static table (where `bank` has one vector), Module 03 opens the blocks that make it contextual, and Module 09 relies on contextual sentence vectors to search documents by meaning.",
       ],
     },
   ],

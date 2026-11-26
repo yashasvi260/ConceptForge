@@ -7,7 +7,7 @@ export const challenges: ChallengeItem[] = [
     options: ["All 22.7 million MiniLM weights", "Only the small head on top (here 1,925 weights)", "None: it's zero-shot", "Only the tokenizer"],
     correctIndex: 1,
     hint: "What stays frozen?",
-    explanation: "The encoder stays frozen and only the head learns, which is why it trains in under a second on 40 examples. Updating the encoder too is fine-tuning (Module 11).",
+    explanation: "The encoder stays frozen and only the head learns, which is why it trains in under a second on 40 examples. Updating the encoder too is fine-tuning (Module 13).",
     relatedStepId: "task-head",
   },
   {

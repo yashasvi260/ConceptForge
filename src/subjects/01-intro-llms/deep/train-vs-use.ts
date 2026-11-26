@@ -102,7 +102,7 @@ export const trainVsUse: DeepLesson = {
       heading: "Inference: running frozen weights",
       paragraphs: [
         "Once training stops, the weights are frozen and saved. Inference loads them and runs the forward pass: tokenize the prompt, run it through every block, read the probabilities, choose a token, append it, repeat. There is no loss, no gradient, no step. The same prompt with the same settings and greedy decoding gives the same answer every time.",
-        "Because nothing is learned, a model's knowledge is fixed at its **training cutoff**: it cannot know about events after its training data was collected unless you paste the information into the prompt. Module 08 builds exactly that workaround (retrieval-augmented generation).",
+        "Because nothing is learned, a model's knowledge is fixed at its **training cutoff**: it cannot know about events after its training data was collected unless you paste the information into the prompt. Module 09 builds exactly that workaround (retrieval-augmented generation).",
       ],
     },
     {

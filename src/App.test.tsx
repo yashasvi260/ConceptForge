@@ -27,8 +27,8 @@ describe("App shell: course overview", () => {
   it("starts on the course overview", () => {
     render(<App />);
     expect(onCourse()).toBeInTheDocument();
-    expect(screen.getByText("0 / 14 modules · 0%")).toBeInTheDocument();
-    expect(screen.getByText("Mastered 0/14")).toBeInTheDocument();
+    expect(screen.getByText("0 / 18 modules · 0%")).toBeInTheDocument();
+    expect(screen.getByText("Mastered 0/18")).toBeInTheDocument();
   });
 
   it("Start Module 01 opens step 1 and writes the hash", async () => {
@@ -236,11 +236,11 @@ describe("App shell: module player", () => {
     expect(saved.tokenization).toBeUndefined();
   });
 
-  it("shows a coming-soon card for an unbuilt module link, with a way back", async () => {
+  it("shows a coming-soon card for an unbuilt module link (old ids redirect), with a way back", async () => {
     window.location.hash = "#/07-agents-tools/1";
     render(<App />);
     expect(screen.getByRole("heading", { name: /Coming soon/ })).toBeInTheDocument();
-    expect(screen.getByText(/Module 07: Advanced Text Generation Techniques & Tools/)).toBeInTheDocument();
+    expect(screen.getByText(/Module 10: Agents and Tools/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Back to course overview" }));
     expect(onCourse()).toBeInTheDocument();
   });

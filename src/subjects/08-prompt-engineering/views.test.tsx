@@ -22,9 +22,9 @@ const FILE = experiment as RecordingFile;
 const SMALL = small as RecordingFile;
 const off = { role: false, fewShot: false, cot: false, schema: false };
 
-describe("Module 06 content", () => {
-  it("is a complete module with bridges from 05 and to 07", () => {
-    expect(subject.moduleNumber).toBe(6);
+describe("Module 08 content", () => {
+  it("is a complete module with bridges from 07 and to 09", () => {
+    expect(subject.moduleNumber).toBe(8);
     expect(steps.length).toBeGreaterThanOrEqual(8);
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();
@@ -32,8 +32,8 @@ describe("Module 06 content", () => {
     }
     expect(subject.challenges.length).toBeGreaterThanOrEqual(4);
     expect(subject.challenges.every((c) => c.hint && steps.some((s) => s.id === c.relatedStepId))).toBe(true);
-    expect(subject.bridge.buildsOn).toMatch(/Module 0[45]/);
-    expect(subject.bridge.leadsTo).toMatch(/Module 07/);
+    expect(subject.bridge.buildsOn).toMatch(/Module 0[67]/);
+    expect(subject.bridge.leadsTo).toMatch(/Module 09/);
   });
 
   it("every combination was recorded for every ticket and sample", () => {

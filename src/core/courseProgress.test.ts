@@ -48,13 +48,13 @@ describe("moduleStatus", () => {
 });
 
 describe("summaries", () => {
-  it("course summary counts all 14", () => {
-    expect(courseSummary(built, complete(m1.id))).toEqual({ completed: 1, total: 14, percent: 7 });
-    expect(courseSummary(built, {})).toEqual({ completed: 0, total: 14, percent: 0 });
+  it("course summary counts all 18", () => {
+    expect(courseSummary(built, complete(m1.id))).toEqual({ completed: 1, total: 18, percent: 6 });
+    expect(courseSummary(built, {})).toEqual({ completed: 0, total: 18, percent: 0 });
   });
 
   it("part summary", () => {
-    expect(partSummary(1, built, complete(m1.id))).toEqual({ completed: 1, total: 3 });
+    expect(partSummary(1, built, complete(m1.id))).toEqual({ completed: 1, total: 5 });
     expect(partSummary(2, built, complete(m1.id))).toEqual({ completed: 0, total: 6 });
   });
 });
@@ -69,7 +69,7 @@ describe("resumeTarget", () => {
   });
 
   it("points at the first unbuilt module when every built one is complete", () => {
-    expect(resumeTarget(built, complete(m1.id, m2.id, m3.id))).toMatchObject({ entry: { id: "04-text-classification" }, built: false });
+    expect(resumeTarget(built, complete(m1.id, m2.id, m3.id))).toMatchObject({ entry: { id: "04-generation-inference" }, built: false });
   });
 });
 

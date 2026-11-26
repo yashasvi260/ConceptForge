@@ -113,7 +113,7 @@ export const howLarge: DeepLesson = {
     {
       heading: "Memory and number formats",
       paragraphs: [
-        "To run a model, its weights must sit in memory, ideally the GPU's. The bill is simple: parameters × bytes per parameter. Training usually keeps weights in 32-bit (4 bytes) or mixed 16-bit formats; running a model typically uses 16-bit (**fp16** or **bf16**, 2 bytes). Shrinking each weight to 8 or 4 bits is called **quantisation**, and it is how an 8B model fits on a laptop GPU. Module 07 measures what that costs in accuracy.",
+        "To run a model, its weights must sit in memory, ideally the GPU's. The bill is simple: parameters × bytes per parameter. Training usually keeps weights in 32-bit (4 bytes) or mixed 16-bit formats; running a model typically uses 16-bit (**fp16** or **bf16**, 2 bytes). Shrinking each weight to 8 or 4 bits is called **quantisation**, and it is how an 8B model fits on a laptop GPU. Module 16 measures what that costs in accuracy.",
         "This is only the weights. Running a model also needs memory for the vectors of the current prompt (the KV cache, which grows with context length), and training needs several times more for gradients and optimiser state. A useful rule of thumb for running: 16-bit weights ≈ 2 GB per billion parameters, plus some headroom.",
       ],
       formula: {

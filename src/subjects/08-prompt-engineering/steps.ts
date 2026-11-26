@@ -76,7 +76,7 @@ export const steps: LessonStep[] = [
     summary: "With a schema, Ollama only lets the model pick tokens that keep the JSON valid. Both models produced valid JSON every time.",
     body: [
       "Asking for JSON in words usually works, but not always: the small model sometimes wraps it in prose or breaks a field type. Software downstream needs it to parse every time.",
-      "**Structured outputs** pass a JSON schema as Ollama's `format`. During decoding (Module 03) the next-token choices are restricted to those that keep the output valid against the schema.",
+      "**Structured outputs** pass a JSON schema as Ollama's `format`. During decoding (Module 06) the next-token choices are restricted to those that keep the output valid against the schema.",
       "In the recordings, every variant with the schema produced valid JSON on every sample, for both models.",
     ],
     tryIt: "Pick the small model and compare the Valid JSON counts.",
@@ -102,7 +102,7 @@ export const steps: LessonStep[] = [
     title: "The probability inspector",
     summary: "Every output token came with its probability and the runner-up tokens. Low-probability tokens show where the model hesitated.",
     body: [
-      "Ollama returned the **log-probabilities** of each generated token and the top alternatives (Module 03's softmax, made visible). Click a token to see what else the model considered.",
+      "Ollama returned the **log-probabilities** of each generated token and the top alternatives (Module 06's softmax, made visible). Click a token to see what else the model considered.",
       "Hesitation tends to sit in the hard parts: an amount written in words, an ambiguous currency, whether something is urgent. Low probability doesn't prove an error, but it's a cheap signal for review.",
     ],
     tryIt: "Pick ticket “two thousand five hundred rupees” and inspect the amount token.",
@@ -124,13 +124,13 @@ export const steps: LessonStep[] = [
   },
   {
     id: "recap",
-    title: "Up next: memory, tools and agents",
-    summary: "So far every call was a single question and answer. Module 07 makes LLMs remember, run smaller, and act through tools.",
+    title: "Up next: answers grounded in your documents",
+    summary: "So far the model answered from what it learned in training. Module 09 lets it answer from your own documents, with sources.",
     body: [
       "You can now build prompts from parts and judge them by measurement, not impressions.",
-      "**Module 07** looks at what happens around the prompt: fitting a conversation into the context window, running quantized models on smaller GPUs, and agents that call tools in a loop.",
+      "**Module 09** adds retrieval: find the passages that answer a question (keyword and vector search, reranking), put them in the prompt, and make the model cite them. Module 10 then lets the model call tools in a loop (agents).",
     ],
-    tryIt: "Take the practice check, then continue to Module 07.",
+    tryIt: "Take the practice check, then continue to Module 09.",
     keyTakeaway: "Prompt engineering is measured engineering: parts, tests, numbers.",
     view: "recap",
   },
