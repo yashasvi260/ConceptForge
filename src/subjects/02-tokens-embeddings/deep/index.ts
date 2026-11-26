@@ -3,6 +3,7 @@ import { bpeEncoding } from "./bpe-encoding";
 import { bpeTraining } from "./bpe-training";
 import { bytesLesson } from "./bytes";
 import { deepData } from "./data";
+import { lookupTable } from "./lookup-table";
 import { playground } from "./playground";
 import { quirks } from "./quirks";
 import { sentencepiece } from "./sentencepiece";
@@ -24,6 +25,7 @@ export const content: DeepContent = {
     "special-tokens": specialTokens,
     playground,
     quirks,
+    "lookup-table": lookupTable,
   },
   data: deepData,
 };

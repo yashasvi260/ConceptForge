@@ -196,6 +196,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "lookup-table",
+    deep: true,
     title: "From token ID to vector: the embedding table",
     summary: "A token ID is just a row number. The model looks up that row in a big table of learned numbers.",
     body: [
