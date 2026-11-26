@@ -53,3 +53,26 @@ retrieval-eval, hybrid. Reused from Module 01: contrastive (row meaning), sense-
 
 Module 02 browser pass (MOD=02-tokens-embeddings STEPS=14, 1280 + 390): 58 lab views, 0 problems.
 New real recording: scripts/record-m02-embedding-labs.mjs → data/embedding-labs.json (padded batch, score traps, error-code hybrid set).
+
+## Module 03 deep conversion (split from Module 04 in 8980c16)
+
+Plan: 10 deep lessons — forward-pass, positional, qkv, self-attention, multi-head, gqa, residual-norm, ffn,
+moe (new, curriculum v2), recap (mini-project: one transformer block in NumPy).
+Real data: scripts/record-m03-gpt2.mjs → data/gpt2.json (GPT-2 small, transformers 5.22.2 / torch 2.15.0 CPU):
+attention for 3 sentences (12 layers × 12 heads), per-head previous/first/self averages over 8 sentences,
+residual-stream norms, LayerNorm before/after, learned-position similarity, GELU activity.
+Findings to use: L4H11 previous-token head 0.997; median head puts 0.664 on the first token (attention sink);
+first-token norm grows 10 → ~3,100; position neighbours 0.997, distance 256 → −0.446; ~10% FFN units > 0.1.
+
+| module | lesson | deep | labs | commit |
+| --- | --- | --- | --- | --- |
+| 03 | forward-pass | yes | 3/3 (forward, shapes, block-params) | (this commit) |
+| 03 | positional | yes | 4/4 (shuffle, positional, learned-pos, rope-relative) | (this commit) |
+| 03 | qkv | | | |
+| 03 | self-attention | | | |
+| 03 | multi-head | | | |
+| 03 | gqa | | | |
+| 03 | residual-norm | | | |
+| 03 | ffn | | | |
+| 03 | moe | | | |
+| 03 | recap | | | |

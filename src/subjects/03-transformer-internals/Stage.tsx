@@ -4,6 +4,7 @@ import type { StageProps } from "../../core/types";
 import { tokenizeWords } from "./attention";
 import { AttentionView, MultiHeadView, QkvView, type AttentionState } from "./views/AttentionViews";
 import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } from "./views/InternalsViews";
+import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
   const [text, setText] = useState("The bank approved the loan");
@@ -34,6 +35,16 @@ export function Stage({ step }: StageProps) {
         return <NormView />;
       case "ffn":
         return <FfnView />;
+      case "shapes":
+        return <ShapesLab />;
+      case "block-params":
+        return <BlockParamsLab />;
+      case "shuffle":
+        return <ShuffleLab />;
+      case "learned-pos":
+        return <LearnedPosLab />;
+      case "rope-relative":
+        return <RopeRelativeLab />;
       case "recap":
         return <RecapView />;
       default:

@@ -12,10 +12,9 @@ const BOXES = [
   { label: "Token IDs → embeddings", step: "Module 02" },
   { label: "+ position", step: "step 2" },
   { label: "Norm → attention (multi-head, GQA) ⊕ residual", step: "steps 3–7" },
-  { label: "Norm → feed-forward (SwiGLU) ⊕ residual", step: "steps 7–8" },
+  { label: "Norm → feed-forward (SwiGLU or experts) ⊕ residual", step: "steps 7–9" },
   { label: "× N blocks, then a final norm", step: "step 7" },
-  { label: "Logits → softmax", step: "step 9" },
-  { label: "Decode next token (+ KV cache)", step: "steps 10–11" },
+  { label: "Last vector → logits → next token", step: "Module 04" },
 ];
 
 export function ForwardView() {

@@ -4,6 +4,7 @@ import type { LessonStep } from "../../core/types";
 export const steps: LessonStep[] = [
   {
     id: "forward-pass",
+    deep: true,
     title: "The forward pass, end to end",
     summary: "Token vectors flow up through a stack of identical blocks and come out as a score for every possible next token.",
     body: [
@@ -18,6 +19,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "positional",
+    deep: true,
     title: "Where am I? Positional information",
     summary: "Attention treats tokens as a set, so the model needs to be told where each token sits.",
     body: [

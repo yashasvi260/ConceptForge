@@ -1,8 +1,8 @@
 import { Cpu } from "lucide-react";
+import { lazyStage } from "../../core/lazyStage";
 import { PART_TITLES } from "../../core/track";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { Stage } from "./Stage";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
@@ -23,7 +23,8 @@ const subject: SubjectModule = {
   accent: "emerald",
   steps,
   challenges,
-  Stage,
+  loadDeep: () => import("./deep").then((m) => m.content),
+  Stage: lazyStage(() => import("./Stage")),
 };
 
 export default subject;
