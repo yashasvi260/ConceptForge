@@ -76,7 +76,7 @@ export const steps: LessonStep[] = [
     summary: "With a schema, Ollama only lets the model pick tokens that keep the JSON valid. Both models produced valid JSON every time.",
     body: [
       "Asking for JSON in words usually works, but not always: the small model sometimes wraps it in prose or breaks a field type. Software downstream needs it to parse every time.",
-      "**Structured outputs** pass a JSON schema as Ollama's `format`. During decoding (Module 06) the next-token choices are restricted to those that keep the output valid against the schema.",
+      "**Structured outputs** pass a JSON schema as Ollama's `format`. During decoding (Module 04) the next-token choices are restricted to those that keep the output valid against the schema.",
       "In the recordings, every variant with the schema produced valid JSON on every sample, for both models.",
     ],
     tryIt: "Pick the small model and compare the Valid JSON counts.",
@@ -102,7 +102,7 @@ export const steps: LessonStep[] = [
     title: "The probability inspector",
     summary: "Every output token came with its probability and the runner-up tokens. Low-probability tokens show where the model hesitated.",
     body: [
-      "Ollama returned the **log-probabilities** of each generated token and the top alternatives (Module 06's softmax, made visible). Click a token to see what else the model considered.",
+      "Ollama returned the **log-probabilities** of each generated token and the top alternatives (Module 04's softmax, made visible). Click a token to see what else the model considered.",
       "Hesitation tends to sit in the hard parts: an amount written in words, an ambiguous currency, whether something is urgent. Low probability doesn't prove an error, but it's a cheap signal for review.",
     ],
     tryIt: "Pick ticket “two thousand five hundred rupees” and inspect the amount token.",

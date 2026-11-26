@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SUBJECTS } from "../../core/registry";
@@ -169,6 +169,64 @@ describe("DeepLessonPage", () => {
     renderPage();
     expect(screen.queryByRole("group", { name: "Choose a view" })).toBeNull();
     expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage x");
+  });
+
+  describe("concept labs", () => {
+    const LABBED: DeepLesson = {
+      ...DEEP,
+      concept: [
+        { heading: "Embedding table", paragraphs: ["A table of vectors."], lab: { view: "table-lab", label: "Table", task: "Look up a row." } },
+        { heading: "Positions", paragraphs: ["Order matters."], lab: { view: "pos-lab", label: "Positions", task: "Swap two words." } },
+        { heading: "No lab here", paragraphs: ["Just reading."] },
+      ],
+    };
+    const renderLabbed = () =>
+      render(
+        <PyRunnerProvider run={vi.fn()}>
+          <DeepLessonPage subject={subject} step={step} lesson={LABBED} stepIndex={1} total={12} isBuilt={() => true} onOpenModule={() => {}} data={undefined} passedParts={[]} onPartPassed={() => {}} stage={(view) => <p>the stage {view}</p>} />
+        </PyRunnerProvider>,
+      );
+
+    it("offers the step's view first, then one lab per concept, in reading order", () => {
+      renderLabbed();
+      const chips = within(screen.getByRole("group", { name: "Choose a view" })).getAllByRole("button");
+      expect(chips.map((c) => c.textContent)).toEqual(["Overview", "Table", "Positions"]);
+      expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage x");
+    });
+
+    it("puts the try-it task in the reading and opens that concept's lab from it", async () => {
+      renderLabbed();
+      await userEvent.click(screen.getByRole("tab", { name: "Build it · Python" }));
+      const reading = screen.getByRole("article", { name: "Lesson" });
+      expect(within(reading).getByText("Swap two words.")).toBeInTheDocument();
+      await userEvent.click(within(reading).getByRole("button", { name: "Try it: Positions" }));
+      expect(screen.getByRole("tab", { name: "Interactive" })).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage pos-lab");
+    });
+
+    it("follows the reading: the concept scrolled into view picks the panel's lab", () => {
+      let callback: IntersectionObserverCallback = () => {};
+      const observed: Element[] = [];
+      vi.stubGlobal(
+        "IntersectionObserver",
+        class {
+          constructor(cb: IntersectionObserverCallback) {
+            callback = cb;
+          }
+          observe(el: Element) {
+            observed.push(el);
+          }
+          unobserve() {}
+          disconnect() {}
+        },
+      );
+      renderLabbed();
+      const target = observed.find((el) => el.getAttribute("data-lab") === "table-lab")!;
+      expect(target).toBeDefined();
+      act(() => callback([{ target, isIntersecting: true } as unknown as IntersectionObserverEntry], {} as IntersectionObserver));
+      expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage table-lab");
+      vi.unstubAllGlobals();
+    });
   });
 
   it("shows the exercise, the local listing with captured output, and copies its code", async () => {

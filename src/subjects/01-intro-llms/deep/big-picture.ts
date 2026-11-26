@@ -3,15 +3,15 @@ import { part } from "./files";
 
 export const bigPicture: DeepLesson = {
   why: [
-    "Suppose you want a computer to write. Not to fill in a form or pick from a list of canned replies, but to continue any text you give it: finish an email, answer a question, translate a sentence, write code. For decades people tried to do this with hand-written rules (grammar rules, templates, lists of facts). Rules break the moment language does something the rule-writer didn't expect, and language does that all the time.",
-    "The idea that won is almost embarrassingly simple: **learn to guess the next piece of text**. Show a program a huge amount of real writing and ask it, over and over, \"given everything so far, what comes next?\" Every time it guesses wrong, adjust it a little. Nobody writes rules; the patterns of language (spelling, grammar, facts, styles, even steps of reasoning) are absorbed because they help with the guess.",
-    "Once a program guesses the next piece well, writing is just a loop: guess a piece, stick it on the end, guess again. That loop is what every chatbot and code assistant runs when it answers you. A **language model** is the guessing part; a **large language model** (LLM) is one with billions of learned numbers inside, trained on trillions of words.",
-    "This step builds the loop with the simplest possible guesser, one that only counts which word follows which, so you can see every number. Every later module replaces a piece of this toy with the real thing.",
+    "Let's start with a question. How would you get a computer to write? Not fill in a form, not pick from canned replies, but actually continue any text you give it: finish your email, answer your question, write your code.",
+    "For decades people tried rules. Grammar rules, templates, long lists of facts. It never lasted. Language keeps doing things the rule-writer didn't expect, and every new surprise needed another rule.",
+    "The idea that finally worked is almost too simple to believe: **just guess the next piece of text**. Show a program an enormous amount of real writing and keep asking it one question: \"given everything so far, what comes next?\" When it guesses wrong, nudge it a little. Nobody writes a single rule. Spelling, grammar, facts, style, even steps of reasoning get picked up, because each of them helps the guess.",
+    "And once a program guesses well, writing is just a loop: guess a piece, add it to the end, guess again. That loop is exactly what ChatGPT, Claude or a code assistant runs while it answers you. In this step you'll watch a real model, gemma4, run that loop, and then build the simplest version yourself, a word counter, so you can see every number.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Our whole training text is 20 tokens (counting each `.` as a word): `the cat sat on the mat . the cat ate the fish . the dog sat on the rug .` The simplest language model, a **bigram model**, counts which word comes right after each word. Here is everything that ever followed `the`:",
+      text: "Here's the smallest language model there is. Its whole training text is 20 tokens (counting each `.` as a word): `the cat sat on the mat . the cat ate the fish . the dog sat on the rug .` It only does one thing: count which word comes right after each word. This is called a **bigram model**. So what has it seen after `the`?",
     },
     {
       kind: "table",
@@ -32,7 +32,7 @@ export const bigPicture: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Now generate. Start with `the`, and each time append the most likely next word (if two are tied, take the one seen first in the text). This rule is called **greedy decoding**:",
+      text: "That list is the model's whole \"knowledge\" about `the`. Now let it write. Start with `the`, and every time, take the most likely next word (on a tie, the one it saw first). This rule is called **greedy decoding**. Before you look at the table: where do you think it ends up?",
     },
     {
       kind: "table",
@@ -51,15 +51,16 @@ export const bigPicture: DeepLesson = {
     },
     {
       kind: "text",
-      text: "The output is `the cat sat on the cat sat on`. Grammatical-ish, and stuck in a loop. Both facts matter: the loop *works* (this is how every LLM writes), and a model that only sees one previous word, and always takes the top choice, is far too weak. The rest of the course fixes exactly those two weaknesses.",
+      text: "It wrote `the cat sat on the cat sat on` and got stuck going round in a circle. Keep both halves of that in mind. The loop itself *works*: this is genuinely how every LLM writes. But a model that only remembers one word, and always takes the top choice, is far too weak. The rest of the course fixes exactly those two weaknesses.",
     },
   ],
   concept: [
     {
       heading: "Next-token prediction",
       paragraphs: [
-        "A language model is a function that takes the text so far and returns a **probability for every possible next piece**. Not one answer: a full list of scores that add up to 1, such as `cat 0.333, mat 0.167, …`. Everything else (writing, chatting, answering) is built on top of that list.",
-        "The pieces are called **tokens**. In our toy a token is a whole word; real models split text into sub-word chunks, so `unbelievable` might become `un`, `believ`, `able`. The set of all tokens the model knows is its **vocabulary**: about 50,000 for GPT-2, about 128,000 for Llama 3. Module 02 shows how that split is chosen.",
+        "So what is a language model, exactly? It's a function. You give it the text so far, and it gives you back a **probability for every possible next piece**. Notice: not one answer. A whole list of scores that add up to 1, like `cat 0.333, mat 0.167, …` from our counter.",
+        "That list is the heart of everything. Writing, chatting, answering questions, translating: they're all built on top of it. When gemma4 sees `Once upon a time, there was a`, it doesn't \"decide\" on `small`. It gives `small` 93.9%, `tiny` 2.6%, and a little bit to thousands of other tokens.",
+        "Why \"pieces\" and not words? Real models cut text into **tokens**, which are often parts of words: `unbelievable` might become `un`, `believ`, `able`. The full set of tokens a model knows is its **vocabulary**, about 50,000 for GPT-2 and about 128,000 for Llama 3. Module 02 shows how those pieces are chosen.",
       ],
       formula: {
         expr: "P(xₜ | x₁, x₂, …, xₜ₋₁)",
@@ -70,42 +71,70 @@ export const bigPicture: DeepLesson = {
         ],
         example: "In the toy, the context is cut down to just the previous word, so P(cat | …, the) becomes P(cat | the) = 2/6 = 0.333.",
       },
+      lab: {
+        view: "guess-next",
+        label: "Guess the next token",
+        task: "Pick a prompt and guess what gemma4 will say next. Then look at the full list: how much did it give your guess?",
+      },
     },
     {
       heading: "The generation loop",
       paragraphs: [
-        "Generating text is a loop around next-token prediction. (1) Feed the context to the model. (2) Get the probability list. (3) Choose one token from it. (4) Append that token to the context. (5) Repeat. This is called **autoregressive** generation: each new token is predicted from the model's own earlier output.",
-        "The loop stops when the model produces a special **end-of-text** token, or when a maximum length is reached. Each trip round the loop is one full pass through the model (a **forward pass**), so a 500-token answer means 500 passes. That is why long answers take longer and cost more, and why Part IV spends a whole module on making this loop fast.",
-        "Notice what the loop does *not* do: it never plans the whole sentence first. The model commits to one token at a time and can only build on what is already written. Good models still produce coherent paragraphs because the probability list at every step already reflects where the text is likely to go.",
+        "One prediction gives you one token. How do you get a whole answer? You loop. (1) Feed the text in. (2) Get the probability list. (3) Choose one token. (4) Stick it on the end. (5) Go again. Each new token is predicted from the model's own earlier output, which is why this is called **autoregressive** generation.",
+        "When does it stop? Either the model produces a special **end-of-text** token (\"I'm done\"), or you hit a length limit you set. And here's the part people often miss: every trip round the loop is a full run through the whole model, a **forward pass**. A 500-token answer means 500 forward passes. That's why long answers take longer and cost more, and why Part IV has a whole module on making this loop fast.",
+        "Now the surprising bit. The loop never plans the sentence. It commits to one token at a time and can only build on what's already there. So how do good models still write coherent paragraphs? Because the probability list at every step already \"knows\" where the text is likely heading.",
       ],
+      lab: {
+        view: "loop-lab",
+        label: "Generation loop",
+        task: "Step through one token with **Next micro-step** and count the forward passes. Then press **Full token** until gemma4 finishes. Could you take a token back once it's added?",
+      },
     },
     {
       heading: "Choosing the next token",
       paragraphs: [
-        "Step (3) of the loop is a choice, and the choice matters. **Greedy decoding** always takes the highest-probability token. It is simple and repeatable, but as the worked example shows, it can get stuck repeating itself, and it never surprises you.",
-        "The alternative is **sampling**: pick a token at random, weighted by the probabilities, so `cat` is chosen a third of the time and `mat`, `fish`, `dog` and `rug` the rest. A setting called **temperature** sharpens or flattens the list before sampling: low temperature behaves almost like greedy, high temperature makes rare tokens more likely. Module 06 lets you play with temperature, top-k and top-p on a real model.",
+        "Step (3), choosing, is where a lot of a model's personality comes from. The simplest choice is **greedy decoding**: always take the top token. It's predictable and repeatable. But you saw what it did to our counter: it got stuck in a circle. And it never surprises you.",
+        "The other option is **sampling**: pick at random, but weighted by the probabilities. If `village` has 72.5%, it's chosen about 72 times in 100, and `cottage` (5.7%) about 6 times. Same model, different stories each time.",
+        "A setting called **temperature** controls how adventurous sampling is. Below 1, it sharpens the list, so the favourite wins even more often. Above 1, it flattens the list, so unlikely tokens get a real chance. At 0 it's just greedy. Here's a question worth thinking about before you try the lab: if a model gives `Paris` 100%, does temperature change anything at all?",
       ],
+      lab: {
+        view: "temperature",
+        label: "Temperature",
+        task: "Move the temperature from 0 to 2 and watch the bars. Then press **Sample 20 times** at 0.5 and at 1.5. Which gives you more variety, and why?",
+      },
     },
     {
       heading: "From counting to neural networks",
       paragraphs: [
-        "Our bigram counter has two fatal limits. First, it only sees **one** previous word. After `the` it cannot tell whether we were talking about cats or rugs. Real models look at the whole context: up to 1,024 tokens for GPT-2, 8,192 for Llama 3, far more for newer models.",
-        "Second, it can only repeat pairs it has literally seen. If `the cat ate` never appeared, the probability of `ate` after `cat` would be exactly 0 forever. Counting longer word sequences makes this worse, not better: almost every 10-word sequence you write has never appeared anywhere before.",
-        "A neural language model fixes both. Instead of a table of counts, it turns each token into a list of numbers (a **vector**) where similar words get similar numbers, then runs those vectors through layers that combine information from the whole context. Because `dog` and `cat` end up with similar vectors, what the model learned about cats partly transfers to dogs. It **generalises** instead of looking things up. The next step opens up those layers.",
+        "Our counter has two big problems. Let's look at each one.",
+        "Problem one: it only remembers **one** word. After `the`, it has no idea whether we were talking about cats or rugs. Real models read the whole context: up to 1,024 tokens for GPT-2, 8,192 for Llama 3, and far more for newer models.",
+        "Problem two: it can only repeat pairs it has literally seen. If `dog ate` never appeared in training, the counter gives it probability 0. Not small. Zero. Forever. And counting longer word sequences makes this worse, not better, because almost every 10-word sentence you write has never been written before.",
+        "Neural language models fix both. Instead of a table of counts, they turn each token into a list of numbers (a **vector**), arranged so that similar words get similar numbers. Then layer after layer mixes in information from the whole context. Because `dog` and `cat` end up with similar vectors, what the model learned about cats partly carries over to dogs. It **generalises** instead of looking things up. The next step opens up those layers.",
       ],
       mistake:
-        "Thinking an LLM looks answers up in a stored copy of its training text. It doesn't store the text at all. It stores learned numbers (weights) that produce a probability list for the next token. It can repeat famous passages because they were seen many times, but mostly it produces new combinations, which is also why it can confidently produce things that are false.",
+        "Thinking an LLM looks answers up in a stored copy of its training text. It doesn't keep the text at all. It keeps learned numbers (weights) that produce a probability list for the next token. It can repeat famous passages because it saw them many times, but mostly it produces new combinations, which is also why it can sound confident while being wrong.",
+      lab: {
+        view: "bigram",
+        label: "Counting model",
+        task: "Check the probability of `dog` after `the`, then of `zebra`. Now add a sentence to the training text that contains `the zebra` and check again. What does this tell you about counting?",
+      },
     },
     {
       heading: "Why one simple task goes so far",
       paragraphs: [
-        "It is surprising that guessing the next token is enough to get translation, summaries and working code. The reason is that guessing well is *hard*. To continue `The capital of France is` you need a fact. To continue a half-written Python function you need to follow the code's logic. To continue a story you need to keep track of characters. A model that gets better at the guess is forced to pick up all of these.",
-        "That is why the same pretrained model can be used in so many ways (Part II of this course) and why the jump from base model to helpful assistant is a later, smaller training stage (Part III). Everything starts with the loop you just built.",
+        "Here's the puzzle: how can \"guess the next token\" possibly give you translation, summaries and working code? The answer is that guessing **well** is hard, and it gets harder in interesting ways.",
+        "To continue `The capital of France is`, you need a fact. To continue a half-written Python function, you need to follow the logic of the code. To continue a story, you need to keep track of who's who. A model that keeps getting better at the guess is forced to pick up all of these along the way.",
+        "That's why one pretrained model can be used in so many ways (Part II of this course), and why turning it into a helpful assistant is a smaller, later training stage (Part III). It all starts with the loop you just watched.",
       ],
+      lab: {
+        view: "next-token-tasks",
+        label: "What it takes",
+        task: "For each prompt, predict gemma4's answer and how sure it will be before you reveal it. Which prompt is it least sure about, and why?",
+      },
     },
   ],
   guided:
-    "In the **Generation loop lab**, pick \"Once upon a time, there was a\" and predict gemma4's first word before pressing anything. Step through one token with **Next micro-step**, watching which stage costs a forward pass. Then set temperature to 0 and press **Full token** until the reply ends, reset, raise temperature to 1.5 and run it again: what changed, and what didn't? Finally try \"The capital of France is\" and explain why temperature makes no difference there.",
+    "Open the **Generation loop** lab and pick \"Once upon a time, there was a\". Predict gemma4's first word before pressing anything. Then run the loop at temperature 0, reset, and run it again at 1.5. What changed, and what didn't?",
   build: {
     id: "01-big-picture-bigram",
     title: "Build the loop: a bigram language model",

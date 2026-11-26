@@ -60,11 +60,29 @@ export function WorkedExample({ blocks }: { blocks: WorkedBlock[] }) {
   );
 }
 
-export function ConceptPartView({ part }: { part: ConceptPart }) {
+export function ConceptPartView({ part, onTry }: { part: ConceptPart; onTry?: (view: string) => void }) {
   return (
-    <div className="space-y-4">
+    <div className="scroll-mt-24 space-y-4" data-lab={part.lab?.view}>
       <h4 className="text-lg font-semibold text-white">{part.heading}</h4>
       <Prose paragraphs={part.paragraphs} />
+      {part.lab && (
+        <div className="flex flex-wrap items-start gap-3 rounded-lg border border-violet-500/40 bg-violet-500/10 p-3 text-sm text-slate-200">
+          <span className="min-w-0 flex-1">
+            <span className="font-semibold text-violet-300">Try it: </span>
+            <RichText text={part.lab.task} />
+          </span>
+          {onTry && (
+            <button
+              type="button"
+              aria-label={`Try it: ${part.lab.label}`}
+              onClick={() => onTry(part.lab!.view)}
+              className="shrink-0 rounded-md border border-violet-500/60 px-2.5 py-1 text-xs font-semibold text-violet-200 transition hover:bg-violet-500/10"
+            >
+              Open the lab →
+            </button>
+          )}
+        </div>
+      )}
       {part.formula && (
         <div role="figure" aria-label={`Formula: ${part.formula.expr}`} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
           <pre className="overflow-x-auto font-mono text-base text-sky-200">{part.formula.expr}</pre>

@@ -60,7 +60,7 @@ export const recap: DeepLesson = {
       heading: "Part 3 · Generation: the loop, with temperature",
       paragraphs: [
         "Your `generate` is the generation loop: compute the probabilities for the next token, choose one, append, repeat. With temperature 0 it is greedy (always the top token, repeatable); with temperature above 0 it samples from probabilities raised to the power 1 / T. T below 1 sharpens the distribution towards the top choices; above 1 flattens it so rarer tokens appear. Every LLM API exposes exactly this setting.",
-        "The real loop adds two things you'll meet later. **Top-k and top-p** sampling cut off the long tail of unlikely tokens before sampling (Module 06 lets you try them on a real model). **The KV cache** stores each token's keys and values so the model doesn't recompute the whole context for every new token (Part IV).",
+        "The real loop adds two things you'll meet later. **Top-k and top-p** sampling cut off the long tail of unlikely tokens before sampling (Module 04 lets you try them on a real model). **The KV cache** stores each token's keys and values so the model doesn't recompute the whole context for every new token (Part IV).",
       ],
       formula: {
         expr: "P_T(w) ∝ P(w)^(1/T)",

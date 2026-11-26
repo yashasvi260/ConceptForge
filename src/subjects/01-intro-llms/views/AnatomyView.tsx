@@ -48,7 +48,7 @@ const PARTS: Part[] = [
     name: "Next-token choice",
     shape: "scores → probabilities → 1 token",
     what: "Softmax turns the scores into probabilities and a decoding rule (greedy, temperature, top-p) picks one token, which is appended before the whole pass runs again.",
-    module: "Module 06 (Decoding)",
+    module: "Module 04 (Decoding)",
   },
 ];
 

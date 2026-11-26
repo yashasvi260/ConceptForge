@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { StageProps } from "../../core/types";
 import { AnatomyView } from "./views/AnatomyView";
 import { ArchView } from "./views/ArchView";
+import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./views/BigPictureLabs";
 import { BowView } from "./views/BowView";
 import { ContextView } from "./views/ContextView";
 import { DenseView } from "./views/DenseView";
@@ -23,6 +24,14 @@ export function Stage({ step }: StageProps) {
     switch (step.view) {
       case "loop-lab":
         return <GenerationLabView />;
+      case "guess-next":
+        return <GuessNextLab />;
+      case "temperature":
+        return <TemperatureLab />;
+      case "bigram":
+        return <BigramLab />;
+      case "next-token-tasks":
+        return <NextTokenTasksLab />;
       case "map":
         return <MapView />;
       case "anatomy":

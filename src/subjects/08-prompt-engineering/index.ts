@@ -14,7 +14,7 @@ const subject: SubjectModule = {
   part: 2,
   moduleNumber: 8,
   bridge: {
-    buildsOn: "Module 06's classification prompt and Module 07's topic-naming prompt, plus Module 06's decoding and token probabilities.",
+    buildsOn: "Module 06's classification prompt and Module 07's topic-naming prompt, plus Module 04's decoding and token probabilities.",
     leadsTo: "Module 09 grounds answers in your own documents: semantic search and retrieval-augmented generation (RAG), with citations.",
   },
   difficulty: "intermediate",

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Code2, Lightbulb, MousePointerClick, Quote } from "lucide-react";
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { ACCENTS } from "../../core/accent";
 import { moduleLabel } from "../../core/track";
 import type { DeepLesson, LessonStep, SubjectModule } from "../../core/types";
@@ -69,8 +69,31 @@ export function DeepLessonPage({
   const [chosen, setChosen] = useState<{ step: string; tab: PanelTab }>({ step: step.id, tab: "stage" });
   const tab: PanelTab = chosen.step === step.id ? chosen.tab : "stage";
   const select = (t: PanelTab) => setChosen({ step: step.id, tab: t });
-  // A step may offer several views; each step opens on its first.
-  const views = step.views ?? [];
+  const [articleEl, setArticleEl] = useState<HTMLElement | null>(null);
+  const showLab = (v: string) => setViewChoice({ step: step.id, view: v });
+  const tryLab = (v: string) => {
+    showLab(v);
+    openFromReading("stage");
+  };
+  // Follow the reading: when a concept with a lab reaches the reading band, the panel shows its lab.
+  useEffect(() => {
+    if (!articleEl || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.find((e) => e.isIntersecting);
+        const v = hit?.target.getAttribute("data-lab");
+        if (v) setViewChoice({ step: step.id, view: v });
+      },
+      { rootMargin: "-30% 0px -60% 0px" },
+    );
+    articleEl.querySelectorAll("[data-lab]").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [articleEl, step.id]);
+  // The panel offers the step's own views, then one lab per concept in reading order; each step opens on its first.
+  const views = useMemo(() => {
+    const all = [...(step.views ?? [{ view: step.view, label: "Overview" }]), ...lesson.concept.flatMap((p) => (p.lab ? [{ view: p.lab.view, label: p.lab.label }] : []))];
+    return all.filter((v, i) => all.findIndex((w) => w.view === v.view) === i);
+  }, [step.views, step.view, lesson.concept]);
   const [viewChoice, setViewChoice] = useState<{ step: string; view: string } | null>(null);
   const view = viewChoice?.step === step.id ? viewChoice.view : (views[0]?.view ?? step.view);
   const openFromReading = (t: PanelTab) => {
@@ -94,6 +117,7 @@ export function DeepLessonPage({
         <AnimatePresence mode="wait">
           <motion.article
             key={step.id}
+            ref={setArticleEl}
             aria-label="Lesson"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,7 +147,7 @@ export function DeepLessonPage({
 
             <Section n={3} title="The concept">
               <div className="space-y-10">
-                {firstPart && <ConceptPartView part={firstPart} />}
+                {firstPart && <ConceptPartView part={firstPart} onTry={tryLab} />}
                 <div className={`space-y-2 rounded-lg border ${a.border} ${a.softBg} p-3 text-sm text-slate-200`}>
                   <p className="flex gap-2">
                     <Lightbulb size={16} className={`mt-0.5 shrink-0 ${a.text}`} aria-hidden="true" />
@@ -138,7 +162,7 @@ export function DeepLessonPage({
                   </button>
                 </div>
                 {restParts.map((p) => (
-                  <ConceptPartView key={p.heading} part={p} />
+                  <ConceptPartView key={p.heading} part={p} onTry={tryLab} />
                 ))}
               </div>
             </Section>

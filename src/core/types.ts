@@ -44,11 +44,20 @@ export interface Formula {
   example: string;
 }
 
+/** The interactive block for one concept: a Stage view shown in the practice panel while the concept is read. */
+export interface ConceptLab {
+  view: string;
+  label: string;
+  /** A one- or two-sentence "try it" task, shown in the reading. */
+  task: string;
+}
+
 export interface ConceptPart {
   heading: string;
   paragraphs: string[];
   formula?: Formula;
   mistake?: string;
+  lab?: ConceptLab;
 }
 
 export interface ExercisePart {

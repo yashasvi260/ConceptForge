@@ -8,23 +8,13 @@ import {
   initialLab,
   labStep,
   pickToken,
-  type GenTree,
   type LabState,
   type StopReason,
 } from "../generationLab";
 
-export interface GenRecording {
-  model: string;
-  recordedAt: string;
-  system: string;
-  trees: GenTree[];
-}
+import { loadGenRecording as loadRecording, pct, showToken as show, type GenRecording } from "./labkit";
 
-const loadRecording = () => import("../data/generation-tree.json").then((m) => m.default as unknown as GenRecording);
-
-/** Show a token's leading space, which is part of the token. */
-const show = (t: string) => t.replace(/^ /, "␣").replace(/\n/g, "↵");
-const pct = (p: number) => (p >= 0.001 ? `${(p * 100).toFixed(1)}%` : "<0.1%");
+export type { GenRecording };
 
 const STOP_TEXT: Record<StopReason, string> = {
   "model-ended": "Loop stopped: gemma4 produced its end-of-turn token, so the reply is finished.",
