@@ -1,6 +1,7 @@
 import { MODEL_CONFIGS, paramBreakdown } from "../../01-intro-llms/modelConfigs";
 import { trainBpe } from "../bpe";
 import { DEFAULT_CORPUS } from "../Stage";
+import { UNIGRAM_VOCAB, UNKNOWN_CHAR_LOGPROB } from "../unigram";
 import minilm from "./data/minilm.json";
 import tokens from "./data/tokens.json";
 
@@ -24,6 +25,8 @@ export const deepData: Record<string, unknown> = {
   bpe: { corpus: DEFAULT_CORPUS, merges: trainBpe(DEFAULT_CORPUS, 10).merges.map((m) => m.pair) },
   /** Step 6's exercise data: a slice of BERT's vocabulary that is exact for its words, plus the BPE corpus. */
   wordpiece: { ...tokens.wordpiece, corpus: DEFAULT_CORPUS },
+  /** Step 7's exercise data: the Unigram view's (illustrative) piece log-probabilities. */
+  unigram: { vocab: UNIGRAM_VOCAB, unknown_char_logprob: UNKNOWN_CHAR_LOGPROB },
   /** Step 2's exercise data: real vocabulary sizes, BERT ids and model sizes. */
   vocab: { sizes: tokens.vocab_sizes, bert_ids: tokens.bert_ids, models },
 };

@@ -3,6 +3,7 @@ import { bpeEncoding } from "./bpe-encoding";
 import { bpeTraining } from "./bpe-training";
 import { bytesLesson } from "./bytes";
 import { deepData } from "./data";
+import { sentencepiece } from "./sentencepiece";
 import { vocabulary } from "./vocabulary";
 import { whyNumbers } from "./why-numbers";
 import { wordpiece } from "./wordpiece";
@@ -16,6 +17,7 @@ export const content: DeepContent = {
     "bpe-encoding": bpeEncoding,
     bytes: bytesLesson,
     wordpiece,
+    sentencepiece,
   },
   data: deepData,
 };

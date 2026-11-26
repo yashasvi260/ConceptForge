@@ -7,7 +7,7 @@
 
 export const SPACE = "▁"; // ▁
 /** Log-probability for a character that isn't in the vocabulary (keeps tokenization lossless). */
-const UNKNOWN_CHAR_LOGPROB = -16;
+export const UNKNOWN_CHAR_LOGPROB = -16;
 
 const COUNTS: Record<string, number> = {
   "▁the": 900, "▁to": 700, "▁a": 650, "▁is": 500, "▁of": 600, "▁and": 640, "▁in": 520, "▁it": 300,

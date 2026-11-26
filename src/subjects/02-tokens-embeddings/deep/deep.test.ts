@@ -11,6 +11,7 @@ import { PYODIDE_CDN } from "../../../py/program";
 import { runInPyodide } from "../../../py/runCore";
 import { encodeBpe, trainBpe } from "../bpe";
 import { steps } from "../steps";
+import { bestSegmentation } from "../unigram";
 import { encodeWordPiece, parseVocab } from "../wordpiece";
 import bertVocabText from "../data/bert-base-uncased-vocab.txt?raw";
 import { LANGUAGE_SAMPLES } from "../views/LanguagesView";
@@ -115,6 +116,17 @@ describe("wrong answers fail", () => {
 });
 
 describe("generated data matches the page", () => {
+  it("the Unigram exercise's Viterbi finds the same best split as the page's", () => {
+    const parts = content.lessons.sentencepiece!.build.parts.slice(0, 2).map((p) => p.solution.replace(/\n(print\(normalize|for t in)[\s\S]*$/, "")).join("\n\n");
+    const globals = py.toPy({});
+    globals.set("_u", JSON.stringify(deepData.unigram));
+    py.runPython(`import json\nDATA = json.loads(_u)\n${parts}`, { globals });
+    for (const t of ["hello world", "unbelievable", "tokenization", "strawberry fields", "the cat sat on the mat", "日本語", "playing words", "zzz qx"]) {
+      const got = (py.runPython(`viterbi(${JSON.stringify(t)})[0]`, { globals }) as { toJs: () => string[] }).toJs();
+      expect(got, t).toEqual(bestSegmentation(t).pieces);
+    }
+  });
+
   it("the WordPiece slice is exact: the exercise splits every word like the page does with BERT's full vocabulary", () => {
     const full = parseVocab(bertVocabText);
     const wp = deepData.wordpiece as { words: string[]; vocab: Record<string, number> };

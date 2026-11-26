@@ -110,6 +110,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "sentencepiece",
+    deep: true,
     title: "SentencePiece and Unigram",
     summary: "Treat spaces as just another symbol, and choose the most probable way to split the text.",
     body: [
