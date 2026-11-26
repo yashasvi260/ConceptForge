@@ -195,6 +195,17 @@ describe("DeepLessonPage", () => {
     expect(within(q).getByText("IDs index rows.")).toBeInTheDocument();
   });
 
+  it("keeps a one-sentence summary with code in it as a single text block next to the icon", () => {
+    render(
+      <PyRunnerProvider run={vi.fn()}>
+        <DeepLessonPage subject={subject} step={step} lesson={{ ...DEEP, oneSentence: "Pieces with `##` continue; failures give `[UNK]` for the word." }} stepIndex={1} total={12} isBuilt={() => true} onOpenModule={() => {}} data={undefined} passedParts={[]} onPartPassed={() => {}} stage={() => null} />
+      </PyRunnerProvider>,
+    );
+    const quote = screen.getByText(/Pieces with/).closest("blockquote")!;
+    expect(quote.children).toHaveLength(2);
+    expect(quote.children[1]).toHaveTextContent("Pieces with ## continue; failures give [UNK] for the word.");
+  });
+
   it("ends with the one-sentence summary, sources and the footer", () => {
     renderPage();
     expect(screen.getByText("An ID picks a row.")).toBeInTheDocument();

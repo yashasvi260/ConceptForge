@@ -174,7 +174,10 @@ export function DeepLessonPage({
             <Section n={6} title="In one sentence">
               <blockquote className={`flex gap-3 rounded-xl border ${a.border} ${a.softBg} p-4 text-base font-medium text-slate-100`}>
                 <Quote size={18} className={`mt-0.5 shrink-0 ${a.text}`} aria-hidden="true" />
-                <RichText text={deep.oneSentence} />
+                {/* One flex item: RichText returns several fragments, which would otherwise sit side by side. */}
+                <span className="min-w-0">
+                  <RichText text={deep.oneSentence} />
+                </span>
               </blockquote>
               <GoDeeper links={deep.deeper} />
             </Section>
