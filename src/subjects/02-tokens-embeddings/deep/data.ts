@@ -1,4 +1,5 @@
 import { MODEL_CONFIGS, paramBreakdown } from "../../01-intro-llms/modelConfigs";
+import { DEFAULT_CORPUS } from "../Stage";
 import minilm from "./data/minilm.json";
 import tokens from "./data/tokens.json";
 
@@ -18,6 +19,8 @@ export const deepData: Record<string, unknown> = {
   /** Real GPT-4 / GPT-4o token counts, pieces, vocabulary sizes and BERT ids (scripts/make-m02-token-data.mjs). */
   tokens,
   models,
+  /** The BPE steps' corpus: the same Sennrich et al. (2016) example the BPE views start with. */
+  bpe: { corpus: DEFAULT_CORPUS },
   /** Step 2's exercise data: real vocabulary sizes, BERT ids and model sizes. */
   vocab: { sizes: tokens.vocab_sizes, bert_ids: tokens.bert_ids, models },
 };

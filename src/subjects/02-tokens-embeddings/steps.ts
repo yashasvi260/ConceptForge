@@ -50,6 +50,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "bpe-training",
+    deep: true,
     title: "BPE: learning the pieces",
     summary: "Byte-Pair Encoding builds its vocabulary by gluing together the pair of symbols that appears together most often, again and again.",
     body: [

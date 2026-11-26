@@ -9,6 +9,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { validateDeep } from "../../../core/deep";
 import { PYODIDE_CDN } from "../../../py/program";
 import { runInPyodide } from "../../../py/runCore";
+import { trainBpe } from "../bpe";
 import { steps } from "../steps";
 import { LANGUAGE_SAMPLES } from "../views/LanguagesView";
 import { content } from ".";
@@ -111,6 +112,15 @@ describe("wrong answers fail", () => {
 });
 
 describe("generated data matches the page", () => {
+  it("the BPE exercise's solution learns the same merges as the page's trainer, on another corpus too", () => {
+    const parts = content.lessons["bpe-training"]!.build.parts.map((p) => p.solution.replace(/\nmerges = train_bpe[\s\S]*$|\nwords = start_words[\s\S]*$/, "")).join("\n\n");
+    const corpus = "the quick brown fox jumps over the lazy dog the dog barks and the fox runs";
+    const globals = py.toPy({});
+    py.runPython(parts, { globals });
+    const got = (py.runPython(`[list(m) for m in train_bpe(${JSON.stringify(corpus)}, 25)]`, { globals }) as { toJs: () => string[][] }).toJs();
+    expect(got).toEqual(trainBpe(corpus, 25).merges.map((m) => m.pair));
+  });
+
   it("the token data covers exactly the Languages view's samples", () => {
     const langs = (deepData.tokens as { languages: { label: string; text: string }[] }).languages;
     expect(langs.map((l) => [l.label, l.text])).toEqual(LANGUAGE_SAMPLES.map((l) => [l.label, l.text]));

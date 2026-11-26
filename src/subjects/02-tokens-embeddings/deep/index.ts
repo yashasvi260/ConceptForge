@@ -1,4 +1,5 @@
 import type { DeepContent } from "../../../core/types";
+import { bpeTraining } from "./bpe-training";
 import { deepData } from "./data";
 import { vocabulary } from "./vocabulary";
 import { whyNumbers } from "./why-numbers";
@@ -8,6 +9,7 @@ export const content: DeepContent = {
   lessons: {
     "why-numbers": whyNumbers,
     vocabulary,
+    "bpe-training": bpeTraining,
   },
   data: deepData,
 };
