@@ -168,6 +168,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "quirks",
+    deep: true,
     title: "Quirks, cost and context limits",
     summary: "Many famous LLM blunders are really tokenization problems.",
     body: [

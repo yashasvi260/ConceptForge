@@ -97,6 +97,7 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
 const WRONG: [step: string, part: string, code: string][] = [
   ["bytes", "p3", "import codecs\nTOKENS = DATA['byte_tokens']\ndef safe_stream(tokens):\n    return [bytes(t['bytes']).decode('utf-8', errors='replace') for t in tokens]"],
   ["special-tokens", "p2", "SPECIAL = DATA['llama3']\ndef naive_encode(prompt_text, encode_text):\n    ids, i = [], 0\n    while i < len(prompt_text):\n        hit = next((t for t in SPECIAL if prompt_text.startswith(t, i)), None)\n        if hit:\n            ids.append(SPECIAL[hit]); i += len(hit)\n        else:\n            ids += encode_text(prompt_text[i]); i += 1\n    return ids\ndef encode_turns(messages, encode_text):\n    return naive_encode(llama3_prompt(messages), encode_text)[:-3]"],
+  ["quirks", "p3", "def chunk(ids, size, overlap):\n    return [ids[i:i + size] for i in range(0, len(ids), size)]"],
   ["vocabulary", "p3", "def table_params(vocab, d_model):\n    return vocab * d_model\n\ndef vocab_share(model):\n    return 100 * table_params(model['vocab'], model['d_model']) / model['total_params']\n\ndef extra_params(old_vocab, new_vocab, d_model, tied):\n    return (new_vocab - old_vocab) * d_model"],
   ["why-numbers", "p1", "def split_words(text):\n    return text.split()\n\ndef split_chars(text):\n    return list(text)\n\ndef split_bytes(text):\n    return list(text)"],
 ];

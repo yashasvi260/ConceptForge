@@ -4,6 +4,7 @@ import { bpeTraining } from "./bpe-training";
 import { bytesLesson } from "./bytes";
 import { deepData } from "./data";
 import { playground } from "./playground";
+import { quirks } from "./quirks";
 import { sentencepiece } from "./sentencepiece";
 import { specialTokens } from "./special-tokens";
 import { vocabulary } from "./vocabulary";
@@ -22,6 +23,7 @@ export const content: DeepContent = {
     sentencepiece,
     "special-tokens": specialTokens,
     playground,
+    quirks,
   },
   data: deepData,
 };
