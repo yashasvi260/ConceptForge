@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const howLarge: DeepLesson = {
   why: [
-    "People describe models by one number: GPT-2 has 124 million, Llama 3 has 8 billion, GPT-3 has 175 billion. That number is the count of **parameters**, the learned numbers inside every table and matrix you met in the anatomy step. It decides how much the model can absorb, how much memory it needs, how fast it runs and how much it costs to train.",
-    "It is easy to treat that number as marketing. It isn't. It follows exactly from a handful of settings in the model's published configuration: how many blocks, how wide each vector is, how wide the feed-forward layer is, how big the vocabulary is. If you can count the parameters yourself you understand where every part of the model lives, and you can answer practical questions immediately: will this model fit on my GPU? Why does a 7B model need 14 GB? Why did doubling the vocabulary barely change the size?",
-    "This step derives the count for GPT-2 small, line by line, to the exact published total, then has you write the counting function for both GPT-2-style and Llama-style models.",
+    "You've probably heard models described by a single number. GPT-2 has 124 million. Llama 3 has 8 billion. GPT-3 has 175 billion. But 124 million *what*?",
+    "**Parameters**: the learned numbers inside every table and matrix you met in the anatomy step. That one number decides how much a model can absorb, how much memory it needs, how fast it runs and how much it costs to train.",
+    "It's tempting to treat it as marketing. It isn't. It follows exactly from a handful of settings in the model's published configuration: how many blocks, how wide each vector is, how wide the feed-forward layer is, how big the vocabulary is. Once you can count them yourself, practical questions answer themselves. Will this model fit on my GPU? Why does a 7B model need 14 GB? Why did doubling the vocabulary barely change the size? In this step you'll count GPT-2 small to its exact published total, and then write the counting function yourself.",
   ],
   worked: [
     {
       kind: "text",
-      text: "GPT-2 small's configuration: vocabulary V = 50,257, width d = 768, context window 1,024 positions, 12 blocks, feed-forward width 3,072. A matrix that maps width a to width b has a × b weights, plus b biases if it has biases (GPT-2 does). Start with one block:",
+      text: "Let's count GPT-2 small by hand. Its configuration: vocabulary V = 50,257, width d = 768, context window 1,024 positions, 12 blocks, feed-forward width 3,072. A matrix that maps width a to width b has a × b weights, plus b biases if it has biases (GPT-2 does). Start with one block:",
     },
     {
       kind: "table",
@@ -28,7 +28,7 @@ export const howLarge: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Now the whole model. The output head is **tied**: GPT-2 reuses the token embedding table to score the vocabulary, so the head adds nothing.",
+      text: "Now the whole model. One thing to notice first: the output head is **tied**. GPT-2 reuses the token embedding table to score the vocabulary, so the head adds nothing.",
     },
     {
       kind: "table",
@@ -50,7 +50,7 @@ export const howLarge: DeepLesson = {
     },
     {
       kind: "text",
-      text: "And memory: each parameter is stored as a number of a chosen precision. For Llama 3 8B (8,030,261,248 parameters):",
+      text: "Now the question everyone actually asks: how much memory? Each parameter is stored as a number of a chosen precision. For Llama 3 8B (8,030,261,248 parameters):",
     },
     {
       kind: "table",
@@ -69,16 +69,22 @@ export const howLarge: DeepLesson = {
     {
       heading: "What a parameter is",
       paragraphs: [
-        "A **parameter** (also called a **weight**) is one number that training is allowed to change. Every entry of the embedding table, every entry of every matrix in every block, every scale in every normalisation layer is one parameter. Training starts them at small random values and nudges all of them, billions of times, until the model predicts text well.",
-        "Two things are *not* parameters, even though they shape the model: the **tokenizer** (a fixed lookup built before training) and the **settings** in the configuration (layer count, widths). The settings are chosen by people and fixed before training; they are sometimes called hyperparameters. The parameter count is a consequence of the settings.",
-        "The parameters are the model. When you download Llama 3 8B, the file is almost entirely those 8 billion numbers; the code that runs them is a few hundred lines.",
+        "A **parameter** (also called a **weight**) is one number that training is allowed to change. That's all. Every entry of the embedding table, every entry of every matrix in every block, every scale in every normalisation layer: each one is a parameter. Training starts them at small random values and nudges all of them, billions of times, until the model predicts text well.",
+        "So what *isn't* a parameter? Two things, even though they shape the model. The **tokenizer** (a fixed lookup built before training), and the **settings** in the configuration, like the number of layers or the widths. People choose the settings before training; they're sometimes called hyperparameters. The parameter count is a *consequence* of the settings.",
+        "Here's a way to make it concrete: the parameters *are* the model. When you download Llama 3 8B, the file is almost entirely those 8 billion numbers. The code that runs them is a few hundred lines.",
       ],
+      lab: {
+        view: "neuron",
+        label: "One neuron",
+        task: "Drag the three sliders of a single neuron and watch its output change: those are its parameters. Then size a whole layer: how many parameters does GPT-2's 768 → 3,072 layer have?",
+      },
     },
     {
       heading: "Counting them from the configuration",
       paragraphs: [
-        "Every learned matrix maps one width to another, so it holds (input width) × (output width) numbers, plus one bias per output if the model uses biases. Walk through the anatomy: the embedding table maps a token to d numbers (V × d). In each block, attention needs matrices for queries, keys, values and the output (4 × d × d in a plain model), and the feed-forward network widens to d_ff and narrows back (2 × d × d_ff). Add the small normalisation layers and you have one block; multiply by the number of blocks.",
-        "Different families make different small choices, and each changes the formula. **GPT-2** has biases, LayerNorm (a scale *and* a shift per number), a learned position table and a tied head. **Llama** has no biases, RMSNorm (scale only), no position table (positions come from rotating vectors), a separate output head, a feed-forward block with three matrices instead of two (SwiGLU), and **grouped-query attention**: 32 query heads share 8 sets of keys and values, so the K and V matrices are a quarter of the size.",
+        "Counting is easier than it sounds. Every learned matrix maps one width to another, so it holds (input width) × (output width) numbers, plus one bias per output if the model uses biases.",
+        "Now walk through the anatomy. The embedding table maps each token to d numbers: V × d. In each block, attention needs four matrices (queries, keys, values, output), so 4 × d × d in a plain model. The feed-forward network widens to d_ff and narrows back: 2 × d × d_ff. Add the small normalisation layers and you have one block. Multiply by the number of blocks, and you're nearly done.",
+        "Different families make different small choices, and each one tweaks the formula. **GPT-2** has biases, LayerNorm (a scale *and* a shift per number), a learned position table and a tied head. **Llama** has no biases, uses RMSNorm (scale only), has no position table (it rotates vectors instead), a separate output head, a feed-forward block with three matrices instead of two (SwiGLU), and **grouped-query attention**: 32 query heads share just 8 sets of keys and values, so the K and V matrices are a quarter of the size.",
       ],
       formula: {
         expr: "N ≈ V·d  +  L · (4·d² + 2·d·d_ff)",
@@ -91,30 +97,48 @@ export const howLarge: DeepLesson = {
         ],
         example: "GPT-2 small: 50,257·768 + 12·(4·768² + 2·768·3,072) = 38,597,376 + 12·7,077,888 = 123,532,032. The exact count, 124,439,808, adds positions, biases and norms (under 1% more).",
       },
+      lab: {
+        view: "param-calc",
+        label: "Calculator",
+        task: "Start from GPT-2 small and check you get its exact published size. Now double the number of blocks, then double the width instead. Which grows the model more, and why?",
+      },
     },
     {
       heading: "Where the parameters live",
       paragraphs: [
-        "In GPT-2 small the embedding table is a surprisingly large 31% of the model, because the vocabulary (50,257) is large compared with the width (768). As models grow, the blocks grow with d² and L, while the table grows only with d, so the blocks take over. In Llama 3 8B, the 32 blocks hold about 87% of the parameters, even though its vocabulary is 2.5 times bigger than GPT-2's.",
-        "Inside each block, the feed-forward network is the heavyweight: in GPT-2 it is 4,722,432 of the block's 7,087,872 parameters, about two thirds. When people say a model's \"knowledge\" lives in its feed-forward layers, this is part of why: that's where most of the numbers are.",
+        "Guess before you look: in GPT-2 small, how much of the model is the embedding table? It's a surprisingly large 31%, because the vocabulary (50,257) is big compared with the width (768).",
+        "But that changes as models grow. The blocks grow with d² and L, while the table grows only with d, so the blocks take over. In Llama 3 8B, the 32 blocks hold about 87% of the parameters, even though its vocabulary is 2.5 times bigger than GPT-2's.",
+        "And inside each block? The feed-forward network is the heavyweight. In GPT-2 it's 4,722,432 of the block's 7,087,872 parameters, about two thirds. When people say a model's \"knowledge\" lives in its feed-forward layers, this is part of why: that's where most of the numbers are.",
       ],
       mistake:
         "Thinking a bigger vocabulary means a much bigger model. Doubling V only grows the embedding table (and a separate head, if there is one). For an 8B model that is a few percent; for a tiny model it can be a lot.",
+      lab: {
+        view: "scale",
+        label: "Where they live",
+        task: "Switch between GPT-2 small, Llama 3 8B and GPT-3. Watch the embedding table's share shrink as the models grow. Can you explain why?",
+      },
     },
     {
       heading: "Two other sizes that are not parameters",
       paragraphs: [
-        "The **context window** is how many tokens the model can look at in one pass: 1,024 for GPT-2, 8,192 for Llama 3 8B. It is a separate setting from the parameter count, and making it longer barely adds parameters (GPT-2's position table is only 0.6% of its weights; Llama adds none). What it does cost is memory and compute *while running*, because attention compares every token with every earlier one.",
-        "**Training tokens** is how much text the model read while learning: about 300 billion for GPT-3, over 15 trillion for Llama 3. A smaller model trained on far more text can beat a bigger one trained on less: the Chinchilla study (Hoffmann et al. 2022) found that, for a fixed compute budget, most earlier models were too big and trained on too little data. Parameters set capacity; training data decides how much of it gets used.",
+        "Two more numbers get thrown around a lot, and neither is a parameter count.",
+        "The **context window** is how many tokens the model can look at in one pass: 1,024 for GPT-2, 8,192 for Llama 3 8B. Making it longer barely adds parameters (GPT-2's position table is only 0.6% of its weights; Llama adds none). What it *does* cost is memory and compute while running, because attention compares every token with every earlier one.",
+        "**Training tokens** is how much text the model read while learning: about 300 billion for GPT-3, over 15 trillion for Llama 3. And here's a surprise: a smaller model trained on far more text can beat a bigger one trained on less. The Chinchilla study (Hoffmann et al. 2022) found that, for a fixed compute budget, most earlier models were too big and trained on too little data. Parameters set the capacity; training data decides how much of it gets used.",
       ],
       mistake:
         "Confusing the context window with memory of past conversations. The context window is just how much text fits into one pass. Nothing is remembered between separate conversations unless an application pastes it back in.",
+      lab: {
+        view: "data-vs-size",
+        label: "Data vs size",
+        task: "Compare tokens per parameter for GPT-3 and Llama 3 8B. Which one read \"too little\" by Chinchilla's standard? Then plan a 70B model: how many training tokens would be compute-optimal?",
+      },
     },
     {
       heading: "Memory and number formats",
       paragraphs: [
-        "To run a model, its weights must sit in memory, ideally the GPU's. The bill is simple: parameters × bytes per parameter. Training usually keeps weights in 32-bit (4 bytes) or mixed 16-bit formats; running a model typically uses 16-bit (**fp16** or **bf16**, 2 bytes). Shrinking each weight to 8 or 4 bits is called **quantisation**, and it is how an 8B model fits on a laptop GPU. Module 16 measures what that costs in accuracy.",
-        "This is only the weights. Running a model also needs memory for the vectors of the current prompt (the KV cache, which grows with context length), and training needs several times more for gradients and optimiser state. A useful rule of thumb for running: 16-bit weights ≈ 2 GB per billion parameters, plus some headroom.",
+        "To run a model, its weights have to sit in memory, ideally the GPU's. The bill is simple: parameters × bytes per parameter. Training usually keeps weights in 32-bit (4 bytes) or mixed 16-bit formats. Running a model typically uses 16-bit (**fp16** or **bf16**, 2 bytes).",
+        "Want to fit a big model on a small GPU? Shrink each weight to 8 or 4 bits. That's called **quantisation**, and it's how an 8B model fits on a laptop GPU. Module 16 measures what it costs in accuracy.",
+        "One caution: this is only the weights. Running a model also needs memory for the vectors of the current prompt (the KV cache, which grows with context length), and training needs several times more for gradients and optimiser state. A handy rule of thumb for running: 16-bit weights ≈ 2 GB per billion parameters, plus some headroom.",
       ],
       formula: {
         expr: "memory (bytes) = N × (bits per parameter ÷ 8)",
@@ -124,10 +148,15 @@ export const howLarge: DeepLesson = {
         ],
         example: "Llama 3 8B in bf16: 8,030,261,248 × 2 = 16,060,522,496 bytes ≈ 16.06 GB.",
       },
+      lab: {
+        view: "memory",
+        label: "Will it fit?",
+        task: "Can Llama 3 8B run on a 16 GB GPU in bf16? Try int8 and int4. What's the smallest GPU that holds GPT-3 in int4?",
+      },
     },
   ],
   guided:
-    "Predict first: in Llama 3 8B, will the embedding table be a bigger or smaller share than GPT-2's 31%? Switch models below and compare the bars. Then predict GPT-3's share before you click it.",
+    "Before touching the **Calculator**, predict: if you double GPT-2 small's width, does the model get about twice as big, or about four times? Then try it, and explain what you see using the formula.",
   build: {
     id: "01-how-large-count",
     title: "Count every parameter yourself",

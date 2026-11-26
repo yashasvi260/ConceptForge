@@ -10,6 +10,7 @@ import { ContextView } from "./views/ContextView";
 import { DenseView } from "./views/DenseView";
 import { EncDecView } from "./views/EncDecView";
 import { GenerationLabView } from "./views/GenerationLabView";
+import { DataVsSizeLab, MemoryLab, NeuronLab, ParamCalcLab } from "./views/HowLargeLabs";
 import { MapView } from "./views/MapView";
 import { RecapView } from "./views/RecapView";
 import { RepGenView } from "./views/RepGenView";
@@ -49,6 +50,14 @@ export function Stage({ step }: StageProps) {
         return <LogitsLab />;
       case "scale":
         return <ScaleView />;
+      case "neuron":
+        return <NeuronLab />;
+      case "param-calc":
+        return <ParamCalcLab />;
+      case "data-vs-size":
+        return <DataVsSizeLab />;
+      case "memory":
+        return <MemoryLab />;
       case "trainuse":
         return <TrainUseView />;
       case "bow":
