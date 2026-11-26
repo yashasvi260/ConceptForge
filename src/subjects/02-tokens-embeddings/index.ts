@@ -1,8 +1,8 @@
 import { Scissors } from "lucide-react";
 import { PART_TITLES } from "../../core/track";
+import { lazyStage } from "../../core/lazyStage";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { Stage } from "./Stage";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
@@ -24,7 +24,7 @@ const subject: SubjectModule = {
   steps,
   challenges,
   loadDeep: () => import("./deep").then((m) => m.content),
-  Stage,
+  Stage: lazyStage(() => import("./Stage")),
 };
 
 export default subject;

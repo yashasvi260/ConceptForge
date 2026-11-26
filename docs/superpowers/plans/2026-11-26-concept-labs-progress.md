@@ -24,5 +24,29 @@ need full deep conversion as well).
 | 01 | representation-vs-generative | yes | 6/6 (two-outputs, centroid, gen-classify, cost-gap, choose, combine) | (this commit) |
 | 01 | pretraining-finetuning | yes | 6/6 (training, finetune-format, transfer, forgetting, data-per-stage, base-to-assistant) | (this commit) |
 | 01 | recap | yes | 6/6 (recap-tokenize, smoothing, recap-generate, perplexity, vs-real, map) | (this commit) |
-| 02 | 14 lessons | | | |
+| 01 | (all) | Module 01 complete: 68 labs, browser pass 75 views 0 problems; Stage lazy (main bundle 203 KB gz) | | cfe6056 |
+| 02 | why-numbers | | | |
+| 02 | vocabulary | | | |
+| 02 | bpe-training | | | |
+| 02 | bpe-encoding | | | |
+| 02 | bytes | | | |
+| 02 | wordpiece | | | |
+| 02 | sentencepiece | | | |
+| 02 | special-tokens | | | |
+| 02 | playground | | | |
+| 02 | quirks | | | |
+| 02 | lookup-table | | | |
+| 02 | static-vs-contextual | | | |
+| 02 | sentence-embeddings | | | |
+| 02 | cheat-sheet | | | |
 | 03, 06, 07, 08 | deep conversion | | | |
+
+## Module 02 lab plan (concept → view)
+
+Existing views reused: intro, chop, vocab, bpe-train, bpe-encode, bytes, wordpiece, unigram, special, playground,
+languages, quirks, practice, lookup, static-contextual, bank-shift, sentence-emb, similarity, search-preview.
+New labs (Module 02 Stage, lazy): oov, seq-length, vocab-cost, vocab-buys, add-tokens, bpe-compress, pretokenize,
+merges-curve, merge-order, fertility, variants, byte-tax, byte-standins, stream-decode, wp-unk, wp-score,
+wp-fertility, sp-normalize, viterbi-table, unigram-prune, special-ids, chat-template, padding-mask, number-chunks,
+glitch, chunker, sparse-grad, table-memory, cos-baseline, pool-mask, score-traps, pipeline-trace, index-cost,
+retrieval-eval, hybrid. Reused from Module 01: contrastive (row meaning), sense-by-example.
