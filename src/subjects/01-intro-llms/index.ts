@@ -1,8 +1,8 @@
 import { Map as MapIcon } from "lucide-react";
 import { PART_TITLES } from "../../core/track";
+import { lazyStage } from "../../core/lazyStage";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { Stage } from "./Stage";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
@@ -23,7 +23,7 @@ const subject: SubjectModule = {
   accent: "violet",
   steps,
   challenges,
-  Stage,
+  Stage: lazyStage(() => import("./Stage")),
   // Lesson text, exercises and MiniLM data download only when a deep step is opened.
   loadDeep: () => import("./deep").then((m) => m.content),
 };

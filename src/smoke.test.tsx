@@ -2,7 +2,7 @@
  * End-to-end smoke test: every subject, every step, every control, every challenge —
  * and no console errors or warnings along the way.
  */
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { SUBJECTS } from "./core/registry";
@@ -55,6 +55,8 @@ describe("smoke: every subject and step", () => {
       expect(screen.getByText(new RegExp(`Step ${i + 1} / ${subject.steps.length}`))).toBeInTheDocument();
       // Deep lessons download on demand; wait until the page (and its stage) is there.
       if (subject.steps[i]!.deep) await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" });
+      // Stages can load lazily (their own chunk); wait for the real stage, not its loading placeholder.
+      await waitFor(() => expect(stage().textContent?.length ?? 0).toBeGreaterThan(20));
       exerciseControls();
       // After poking controls the stage must still be on screen.
       expect(stage().textContent?.length ?? 0).toBeGreaterThan(20);
