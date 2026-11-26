@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const staticVsContextual: DeepLesson = {
   why: [
-    "The embedding table gives every token one fixed vector. That is a problem for any word with more than one meaning. `bank` in \"the bank approved the loan\" and \"the river bank flooded\" gets the identical row, so at the input the model cannot tell a lender from a riverside. A vector that stays the same in every sentence is called **static**, and static vectors (from the table, or from older methods such as word2vec and GloVe) blur all of a word's senses into one point.",
-    "Transformers fix this in their layers. Each layer lets every token's vector take in information from the other tokens in the sentence (attention, Module 03), so by the output `bank` near `loan` and `bank` near `river` have moved in different directions. Those output vectors are **contextual**: a fresh vector for each word in each sentence. Contextual vectors are what made BERT-era models so much better at understanding text, and they are what sentence embeddings (step 13) are built from.",
-    "This step measures the effect on real MiniLM vectors, and is honest about its size. The two copies of `the` in one sentence stop being identical. The two river sentences' `bank`s end up closest to each other. But MiniLM is a small model tuned for sentence similarity, and the money and river senses separate only partly. Seeing what contextual vectors do, and do not, guarantee is what lets you use them sensibly.",
+    "The embedding table gives every token one fixed vector. Can you spot the problem? Think of any word with more than one meaning. `bank` in \"the bank approved the loan\" and \"the river bank flooded\" gets the identical row, so at the input the model can't tell a lender from a riverside. A vector that stays the same in every sentence is called **static**, and static vectors (from the table, or from older methods like word2vec) carry every sense of a word blended together.",
+    "Transformers fix this in their layers. Each layer lets every token's vector take in information from the other tokens in the sentence (attention, Module 03), so by the output, `bank` near `loan` and `bank` near `river` have moved in different directions. Those output vectors are **contextual**: a fresh vector for each word in each sentence. Contextual vectors are what made BERT-era models so much better at understanding text.",
+    "In this step you'll measure the effect on real MiniLM vectors, and be honest about its size. The two copies of `the` in one sentence stop being identical. The two river sentences' `bank`s end up closest to each other. But MiniLM is a small model tuned for sentence similarity, and the money and river senses separate only partly. Knowing what contextual vectors do, and don't, guarantee is what lets you use them well.",
   ],
   worked: [
     {
       kind: "text",
-      text: "MiniLM's real output vector for `bank` in four sentences, two about money and two about rivers. Every pair would score exactly 1.0 with a static table (same ID, same row). The contextual vectors:",
+      text: "Let's measure. Here is MiniLM's real output vector for `bank` in four sentences, two about money and two about rivers. Every pair would score exactly 1.0 with a static table (same ID, same row). The contextual vectors:",
     },
     {
       kind: "table",
@@ -26,7 +26,7 @@ export const staticVsContextual: DeepLesson = {
     },
     {
       kind: "text",
-      text: "The river pair is the closest pair in the table (0.902). On average, same-sense pairs score 0.854 and different-sense pairs 0.780. But look at the first row: the loan sentence's `bank` is slightly closer to \"the river bank flooded\" (0.826) than to \"deposited cash\" (0.806). The senses separate, partly. Now compare a static table with contextual vectors for repeated tokens:",
+      text: "What do you see? The river pair is the closest pair in the table (0.902). On average, same-sense pairs score 0.854 and different-sense pairs 0.780. But look at the first row: the loan sentence's `bank` is slightly closer to \"the river bank flooded\" (0.826) than to \"deposited cash\" (0.806). The senses separate, partly. Now compare a static table with contextual vectors for repeated tokens:",
     },
     {
       kind: "table",
@@ -45,17 +45,22 @@ export const staticVsContextual: DeepLesson = {
     {
       heading: "Static vectors: one point per word",
       paragraphs: [
-        "A static embedding gives each vocabulary entry a single vector, used in every sentence. That is what the embedding table holds (step 11), and it is what classic word-vector methods produced: word2vec (2013) and GloVe (2014) trained tables in which words used in similar contexts sit close together, and those tables powered search and classification for years.",
-        "The limitation is built in. A word with several senses (`bank`, `bat`, `spring`, `bass`) gets one vector, which ends up as a blend of all its uses weighted by how often each occurs. A sentence about a riverbank and one about a loan both start from that same blend. Static vectors also cannot reflect grammar or negation: `good` has the same vector in \"good service\" and \"not good service\".",
+        "A static embedding gives each vocabulary entry a single vector, used in every sentence. That's what the embedding table holds (step 11), and it's what classic word-vector methods produced: word2vec (2013) and GloVe (2014) trained tables in which words used in similar contexts sit close together, and those tables powered search and classification for years.",
+        "But the limitation is built in. A word with several senses (`bank`, `bat`, `spring`, `bass`) gets one vector, which ends up as a blend of all its uses, weighted by how often each occurs. A sentence about a riverbank and one about a loan both start from that same blend. Static vectors can't reflect grammar or negation either: `good` has the same vector in \"good service\" and \"not good service\".",
       ],
+      lab: {
+        view: "static-contextual",
+        label: "Static vs contextual",
+        task: "Compare the static row for `bank` with the contextual vectors from two sentences. Which part is identical, and which part moved?",
+      },
     },
     {
       heading: "Contextual vectors: one point per word, per sentence",
       paragraphs: [
         "In a transformer, the static vector is only the starting point. Every layer updates each token's vector using the vectors of the other tokens (attention), plus a small network applied to each position (Module 03). After several layers, each output vector encodes the token **and** its context. ELMo (2018) showed the value of contextual vectors with recurrent networks; BERT (2018) made them the standard with transformers.",
-        "You can see the mixing in the data. Inside `The bank approved the loan`, MiniLM's output vector for `bank` is closest to the vector for `loan` (0.61 cosine), and the two copies of `the`, identical at the input, end with a cosine of 0.907 because each has absorbed a different neighbourhood. Nothing was looked up differently; the layers made the difference.",
-        "In code, contextual vectors are the model's hidden states. With Hugging Face Transformers, running `AutoModel` on tokenized input returns `last_hidden_state`, an array of shape (batch × tokens × d); passing `output_hidden_states=True` also returns every layer's version. Two practical details: the rows include `[CLS]` and `[SEP]`, and a word split into several pieces (`em ##bed ##ding ##s`) has one row per piece, so to get one vector per word you usually average its pieces' rows, using the tokenizer's word-to-piece mapping to find them.",
-        "Contextual vectors are computed, not stored. To get them you must run the model on the whole sentence, so they cost a forward pass each time, unlike a table lookup. That is the price of context, and the reason systems compute sentence vectors once and store them (step 13 and Module 09).",
+        "You can see the mixing in the data. Inside `The bank approved the loan`, MiniLM's output vector for `bank` is closest to the vector for `loan` (0.61 cosine), and the two copies of `the`, identical at the input, end with a cosine of 0.907, because each has absorbed a different neighbourhood. Nothing was looked up differently; the layers made the difference.",
+        "In code, contextual vectors are the model's hidden states. With Hugging Face Transformers, running `AutoModel` on tokenized input returns `last_hidden_state`, an array of shape (batch × tokens × d); passing `output_hidden_states=True` also returns every layer's version. Two practical details: the rows include `[CLS]` and `[SEP]`, and a word split into several pieces (`em ##bed ##ding ##s`) has one row per piece. To get one vector per word, you usually average its pieces' rows, using the tokenizer's word-to-piece mapping to find them.",
+        "Keep in mind that contextual vectors are computed, not stored. To get them you have to run the model on the whole sentence, so they cost a forward pass every time, unlike a table lookup. That's the price of context, and the reason systems compute sentence vectors once and store them (step 13 and Module 09).",
       ],
       formula: {
         expr: "static:      v(word) = E[id(word)]                      (same in every sentence)\ncontextual:  h_i = Layers(E[id_1], …, E[id_n])_i          (depends on every token in the sentence)",
@@ -65,25 +70,41 @@ export const staticVsContextual: DeepLesson = {
         ],
         example: "Both `the`s start as row 1,996; their outputs h₁ and h₄ have a cosine of 0.907.",
       },
+      lab: {
+        view: "bank-shift",
+        label: "Bank shift",
+        task: "Change Sentence B to another river sentence, then a money sentence. Predict whether the score goes up or down before it appears.",
+      },
     },
     {
       heading: "Reading cosine similarities honestly",
       paragraphs: [
-        "Cosine similarity measures the angle between two vectors: 1 means the same direction, 0 unrelated (perpendicular), −1 opposite. For contextual vectors the absolute numbers are misleading on their own. Researchers have found that vectors from models like BERT and GPT-2 all point into a fairly narrow cone, so even unrelated words often score well above zero; Ethayarajh (2019) measured this and called it anisotropy. In the table, the lowest score between `bank`s of different senses is still 0.757.",
-        "So compare against a baseline instead of reading values in isolation. Here, same-sense pairs average 0.854 and different-sense pairs 0.780: a real gap, but a small one, and not large enough to make every individual comparison come out right, as the loan-vs-river case shows. Other models, and other layers of the same model, can behave quite differently, which is worth testing on your own task before relying on any one of them.",
+        "Cosine similarity measures the angle between two vectors: 1 means the same direction, 0 unrelated (perpendicular), −1 opposite. So is 0.78 high? On its own, you can't tell. Researchers found that vectors from models like BERT and GPT-2 all point into a fairly narrow cone, so even unrelated words often score well above zero; Ethayarajh (2019) measured this and called it anisotropy. MiniLM's last layer behaves better: 30 pairs of different words taken from two unrelated sentences average just 0.07 here. But every `bank` pair scores at least 0.757, whatever the sense, simply because it's the same word.",
+        "So compare against a baseline instead of reading values in isolation. Here, same-sense pairs average 0.854 and different-sense pairs 0.780: a real gap, but a small one. Try to draw a line between them and you'll find no threshold gets all six pairs right, because the loan sentence's `bank` sits closer to the flooded river (0.826) than to the cash deposit (0.806). Other models, and other layers of the same model, can behave quite differently, which is worth testing on your own task before relying on any one of them.",
       ],
-      mistake: "Treating a cosine of 0.8 as \"very similar\" in general. Similarity is relative to the model and the vectors' baseline: calibrate with pairs you know are related and unrelated before you set a threshold.",
+      mistake:
+        "Treating a cosine of 0.8 as \"very similar\" in general. Similarity is relative to the model and the vectors' baseline: calibrate with pairs you know are related and unrelated before you set a threshold.",
+      lab: {
+        view: "cos-baseline",
+        label: "Baseline & threshold",
+        task: "Move the threshold and try to judge all six `bank` pairs correctly. What's the best you can do? Compare every score with the 0.07 baseline at the top.",
+      },
     },
     {
       heading: "Why MiniLM separates senses only partly",
       paragraphs: [
-        "MiniLM (all-MiniLM-L6-v2) is a small model, 6 layers and 384 numbers per vector, and it was fine-tuned for one job: making **sentence** vectors of similar sentences close. Nothing in that training asks individual word vectors to separate senses cleanly, and its last layer's token vectors are optimised to be averaged into a sentence vector. With half as many layers as BERT-base's twelve, it also has fewer steps in which to mix context into each token. Partial separation is the expected result.",
-        "If your task really is about word senses (for example, disambiguating terms in legal or medical text), use a model trained for token-level tasks and measure separation on examples from your domain, as part 2 does here. For comparing whole sentences, which is what search and clustering need, MiniLM's design is exactly right, and step 13 shows how its token vectors become one sentence vector.",
+        "Why is the separation only partial? MiniLM (all-MiniLM-L6-v2) is a small model, 6 layers and 384 numbers per vector, and it was fine-tuned for one job: making **sentence** vectors of similar sentences close. Nothing in that training asks individual word vectors to separate senses cleanly, and its last layer's token vectors are optimised to be averaged into a sentence vector. With half as many layers as BERT-base's twelve, it also has fewer steps in which to mix context into each token. Partial separation is the expected result.",
+        "So if your task really is about word senses (for example, disambiguating terms in legal or medical text), use a model trained for token-level tasks, and measure separation on examples from your own domain, as part 2 does here. For comparing whole sentences, which is what search and clustering need, MiniLM's design is exactly right, and step 13 shows how its token vectors become one sentence vector.",
       ],
+      lab: {
+        view: "sense-by-example",
+        label: "Sense by example",
+        task: "Each `bank` is labelled with the sense of its nearest neighbour. How many of the four come out right, and which one fails?",
+      },
     },
   ],
   guided:
-    "Under **Static vs contextual**, look at how far apart the contextual `bank` vectors are in each pair. Then open **Bank shift**, change Sentence B to another river or money sentence, and predict whether the score will go up or down before you look.",
+    "In **Bank shift**, predict whether a second river sentence will score higher or lower than a money sentence. Then open **Baseline & threshold** and look for a cut-off that separates every pair: is there one?",
   build: {
     id: "m02-static-vs-contextual",
     title: "Measure context in real vectors",

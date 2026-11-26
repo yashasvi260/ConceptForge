@@ -33,12 +33,12 @@ need full deep conversion as well).
 | 02 | wordpiece | yes | 4/4 (wordpiece, wp-unk, wp-score, wp-fertility) | (this commit) |
 | 02 | sentencepiece | yes | 4/4 (sp-normalize, unigram, viterbi-table, unigram-prune) | (this commit) |
 | 02 | special-tokens | yes | 4/4 (special-ids, chat-template, special, padding-mask) | (this commit) |
-| 02 | playground | yes | 4/4 (languages, pretokenize, number-chunks, playground) | (this commit) |
-| 02 | quirks | yes | 4/4 (quirks, glitch, practice, chunker) | (this commit) |
-| 02 | lookup-table | | | |
-| 02 | static-vs-contextual | | | |
-| 02 | sentence-embeddings | | | |
-| 02 | cheat-sheet | | | |
+| 02 | playground | yes | 4/4 (languages, pretokenize, number-chunks, playground) | b755dd9 |
+| 02 | quirks | yes | 4/4 (quirks, glitch, practice, chunker) | b755dd9 |
+| 02 | lookup-table | yes | 4/4 (lookup, sparse-grad, contrastive [M01], table-memory) | (this commit) |
+| 02 | static-vs-contextual | yes | 4/4 (static-contextual, bank-shift, cos-baseline, sense-by-example [M01]) | (this commit) |
+| 02 | sentence-embeddings | yes | 4/4 (sentence-emb, pool-mask, similarity, score-traps) | (this commit) |
+| 02 | cheat-sheet | yes | 5/5 (pipeline-trace, search-preview, index-cost, retrieval-eval, hybrid) | (this commit) |
 | 03, 06, 07, 08 | deep conversion | | | |
 
 ## Module 02 lab plan (concept → view)
@@ -50,3 +50,6 @@ merges-curve, merge-order, fertility, variants, byte-tax, byte-standins, stream-
 wp-fertility, sp-normalize, viterbi-table, unigram-prune, special-ids, chat-template, padding-mask, number-chunks,
 glitch, chunker, sparse-grad, table-memory, cos-baseline, pool-mask, score-traps, pipeline-trace, index-cost,
 retrieval-eval, hybrid. Reused from Module 01: contrastive (row meaning), sense-by-example.
+
+Module 02 browser pass (MOD=02-tokens-embeddings STEPS=14, 1280 + 390): 58 lab views, 0 problems.
+New real recording: scripts/record-m02-embedding-labs.mjs → data/embedding-labs.json (padded batch, score traps, error-code hybrid set).

@@ -3,14 +3,14 @@ import { localListing, part } from "./files";
 
 export const cheatSheet: DeepLesson = {
   why: [
-    "This module followed text all the way from characters to meaning. A tokenizer cut it into pieces from a learned vocabulary (BPE, WordPiece or Unigram, usually on bytes), wrapped it in special tokens, and turned it into IDs. An embedding table turned each ID into a vector. The transformer's layers made those vectors contextual, and pooling turned them into one vector per sentence, where closeness means similar meaning. Each step is simple on its own; together they are the input half of every language model.",
-    "The best way to check that you understand a pipeline is to build something real with it and measure it. The recap does that with the most common application of everything in this module: **semantic search**. Given a customer's question, find the help article that answers it, even when the two share no words. It is the retrieval step of every RAG system (Module 09), and it is a few lines of code once you have sentence vectors.",
-    "You will search 12 real banking help questions with 6 real customer queries, all embedded by MiniLM, then evaluate the results with the standard retrieval metrics and compare them with the keyword matching from Module 01. The numbers are small enough to check by hand and real enough to show both the power of embeddings and their failure modes.",
+    "Look back at how far we've come. This module followed text all the way from characters to meaning. A tokenizer cut it into pieces from a learned vocabulary (BPE, WordPiece or Unigram, usually on bytes), wrapped it in special tokens, and turned it into IDs. An embedding table turned each ID into a vector. The transformer's layers made those vectors contextual, and pooling turned them into one vector per sentence, where closeness means similar meaning. Each step is simple on its own; together, they're the input half of every language model.",
+    "What's the best way to check you really understand a pipeline? Build something real with it and measure it. So the recap does that with the most common application of everything in this module: **semantic search**. Given a customer's question, find the help article that answers it, even when the two share no words. It's the retrieval step of every RAG system (Module 09), and it's a few lines of code once you have sentence vectors.",
+    "You'll search 12 real banking help questions with 6 real customer queries, all embedded by MiniLM, then evaluate the results with the standard retrieval metrics and compare them with the keyword matching from Module 01. The numbers are small enough to check by hand, and real enough to show both the power of embeddings and their failure modes.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Embed every help question once and store the 12 unit vectors. For each customer query, embed it, take the dot product with all 12, and rank. Here is the top result for each of the six queries, and the rank at which the labelled correct answer appeared:",
+      text: "Let's build it. Embed every help question once and store the 12 unit vectors. For each customer query, embed it, take the dot product with all 12, and rank. Here is the top result for each of the six queries, and the rank at which the labelled correct answer appeared:",
     },
     {
       kind: "table",
@@ -28,7 +28,7 @@ export const cheatSheet: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Five of six correct at rank 1, with queries that share almost no words with their answers (`transfer funds to another country` → `How do I send money abroad?`). The one miss is arguable: for \"I can't sign in\", the label says \"I forgot my login details\" but the search picked \"How do I reset my password?\", which many people would accept. Now the same queries with keyword overlap:",
+      text: "How did it do? Five of six correct at rank 1, with queries that share almost no words with their answers (`transfer funds to another country` → `How do I send money abroad?`). The one miss is arguable: for \"I can't sign in\", the label says \"I forgot my login details\" but the search picked \"How do I reset my password?\", which many people would accept. Now the same queries with keyword overlap:",
     },
     {
       kind: "table",
@@ -49,15 +49,20 @@ export const cheatSheet: DeepLesson = {
     {
       heading: "The pipeline, end to end",
       paragraphs: [
-        "Text → **tokenizer** → IDs: pre-tokenization rules, then BPE merges (GPT, Llama), greedy WordPiece (BERT, MiniLM) or Unigram's most probable split (T5), on a fixed vocabulary of 30k–200k entries, with special tokens added by the template. IDs → **embedding table** → static vectors: one row per ID, learned during training. Static vectors → **transformer layers** → contextual vectors: each token's vector absorbs its neighbours. Contextual vectors → **pooling** → one unit-length sentence vector. Two sentence vectors → **dot product** → similarity.",
-        "Each arrow has a failure mode you have now measured: the token tax for other languages and the digit chunking for numbers (tokenizer), the poorly trained rows of rare tokens (table), only partial sense separation in a small model (contextual vectors), padding leaking into the average (pooling), and scores that still respond to shared words (similarity). Knowing which arrow a problem comes from is most of debugging an embedding system.",
+        "Here's the whole journey in one breath. Text → **tokenizer** → IDs: pre-tokenization rules, then BPE merges (GPT, Llama), greedy WordPiece (BERT, MiniLM) or Unigram's most probable split (T5), on a fixed vocabulary of 30k–200k entries, with special tokens added by the template. IDs → **embedding table** → static vectors: one row per ID, learned during training. Static vectors → **transformer layers** → contextual vectors: each token's vector absorbs its neighbours. Contextual vectors → **pooling** → one unit-length sentence vector. Two sentence vectors → **dot product** → similarity.",
+        "And each arrow has a failure mode you've now measured: the token tax for other languages and the digit chunking for numbers (tokenizer), the poorly trained rows of rare tokens (table), only partial sense separation in a small model (contextual vectors), padding leaking into the average (pooling), and scores that still respond to shared words and miss negation (similarity). Knowing which arrow a problem comes from is most of debugging an embedding system.",
       ],
+      lab: {
+        view: "pipeline-trace",
+        label: "Pipeline trace",
+        task: "Step a sentence through all six stages. At which stage does the vector get length 1? Which help question does it find, and why?",
+      },
     },
     {
       heading: "Semantic search",
       paragraphs: [
-        "Semantic search has two phases. **Indexing**, done once: split documents into chunks that fit the model's input limit (step 10), embed each chunk, and store the unit vectors with a pointer back to the text. **Querying**, done per request: embed the query with the same model, compute its dot product with every stored vector, and return the top k. With 12 documents that is one tiny matrix product; with millions, vector databases use approximate nearest-neighbour indexes to avoid comparing with every vector (Module 09).",
-        "The query and the documents must be embedded by the **same model**, with the same pooling and normalisation: vectors from different models live in unrelated spaces and their dot products mean nothing. Some models are also trained with different prefixes or instructions for queries and documents; when a model card asks for them, leaving them out quietly lowers quality.",
+        "Semantic search has two phases. **Indexing**, done once: split documents into chunks that fit the model's input limit (step 10), embed each chunk, and store the unit vectors with a pointer back to the text. **Querying**, done per request: embed the query with the same model, compute its dot product with every stored vector, and return the top k. With 12 documents that's one tiny matrix product; with millions, vector databases use approximate nearest-neighbour indexes to avoid comparing with every vector (Module 09).",
+        "One rule you can't break: the query and the documents must be embedded by the **same model**, with the same pooling and normalisation. Vectors from different models live in unrelated spaces, and their dot products mean nothing. Some models are also trained with different prefixes or instructions for queries and documents; when a model card asks for them, leaving them out quietly lowers quality.",
       ],
       formula: {
         expr: "score(query, doc) = e(query) · e(doc)          top-k = the k documents with the highest scores",
@@ -67,20 +72,30 @@ export const cheatSheet: DeepLesson = {
         ],
         example: "e(transfer funds to another country) · e(How do I send money abroad?) = 0.694, the highest of the 12.",
       },
+      lab: {
+        view: "search-preview",
+        label: "Search",
+        task: "Type a question that shares no words with any document, and predict the top result before it appears. Then try one that reuses a document's exact words.",
+      },
     },
     {
       heading: "Running it in practice",
       paragraphs: [
-        "The costs fall in different places. Indexing runs the embedding model once per chunk, which is the expensive part, but it happens ahead of time and can be batched. Each query costs one forward pass for the query plus a dot product per stored vector, which is cheap: a million 384-number vectors are about 1.5 GB in float32 (step 13) and a full scan is one large matrix-vector product. Storing the chunk text next to its vector lets you show or quote the source of every result.",
-        "The index has to follow the data. When a document changes, re-embed its chunks; when a document is deleted, remove its vectors, or search will keep returning text that no longer exists. When you change the chunking rules or the embedding model, re-embed everything, because vectors made under different settings are not comparable. Keeping the model name and settings next to the stored vectors makes those mistakes easy to catch.",
+        "Where do the costs fall? Indexing runs the embedding model once per chunk, which is the expensive part, but it happens ahead of time and can be batched. Each query costs one forward pass for the query plus a dot product per stored vector, which is cheap: a million 384-number vectors are about 1.5 GB in float32 (step 13), and a full scan is one large matrix-vector product. Storing the chunk text next to its vector lets you show or quote the source of every result.",
+        "The index also has to follow the data. When a document changes, re-embed its chunks; when a document is deleted, remove its vectors, or search will keep returning text that no longer exists. When you change the chunking rules or the embedding model, re-embed everything, because vectors made under different settings aren't comparable. Keeping the model name and settings next to the stored vectors makes those mistakes easy to catch.",
         "The \"Run it locally\" listing runs the same search with the full-precision model in Python. Its scores differ slightly from this page's (0.564 instead of 0.572 for the sign-in query), because the browser runs a quantized copy of MiniLM, but the rankings come out the same.",
       ],
+      lab: {
+        view: "index-cost",
+        label: "Index cost",
+        task: "Size an index for 1 million documents. What happens to storage when you double the overlap, or switch to 1,536-number vectors?",
+      },
     },
     {
       heading: "Measuring retrieval",
       paragraphs: [
-        "You cannot judge search by trying a few queries and nodding. Build a small labelled set (real queries, each with the document that should be found) and compute metrics from the rank at which the right document appears. **hit@k** is the share of queries whose answer is in the top k; it matters when you pass the top k to a model or a person. **MRR**, mean reciprocal rank, averages 1/rank, rewarding answers that come first and penalising those that come lower.",
-        "Labels are judgements, and imperfect ones. The single \"miss\" above returned a password-reset article for a sign-in problem, which a reviewer might mark correct. Looking at the misses one by one, not just the averages, tells you whether you have a model problem, a data problem or a labelling problem. Six queries illustrate the method; a real evaluation needs at least dozens per kind of question.",
+        "You can't judge search by trying a few queries and nodding. Build a small labelled set (real queries, each with the document that should be found) and compute metrics from the rank at which the right document appears. **hit@k** is the share of queries whose answer is in the top k; it matters when you pass the top k to a model or a person. **MRR**, mean reciprocal rank, averages 1/rank, rewarding answers that come first and penalising those that come lower.",
+        "But labels are judgements, and imperfect ones. The single \"miss\" above returned a password-reset article for a sign-in problem, which a reviewer might mark correct, and accepting it lifts MRR from 0.917 to 1.000. Looking at the misses one by one, not just the averages, tells you whether you have a model problem, a data problem or a labelling problem. Six queries illustrate the method; a real evaluation needs at least dozens per kind of question.",
       ],
       formula: {
         expr: "hit@k = (1/N) Σ_q [rank_q ≤ k]          MRR = (1/N) Σ_q 1 / rank_q",
@@ -90,18 +105,29 @@ export const cheatSheet: DeepLesson = {
         ],
         example: "Ranks [2, 1, 1, 1, 1, 1]: hit@1 = 5/6, hit@3 = 6/6, MRR = 5.5/6 = 0.917.",
       },
-      mistake: "Evaluating only on queries that reuse the documents' wording. Keyword search looks fine on those; the queries that matter are the ones users actually type, which often share no words with the answer.",
+      mistake:
+        "Evaluating only on queries that reuse the documents' wording. Keyword search looks fine on those; the queries that matter are the ones users actually type, which often share no words with the answer.",
+      lab: {
+        view: "retrieval-eval",
+        label: "Measure it",
+        task: "Switch between embeddings and keyword overlap and compare hit@1 and MRR. Then accept the password-reset answer: how much does one labelling decision move the score?",
+      },
     },
     {
       heading: "When keywords still win",
       paragraphs: [
-        "On these paraphrased queries, embeddings beat keyword overlap easily (MRR 0.917 vs 0.456). But keyword methods, especially the refined BM25 score, remain strong in practice: on benchmarks covering many kinds of search, BM25 is a hard baseline to beat for models used outside their training domain. They win on exact strings that embeddings blur: product codes, error messages, names, account numbers, rare technical terms.",
-        "That is why production systems usually combine both (hybrid search) and then re-rank the top candidates with a stronger, slower model. Module 09 builds that full retrieval pipeline. Before that, Module 03 opens the transformer itself, to show how the layers between the embedding table and the output turn static vectors into contextual ones.",
+        "On these paraphrased queries, embeddings beat keyword overlap easily (MRR 0.917 vs 0.456). So are keywords obsolete? Not at all. Keyword methods, especially the refined BM25 score, remain strong in practice: on benchmarks covering many kinds of search, BM25 is a hard baseline to beat for models used outside their training domain. They win on exact strings that embeddings blur: product codes, error messages, names, account numbers, rare technical terms.",
+        "You can see it in real MiniLM scores. Asked \"what does E2091 mean\", MiniLM ranks the page for E1043 first; to a sentence model, one error code looks much like another. Keyword overlap finds E2091 instantly, but it's helpless with \"my payment failed because I sent too much today\", which shares no words with any page. Blend the two scores with a keyword weight of 0.7 and every error-code query comes out right while the banking queries stay at 5 of 6; push the weight to 0.8 and the banking queries fall to 3 of 6. That's why production systems usually combine both (hybrid search), with care over how the scores are scaled, and then re-rank the top candidates with a stronger, slower model. Module 09 builds that full retrieval pipeline. Before that, Module 03 opens the transformer itself, to show how the layers between the embedding table and the output turn static vectors into contextual ones.",
       ],
+      lab: {
+        view: "hybrid",
+        label: "Hybrid search",
+        task: "Start at α = 0 and raise the keyword weight slowly. Where do the error codes all come right, and where do the banking queries start to break?",
+      },
     },
   ],
   guided:
-    "In **Search**, type a question that uses different words from every document (for example \"I can't sign in to my account\") and predict the top result before you press enter. Then open the **Cheat sheet**, cover the right column, and explain each term out loud.",
+    "In **Pipeline trace**, predict the nearest help question before the last stage. Then open **Hybrid search** and find the range of keyword weights that gets both kinds of query right.",
   build: {
     id: "m02-recap-search",
     title: "Mini-project: semantic search, measured",

@@ -19,6 +19,9 @@ import { BpeCompressLab, FertilityLab, MergeOrderLab, MergesCurveLab, Pretokeniz
 import { ByteStandinsLab, ByteTaxLab, StreamDecodeLab, WpFertilityLab, WpScoreLab, WpUnkLab } from "./views/labs/BytesWordPieceLabs";
 import { ChatTemplateLab, PaddingMaskLab, SpNormalizeLab, SpecialIdsLab, UnigramPruneLab, ViterbiTableLab } from "./views/labs/SpSpecialLabs";
 import { ChunkerLab, GlitchLab, NumberChunksLab } from "./views/labs/PlaygroundQuirksLabs";
+import { CosBaselineLab, HybridLab, IndexCostLab, PipelineTraceLab, PoolMaskLab, RetrievalEvalLab, ScoreTrapsLab, SparseGradLab, TableMemoryLab } from "./views/labs/EmbeddingLabs";
+import { ContrastiveLab } from "../01-intro-llms/views/DenseLabs";
+import { SenseByExampleLab } from "../01-intro-llms/views/ContextLabs";
 import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
@@ -125,6 +128,28 @@ export function Stage({ step }: StageProps) {
         return <GlitchLab />;
       case "chunker":
         return <ChunkerLab />;
+      case "sparse-grad":
+        return <SparseGradLab />;
+      case "contrastive":
+        return <ContrastiveLab />;
+      case "table-memory":
+        return <TableMemoryLab />;
+      case "cos-baseline":
+        return <CosBaselineLab />;
+      case "sense-by-example":
+        return <SenseByExampleLab />;
+      case "pool-mask":
+        return <PoolMaskLab />;
+      case "score-traps":
+        return <ScoreTrapsLab />;
+      case "pipeline-trace":
+        return <PipelineTraceLab />;
+      case "index-cost":
+        return <IndexCostLab />;
+      case "retrieval-eval":
+        return <RetrievalEvalLab />;
+      case "hybrid":
+        return <HybridLab />;
       default:
         return (
           <Panel>

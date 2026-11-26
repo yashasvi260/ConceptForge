@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const sentenceEmbeddings: DeepLesson = {
   why: [
-    "Many of the most useful things you can do with a language model need one vector per **text**, not per token: finding the support article that answers a question, grouping thousands of customer comments by topic, spotting duplicate tickets, recommending similar documents. A transformer produces one contextual vector per token, so something has to turn a sentence's 7 or 30 token vectors into a single vector that stands for the whole sentence.",
-    "The common answer is almost embarrassingly simple: **average them**, then scale the result to length 1. That is called mean pooling, and it is exactly what MiniLM, the model running in this page, does. What makes it work is not the averaging but the training: sentence-embedding models are fine-tuned on very large numbers of sentence pairs so that the averaged vectors of related sentences end up close together. Without that training, averaged vectors from a plain model are much less useful for similarity.",
-    "With one unit-length vector per sentence, comparing texts becomes a dot product, and comparing all of them at once becomes a single matrix product. That is the engine behind semantic search (step 14 and Module 09), classification by similarity (Module 06) and clustering (Module 07). This step rebuilds MiniLM's sentence vectors from its real token vectors, shows why padding must be masked, and reads a similarity matrix of real banking questions critically.",
+    "Many of the most useful things you can do with a language model need one vector per **text**, not per token: finding the support article that answers a question, grouping thousands of customer comments by topic, spotting duplicate tickets, recommending similar documents. But a transformer produces one contextual vector per token. So how do you turn a sentence's 7 or 30 token vectors into a single vector that stands for the whole sentence?",
+    "The common answer is almost embarrassingly simple: **average them**, then scale the result to length 1. That's called mean pooling, and it's exactly what MiniLM, the model running in this page, does. What makes it work isn't the averaging but the training: sentence-embedding models are fine-tuned on very large numbers of sentence pairs, so that the averaged vectors of related sentences end up close together. Without that training, averaged vectors from a plain model are much less useful for similarity.",
+    "Once every sentence is one unit-length vector, comparing two texts is a dot product, and comparing all of them at once is a single matrix product. That's the engine behind semantic search (step 14 and Module 09), classification by similarity (Module 06) and clustering (Module 07). In this step you'll rebuild MiniLM's sentence vectors from its real token vectors, see what happens when padding leaks into the average, and read real similarity scores critically, including the ones that mislead.",
   ],
   worked: [
     {
       kind: "text",
-      text: "MiniLM produced 8 token vectors for `I forgot my login details` (`[CLS] i forgot my log ##in details [SEP]`) and, separately, its own sentence vector. Pool the token vectors three different ways and compare each with MiniLM's own sentence vector (cosine 1.0 = identical direction):",
+      text: "Let's rebuild one. MiniLM produced 8 token vectors for `I forgot my login details` (`[CLS] i forgot my log ##in details [SEP]`) and, separately, its own sentence vector. Pool the token vectors three different ways and compare each with MiniLM's own sentence vector (cosine 1.0 = identical direction):",
     },
     {
       kind: "table",
@@ -25,7 +25,7 @@ export const sentenceEmbeddings: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Averaging every position, special tokens included, reproduces MiniLM's vector exactly. Dropping the specials gives a slightly different vector, and taking `[CLS]` alone (a common choice for other BERT models) gives a very different one. The right pooling is whatever the model was trained with. Now compare 12 real banking questions with each other; here are the three most similar pairs and the two least similar:",
+      text: "What do you notice? Averaging every position, special tokens included, reproduces MiniLM's vector exactly. Dropping the specials gives a slightly different vector, and taking `[CLS]` alone (a common choice for other BERT models) gives a very different one. The right pooling is whatever the model was trained with. Now compare 12 real banking questions with each other; here are the three most similar pairs and the two least similar:",
     },
     {
       kind: "table",
@@ -46,8 +46,8 @@ export const sentenceEmbeddings: DeepLesson = {
       heading: "Mean pooling",
       paragraphs: [
         "Mean pooling takes the n token vectors of a sentence and averages them position by position, giving one vector of the same width (384 for MiniLM). MiniLM then **normalises** the result, dividing by its length so that it has length 1. Every sentence, short or long, ends up as a point on the same unit sphere.",
-        "Why should an average mean anything? Because by the last layer each token's vector already carries information about the whole sentence (step 12), so averaging keeps what the tokens share and cancels much of what is specific to single positions. Training then makes that average useful: the model's weights are adjusted until the averaged vectors of paraphrases point the same way. The result is compact. One MiniLM sentence vector is 384 numbers, 1,536 bytes in float32, so a million sentences take about 1.5 GB, small enough to search on one machine.",
-        "Other pooling choices exist: the `[CLS]` vector (BERT's classification position), the maximum of each dimension across tokens, or a weighted average. None is correct in general. A sentence-embedding model is trained with one particular pooling, and using a different one at inference gives vectors the model was not optimised for: in the worked example, `[CLS]` alone points in a substantially different direction from MiniLM's real sentence vector (cosine 0.45). Check the model card; for sentence-transformers models the pooling is stored in the model's configuration and applied for you.",
+        "But why should an average mean anything? Because by the last layer, each token's vector already carries information about the whole sentence (step 12), so averaging keeps what the tokens share and cancels much of what's specific to single positions. Training then makes that average useful: the model's weights are adjusted until the averaged vectors of paraphrases point the same way. And the result is compact. One MiniLM sentence vector is 384 numbers, 1,536 bytes in float32, so a million sentences take about 1.5 GB, small enough to search on one machine.",
+        "Other pooling choices exist: the `[CLS]` vector (BERT's classification position), the maximum of each dimension across tokens, or a weighted average. None is correct in general. A sentence-embedding model is trained with one particular pooling, and using a different one at inference gives vectors the model wasn't optimised for. In the worked example, `[CLS]` alone points in a substantially different direction from MiniLM's real sentence vector (cosine 0.45). So check the model card; for sentence-transformers models, the pooling is stored in the model's configuration and applied for you.",
       ],
       formula: {
         expr: "s = mean_i(h_i · m_i) = Σ_i m_i h_i / Σ_i m_i          sentence vector = s / ‖s‖",
@@ -58,20 +58,31 @@ export const sentenceEmbeddings: DeepLesson = {
         ],
         example: "For `I forgot my login details`, averaging all 8 rows and normalising gives MiniLM's sentence vector exactly (cosine 1.0).",
       },
+      lab: {
+        view: "sentence-emb",
+        label: "Mean pooling",
+        task: "Type a sentence and watch every token row being averaged into the one at the bottom. Add a word: how much does the average change?",
+      },
     },
     {
       heading: "Masks: padding must not leak in",
       paragraphs: [
-        "Models embed many sentences at once, so short sentences are padded to the batch's longest (step 8). The model still produces an output vector at every padded position, and those vectors are not zero. If you average every row, they leak into the sentence vector, and the same sentence gets a different vector depending on what it was batched with. Multiplying by the attention mask before summing, and dividing by the number of real tokens, removes them.",
-        "Libraries do this for you, but code that pools hidden states by hand is a common source of subtle bugs: results that change with batch size, or search quality that drops when documents are embedded in larger batches. Part 2 shows the leak and the fix.",
+        "Models embed many sentences at once, so short sentences are padded to the batch's longest (step 8). Here's the catch: the model still produces an output vector at every padded position, and those vectors aren't zero. Average every row, and they leak into the sentence vector, so the same sentence gets a different vector depending on what it was batched with. Multiplying by the attention mask before summing, and dividing by the number of real tokens, removes them.",
+        "How big is the damage? We batched `The bank approved the loan` (7 tokens) with a 22-token sentence and recorded MiniLM's real outputs. With the mask used correctly, the pooled vector matches the sentence embedded on its own (cosine 0.992; not exactly 1, because the quantized model's numbers shift slightly inside a batch). Average all 22 rows, padding included, and it drops to 0.737. Forget to pass the attention mask to the model as well, and it falls to 0.633. Libraries handle this for you, but code that pools hidden states by hand is a common source of subtle bugs: results that change with batch size, or search quality that drops when documents are embedded in larger batches.",
       ],
-      mistake: "Pooling with `vectors.mean(axis=1)` over a padded batch. Use the mask: `(X * mask[..., None]).sum(1) / mask.sum(1, keepdims=True)`.",
+      mistake:
+        "Pooling with `vectors.mean(axis=1)` over a padded batch. Use the mask: `(X * mask[..., None]).sum(1) / mask.sum(1, keepdims=True)`.",
+      lab: {
+        view: "pool-mask",
+        label: "Padding leak",
+        task: "Switch off the pooling mask and watch the score drop. Now shorten the batch: does less padding mean less damage? Then switch off the model's attention mask too.",
+      },
     },
     {
       heading: "Similarity: dot products on unit vectors",
       paragraphs: [
-        "Cosine similarity divides the dot product by both vectors' lengths. When every vector already has length 1, the division does nothing, so cosine similarity **is** the dot product. Comparing one query with a million stored sentence vectors is then a single matrix-vector product, and comparing every pair among n sentences is the matrix product D · Dᵀ, an n × n table of similarities. That is why sentence-embedding models normalise, and why vector databases store unit vectors and search by dot product (Module 09).",
-        "The numbers are relative. Among the 12 banking questions, the closest pair scores 0.576 and unrelated pairs sit near 0. There is no universal threshold for \"same meaning\": it depends on the model and on what your texts look like, so you calibrate by checking scores on pairs you have labelled yourself.",
+        "Cosine similarity divides the dot product by both vectors' lengths. When every vector already has length 1, the division does nothing, so cosine similarity **is** the dot product. Comparing one query with a million stored sentence vectors is then a single matrix-vector product, and comparing every pair among n sentences is the matrix product D · Dᵀ, an n × n table of similarities. That's why sentence-embedding models normalise, and why vector databases store unit vectors and search by dot product (Module 09).",
+        "And remember, the numbers are relative. Among the 12 banking questions, the closest pair scores 0.576 and unrelated pairs sit near 0. There's no universal threshold for \"same meaning\": it depends on the model and on what your texts look like, so you calibrate by checking scores on pairs you've labelled yourself.",
       ],
       formula: {
         expr: "cos(a, b) = a · b / (‖a‖ ‖b‖) = a · b   when ‖a‖ = ‖b‖ = 1          all pairs: C = D Dᵀ",
@@ -81,18 +92,28 @@ export const sentenceEmbeddings: DeepLesson = {
         ],
         example: "C[reset my password, forgot my login details] = 0.576, the highest of the 66 pairs.",
       },
+      lab: {
+        view: "similarity",
+        label: "Similarity matrix",
+        task: "Add two sentences that share words but mean different things, and two that mean the same thing in different words. Which pair scores higher?",
+      },
     },
     {
       heading: "What the scores capture, and what they miss",
       paragraphs: [
-        "The top pair shares almost no words (`How do I reset my password?` and `I forgot my login details`), yet scores highest: the model learned that both are about getting into an account. That is the strength of sentence embeddings over word counts (Module 01's bag-of-words).",
-        "The second pair is a warning. `How do I order a new debit card?` and `How do I set up a direct debit?` are different tasks, but they share `debit` and the `How do I …` pattern, and score 0.556. Sentence vectors still respond to surface overlap, and they also struggle with negation (\"I can log in\" vs \"I can't log in\") and with exact details such as amounts and dates. For search, that is why systems combine vector similarity with keyword matching and re-check the top results with a stronger model (Module 09).",
+        "The top pair shares almost no words (`How do I reset my password?` and `I forgot my login details`), yet scores highest: the model learned that both are about getting into an account. That's the strength of sentence embeddings over word counts (Module 01's bag-of-words).",
+        "Now the warnings. `How do I order a new debit card?` and `How do I set up a direct debit?` are different tasks, but they share `debit` and the `How do I …` pattern, and score 0.556. Push further and it gets worse. In real MiniLM scores, `The transfer was approved` and `The transfer was not approved` score 0.913; `I was charged $10` and `I was charged $10,000` score 0.903; `Dog bites man` and `Man bites dog` score 0.895. Meanwhile a genuine paraphrase, `I can't sign in to my account` and `My login details stopped working`, scores only 0.640. Sentence vectors mostly measure *what a text is about*, not the exact claim it makes. For search, that's why systems combine vector similarity with keyword matching, and re-check the top results with a stronger model (Module 09).",
         "Two more limits are worth knowing. MiniLM reads at most 256 word pieces and silently truncates the rest, so long documents must be chunked (step 10). And a sentence-embedding model is only as good as its training pairs: MiniLM was trained on over a billion sentence pairs from the web, so specialised domains may need a fine-tuned model (Module 12).",
       ],
+      lab: {
+        view: "score-traps",
+        label: "Score traps",
+        task: "Predict each pair's score as high or low, then reveal it. Which surprised you most? What would that mean for a bank's search over refund and fraud rules?",
+      },
     },
   ],
   guided:
-    "In **Mean pooling**, watch the token rows being averaged into the sentence vector at the bottom. Then switch to **Similarity matrix**, add two sentences that share words but mean different things, and two that mean the same thing in different words, and compare their scores.",
+    "Before you open **Padding leak**, predict how far the score falls when 15 padding rows are averaged in. Then try **Score traps**: guess each score before you reveal it.",
   build: {
     id: "m02-sentence-embeddings",
     title: "Rebuild MiniLM's sentence vectors and compare them",
