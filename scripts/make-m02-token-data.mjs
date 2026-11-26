@@ -24,7 +24,11 @@ const pieces = (e, text) => e.encode(text).map((id) => ({ id, text: e.decode([id
 const nVocab = (ranks) => Math.max(...Object.values(ranks.special_tokens)) + 1;
 const bertVocab = readFileSync("src/subjects/02-tokens-embeddings/data/bert-base-uncased-vocab.txt", "utf8").split("\n").filter((l, i, a) => i < a.length - 1 || l);
 const BERT_WORDS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", "the", "bank", "river", "loan", "cat", "cats", "token", "##izer", "##s", "un", "##able", "##ably"];
+/** Tokens as raw bytes: some tokens hold only part of a character (step 5). */
+const BYTE_TEXTS = ["é", "🤖", "आज मौसम"];
+const byteTokens = (e, text) => e.encode(text).map((id) => ({ id, bytes: [...e.textMap.get(id)] }));
 const out = {
+  byte_tokens: Object.fromEntries(BYTE_TEXTS.map((t) => [t, { cl100k_base: byteTokens(enc.cl100k_base, t), o200k_base: byteTokens(enc.o200k_base, t) }])),
   vocab_sizes: { cl100k_base: nVocab(cl100k), o200k_base: nVocab(o200k), bert_base_uncased: bertVocab.length },
   bert_ids: Object.fromEntries(BERT_WORDS.map((w) => [w, bertVocab.indexOf(w)])),
   source: "js-tiktoken 1.0.21 (OpenAI tiktoken vocabularies)",

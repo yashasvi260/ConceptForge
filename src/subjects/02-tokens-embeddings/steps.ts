@@ -80,6 +80,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "bytes",
+    deep: true,
     title: "Bytes: never an unknown token",
     summary: "Computers store every character as bytes. Start BPE from the 256 possible bytes and no text can ever be unknown.",
     body: [
