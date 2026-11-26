@@ -2,6 +2,7 @@ import { Map as MapIcon } from "lucide-react";
 import { PART_TITLES } from "../../core/track";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
+import { deepData } from "./deep/data";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
@@ -24,6 +25,7 @@ const subject: SubjectModule = {
   steps,
   challenges,
   Stage,
+  deepData,
 };
 
 export default subject;

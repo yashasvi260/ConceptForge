@@ -1,4 +1,7 @@
 import type { LessonStep } from "../../core/types";
+import { anatomy } from "./deep/anatomy";
+import { bigPicture } from "./deep/big-picture";
+import { howLarge } from "./deep/how-large";
 
 /** Facts checked in docs/research/part1-sources.md; similarities are computed live with MiniLM. */
 export const steps: LessonStep[] = [
@@ -14,6 +17,7 @@ export const steps: LessonStep[] = [
     tryIt: "Follow the loop on the right, then open the module list to see the whole journey.",
     keyTakeaway: "An LLM is a next-token predictor: text → tokens → vectors → transformer → probabilities → next token, repeated.",
     view: "map",
+    deep: bigPicture,
   },
   {
     id: "anatomy",
@@ -28,6 +32,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Tokenizer → embedding table → N × (attention + feed-forward) → output head → next token.",
     callout: "text → IDs → vectors → N × block → logits → next token",
     view: "anatomy",
+    deep: anatomy,
   },
   {
     id: "how-large",
@@ -42,6 +47,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Parameters are learned numbers; their count comes from the layer count and widths, and most sit in the transformer layers.",
     callout: "16-bit memory ≈ parameters × 2 bytes",
     view: "scale",
+    deep: howLarge,
   },
   {
     id: "train-vs-use",
