@@ -15,7 +15,7 @@ need full deep conversion as well).
 | 01 | big-picture | yes | 5/5 (guess-next, loop-lab, temperature, bigram, next-token-tasks) | 7d3c6d6 |
 | 01 | anatomy | yes | 6/6 (anatomy, token-lookup, positions, attention, norm-residual, logits) | (this commit) |
 | 01 | how-large | yes | 5/5 (neuron, param-calc, scale, data-vs-size, memory) | (this commit) |
-| 01 | train-vs-use | | | |
+| 01 | train-vs-use | yes | 5/5 (loss, gradient, frozen, compute, map) | (this commit) |
 | 01 | bag-of-words | | | |
 | 01 | dense-embeddings | | | |
 | 01 | context | | | |

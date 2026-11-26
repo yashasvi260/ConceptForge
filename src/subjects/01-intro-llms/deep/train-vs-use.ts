@@ -3,14 +3,15 @@ import { part } from "./files";
 
 export const trainVsUse: DeepLesson = {
   why: [
-    "The anatomy step ended with an untrained toy that thought `sat` should follow `the cat sat`. Its parts were right; its numbers were not. Getting from random numbers to numbers that predict English is **training**. Using the finished numbers to answer you is **inference**. They are different activities with wildly different costs, and confusing them is behind many misunderstandings about LLMs: \"does it learn from my chats?\", \"why is training so expensive if answering is cheap?\", \"why can't it just update itself with today's news?\".",
-    "Training is a search. The model starts with billions of random weights. It reads a piece of text, predicts every next token, measures how wrong it was with a single number (the **loss**), works out which way each weight should move to make the loss smaller, moves them all a tiny bit, and repeats. It does this for trillions of tokens. That is why it needs thousands of GPUs for weeks.",
-    "Inference is just the forward pass you built in the anatomy step, run with the finished weights, once per generated token. No weights change. This step makes both concrete: you'll compute a loss, run real gradient descent on a one-weight model and watch it learn, then estimate the compute for training Llama 3 8B against the compute for one token of its output.",
+    "Remember the untrained toy from the anatomy step? It thought `sat` should follow `the cat sat`. Its parts were right; its numbers were wrong. So how do you get from random numbers to numbers that predict English?",
+    "That's **training**. And using the finished numbers to answer you is **inference**. They sound similar, but they're completely different activities with wildly different costs. Mixing them up is behind a lot of confusion about LLMs. \"Does it learn from my chats?\" \"Why is training so expensive if answering is cheap?\" \"Why can't it just update itself with today's news?\"",
+    "Here's the short version. Training is a search. The model starts with billions of random weights, reads some text, predicts every next token, and measures how wrong it was with a single number, the **loss**. Then it works out which way each weight should move to make the loss smaller, moves them all a tiny bit, and repeats. For trillions of tokens. That's why it needs thousands of GPUs for weeks.",
+    "Inference is just the forward pass you built in the anatomy step, run with the finished weights, once per generated token. No weight changes. In this step you'll compute a loss, train a one-weight model by hand and watch it learn (and blow up), and compare the cost of training Llama 3 8B with the cost of one token of its output.",
   ],
   worked: [
     {
       kind: "text",
-      text: "**Measuring wrongness.** For each position the model outputs a probability for every token. The loss looks only at the probability it gave to the token that actually came next, and takes minus its logarithm. This is called **cross-entropy**. Our untrained toy gave the right next token probabilities like 0.179:",
+      text: "**Measuring wrongness.** First we need a number for \"how wrong\". For each position the model outputs a probability for every token. The loss looks only at the probability it gave to the token that actually came next, and takes minus its logarithm. This is called **cross-entropy**. Our untrained toy gave the right next token probabilities like 0.179. How bad is that?",
     },
     {
       kind: "table",
@@ -26,7 +27,7 @@ export const trainVsUse: DeepLesson = {
     },
     {
       kind: "text",
-      text: "**Learning by gradient descent.** Shrink the model to a single weight w that predicts y = w · x, with one training example: x = 2, the right answer y = 6 (so the ideal w is 3). The loss is (w·x − y)². Its **gradient**, the slope telling you which way and how steeply the loss changes as w changes, is 2·(w·x − y)·x. Each step moves w against the gradient by a **learning rate** of 0.05:",
+      text: "**Learning by gradient descent.** Now let's actually learn something. Shrink the model to a single weight w that predicts y = w · x, with one training example: x = 2, the right answer y = 6 (so the ideal w is 3). The loss is (w·x − y)². Its **gradient**, the slope telling you which way and how steeply the loss changes as w changes, is 2·(w·x − y)·x. Each step moves w against the gradient by a **learning rate** of 0.05:",
     },
     {
       kind: "math",
@@ -47,7 +48,7 @@ export const trainVsUse: DeepLesson = {
     },
     {
       kind: "text",
-      text: "The loss falls from 16 to 0.27 in five steps and w heads towards 3. An LLM does exactly this, except w is 8 billion weights, the gradient is computed for all of them at once (by an algorithm called **backpropagation**), and the loss is cross-entropy averaged over millions of tokens per step.",
+      text: "Look at that: the loss falls from 16 to 0.27 in five steps, and w heads towards 3. That's learning! An LLM does exactly this, except w is 8 billion weights, the gradient is computed for all of them at once (by an algorithm called **backpropagation**), and the loss is cross-entropy averaged over millions of tokens per step.",
     },
     {
       kind: "table",
@@ -65,8 +66,8 @@ export const trainVsUse: DeepLesson = {
     {
       heading: "What training minimises",
       paragraphs: [
-        "Training needs one number that says how badly the model is doing, so that \"better\" has a direction. For language models that number is the average **cross-entropy** over every position in a batch of text: for each position, take the probability the model gave to the token that really came next, and add up minus its logarithm.",
-        "The logarithm is what makes it work. Giving the right token probability 0.99 costs almost nothing (0.01); 0.5 costs 0.69; 0.179 costs 1.72; and as the probability heads towards 0 the cost goes to infinity. So the model is punished hardest for being confidently wrong, and the only way to drive the loss down is to put high probability on what actually comes next, across trillions of examples.",
+        "To get better, a model needs one number that says how badly it's doing, so that \"better\" has a direction. For language models, that number is the average **cross-entropy**. For every position in a batch of text, take the probability the model gave to the token that really came next, and add up minus its logarithm.",
+        "Why a logarithm? Watch what it does. Giving the right token 0.99 costs almost nothing (0.01). Giving it 0.5 costs 0.69. Giving it 0.179 costs 1.72. And as the probability heads towards 0, the cost shoots off towards infinity. So the model is punished hardest for being *confidently wrong*. The only way to drive the loss down is to put high probability on what actually comes next, across trillions of examples.",
       ],
       formula: {
         expr: "loss = −(1/T) · Σₜ ln p(xₜ₊₁ | x₁ … xₜ)",
@@ -78,13 +79,19 @@ export const trainVsUse: DeepLesson = {
         ],
         example: "Two positions where the model gave the right token 0.9 and 0.179: loss = (0.105 + 1.72) / 2 ≈ 0.91.",
       },
+      lab: {
+        view: "loss",
+        label: "Loss",
+        task: "Drag the probability towards 0 and watch the loss explode. Then look at gemma4's real predictions: which one would cost it the most loss, and why?",
+      },
     },
     {
       heading: "One step of learning",
       paragraphs: [
-        "To make the loss smaller you need to know, for each weight, whether nudging it up would make the loss go up or down, and how strongly. That is the **gradient**: one number per weight. For our one-weight model it was 2·(w·x − y)·x, which you can work out by hand. For an LLM, **backpropagation** computes all billions of them at once by applying the chain rule of calculus backwards through every layer; deep-learning libraries do it for you automatically.",
-        "Then every weight takes a small step in the opposite direction of its gradient: w ← w − learning rate × gradient. Too large a learning rate and the weights overshoot and the loss explodes; too small and training takes forever. Real training uses an improved stepping rule called **Adam** and changes the learning rate over the course of training, but the idea is exactly the five-row table above.",
-        "One pass of predict → measure loss → compute gradients → step is one **training step**. Llama 3 8B took hundreds of thousands of such steps, each on millions of tokens at once.",
+        "So we have a loss. How do we make it smaller? For each weight, we need to know: if I nudge it up, does the loss go up or down, and by how much? That's the **gradient**, one number per weight.",
+        "For our one-weight model it was 2·(w·x − y)·x, which you can work out by hand. For an LLM, an algorithm called **backpropagation** computes all billions of them at once, by applying the chain rule of calculus backwards through every layer. You never do this by hand; deep-learning libraries do it automatically.",
+        "Then every weight takes a small step *against* its gradient: w ← w − learning rate × gradient. Here's the catch. Make the learning rate too large and the weights overshoot, and the loss explodes. Too small and training takes forever. Real training uses a smarter stepping rule called **Adam** and changes the learning rate as it goes, but the idea is exactly the five-row table above.",
+        "One round of predict → measure loss → compute gradients → step is one **training step**. Llama 3 8B took hundreds of thousands of them, each on millions of tokens at once.",
       ],
       formula: {
         expr: "w ← w − η · ∂loss/∂w",
@@ -97,20 +104,31 @@ export const trainVsUse: DeepLesson = {
       },
       mistake:
         "Thinking the model learns from each conversation as it chats. Chatting is inference: the forward pass runs, nothing computes a loss or a gradient, and no weight moves. A chatbot \"remembers\" earlier messages only because the application sends them again as part of the context.",
+      lab: {
+        view: "gradient",
+        label: "Gradient descent",
+        task: "Take ten steps at learning rate 0.05 and watch w approach 3. Reset, and try 0.2, then 0.3. Where does it stop learning and start blowing up?",
+      },
     },
     {
       heading: "Inference: running frozen weights",
       paragraphs: [
-        "Once training stops, the weights are frozen and saved. Inference loads them and runs the forward pass: tokenize the prompt, run it through every block, read the probabilities, choose a token, append it, repeat. There is no loss, no gradient, no step. The same prompt with the same settings and greedy decoding gives the same answer every time.",
-        "Because nothing is learned, a model's knowledge is fixed at its **training cutoff**: it cannot know about events after its training data was collected unless you paste the information into the prompt. Module 09 builds exactly that workaround (retrieval-augmented generation).",
+        "When training stops, the weights are frozen and saved. Inference loads them and runs the forward pass: tokenize the prompt, run it through every block, read the probabilities, choose a token, append it, repeat. No loss. No gradient. No step.",
+        "So why do chatbots give different answers to the same question? Not because they changed! The probabilities are identical every time; the variety comes only from *sampling* (step 1). With greedy decoding, the same prompt gives the same answer every single time.",
+        "And because nothing is learned, a model's knowledge is frozen at its **training cutoff**. It can't know about anything that happened after its training data was collected, unless you paste the information into the prompt. Module 09 builds exactly that workaround (retrieval-augmented generation).",
       ],
+      lab: {
+        view: "frozen",
+        label: "Frozen weights",
+        task: "Generate five replies at temperature 1, then five at 0. The weights never changed between runs. So where does the variety come from?",
+      },
     },
     {
       heading: "Compute: why training costs so much more",
       paragraphs: [
-        "A useful rule from the scaling-law research (Kaplan et al. 2020): a forward pass costs about **2 floating-point operations per parameter per token** (each weight is used in one multiply and one add). Training costs about **6 per parameter per token**: the forward pass, plus roughly twice that again to compute the gradients backwards.",
-        "Plug in Llama 3 8B, trained on about 15 trillion tokens: 6 × 8.03 billion × 15 trillion ≈ 7.2 × 10²³ operations. Generating one token costs 2 × 8.03 billion ≈ 1.6 × 10¹⁰. The training compute would pay for about 45 trillion generated tokens. Meta reports about 1.3 million H100 GPU-hours for the 8B model's pre-training.",
-        "The two costs are paid differently. Training is paid once, by the model's maker. Inference is paid on every token by everyone who uses the model, so across millions of users it adds up, which is why Part IV of this course is about making inference cheap.",
+        "There's a handy rule from the scaling-law research (Kaplan et al. 2020). A forward pass costs about **2 operations per parameter per token**: each weight is used in one multiply and one add. Training costs about **6 per parameter per token**: the forward pass, plus roughly twice that again to compute the gradients backwards.",
+        "Let's plug in Llama 3 8B, trained on about 15 trillion tokens. Training: 6 × 8.03 billion × 15 trillion ≈ 7.2 × 10²³ operations. One generated token: 2 × 8.03 billion ≈ 1.6 × 10¹⁰. So the training compute would pay for about 45 trillion generated tokens! Meta reports about 1.3 million H100 GPU-hours for the 8B model's pre-training.",
+        "But notice who pays. Training is paid once, by the model's maker. Inference is paid on every token, by everyone who uses the model. Across millions of users that adds up fast, which is why Part IV of this course is all about making inference cheap.",
       ],
       formula: {
         expr: "C_train ≈ 6 · N · D        C_token ≈ 2 · N",
@@ -123,16 +141,27 @@ export const trainVsUse: DeepLesson = {
       },
       mistake:
         "Treating these as exact. 6·N·D and 2·N ignore attention's extra cost for long contexts and the overheads of real hardware; they are the standard first estimate, accurate to within a small factor, not a bill.",
+      lab: {
+        view: "compute",
+        label: "Train vs answer",
+        task: "Pick Llama 3 8B and set a busy service's usage. How long until answering questions has cost as much compute as training did? Now try GPT-3.",
+      },
     },
     {
       heading: "Where this goes in the course",
       paragraphs: [
-        "Part II uses trained models as they are: inference only, the weights never change. Part III changes weights again, much more cheaply than pre-training, by fine-tuning on a small dataset. Part IV makes inference fast and affordable at scale. Knowing which side of the line you are on, writing weights or reading them, tells you what a technique can and cannot do.",
+        "Now you can sort every technique in this course into one of two boxes: does it *write* weights, or only *read* them?",
+        "Part II uses trained models exactly as they are: inference only, weights never change. Part III changes weights again, but far more cheaply than pre-training, by fine-tuning on a small dataset. Part IV makes inference fast and affordable at scale. Knowing which box you're in tells you what a technique can and can't do.",
       ],
+      lab: {
+        view: "map",
+        label: "Course map",
+        task: "Look at the learning map and sort the four parts: which ones read weights only, and which ones write them?",
+      },
     },
   ],
   guided:
-    "Predict first: which number is bigger, the training compute or the compute for a billion generated tokens? Compare the two panels below, then work out how many tokens you'd need to generate before inference had cost as much as training.",
+    "Before you open **Train vs answer**, guess: does training Llama 3 8B cost more compute than generating a billion tokens with it? A trillion? Then check, and work out what that means for a service with millions of users.",
   build: {
     id: "01-train-vs-use",
     title: "Train a model (a very small one) and price a big one",

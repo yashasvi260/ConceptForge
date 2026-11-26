@@ -16,6 +16,7 @@ import { RecapView } from "./views/RecapView";
 import { RepGenView } from "./views/RepGenView";
 import { ScaleView } from "./views/ScaleView";
 import { TrainingView } from "./views/TrainingView";
+import { ComputeLab, FrozenLab, GradientLab, LossLab } from "./views/TrainUseLabs";
 import { TrainUseView } from "./views/TrainUseView";
 
 export const DEFAULT_SENTENCES = ["The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog"].join("\n");
@@ -60,6 +61,14 @@ export function Stage({ step }: StageProps) {
         return <MemoryLab />;
       case "trainuse":
         return <TrainUseView />;
+      case "loss":
+        return <LossLab />;
+      case "gradient":
+        return <GradientLab />;
+      case "frozen":
+        return <FrozenLab />;
+      case "compute":
+        return <ComputeLab />;
       case "bow":
         return <BowView text={sentences} setText={setSentences} />;
       case "dense":
