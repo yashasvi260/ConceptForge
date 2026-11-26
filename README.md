@@ -11,7 +11,7 @@ menu as "coming soon".
 | Part | Module | Status / what you can play with |
 | --- | --- | --- |
 | I · Understanding Language Models | **01 Introduction to Language Models** | **Deep lessons**: 12 long-form steps (why → worked example → concept with the live view → **Build it** in Python in the page → check → one sentence), ending in a mini-project that builds a tiny language model end to end. Covers the LLM loop, anatomy, exact parameter counts (GPT-2, Llama 3 8B, GPT-3), training vs using, Bag-of-Words, real MiniLM embeddings, context, the three families, cross-attention, representation vs generative, pre-training vs fine-tuning |
-| | **02 Tokens and Embeddings** | Real GPT-4o/GPT-4 tokenizers, BPE trainer, real BERT WordPiece, SentencePiece, special tokens, token tax; embedding lookup, contextual "bank" shift, mean pooling, similarity matrix, semantic search |
+| | **02 Tokens and Embeddings** | **Deep lessons**: 14 long-form steps (merged from 20; steps with two views get a view switcher). Tokens: three ways to chop text, the vocabulary and its cost, BPE training and encoding (checked against the page's own trainer), bytes and UTF-8, WordPiece on a slice of BERT's real vocabulary, SentencePiece/Unigram with Viterbi, special tokens and Llama 3's chat template, real GPT-4/GPT-4o counts, cost and context limits. Embeddings: the lookup table, real MiniLM contextual vectors, mean pooling that reproduces MiniLM exactly, and a mini-project: semantic search evaluated with hit@k and MRR |
 | | **03 Inside the Transformer Block** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
 | | 04 How LLMs Generate · 05 How Models Learn | coming soon (Module 03's decoding and KV cache steps move to 04 when it is built) |
 | II · Using Pretrained Language Models | **06 Text Classification** | 60 bank tickets: a classifier head trained live on MiniLM vectors, zero-shot with editable label descriptions, gemma4 by prompting (recorded, with real token probabilities); 3-way comparator |
@@ -33,7 +33,7 @@ runs your own prompts live. The site never contacts Ollama until you click it; i
 Ollama with `OLLAMA_ORIGINS` set to the site's origin (e.g. `https://yashasvi260.github.io`).
 Every specific fact is checked against primary sources; see `docs/research/`.
 
-**Deep lessons: understand it, then build it (Module 01).** A step with a `deep` field renders as a
+**Deep lessons: understand it, then build it (Modules 01 and 02).** A step with a `deep` field renders as a
 split page: the six-section reading scrolls on the left, and a practice panel stays in view on the right with two
 tabs, **Interactive** (the step's live view) and **Build it · Python**. Prompts in the reading open the right tab;
 on a phone the panel sits under the reading. Its **Build it** exercise is real Python, run in the page by [Pyodide](https://pyodide.org)
@@ -45,7 +45,7 @@ fail; hints and the solution are a click away. Three rules keep it honest, and t
   Pyodide under Node);
 - every worked-example table equals what its script in `deep/worked/` prints;
 - every **Run it locally** listing (PyTorch, transformers, sentence-transformers, Ollama) shows the output of a real
-  run: `OLLAMA_URL=http://<host>:11434 node scripts/capture-local-outputs.mjs` reruns them in Docker
+  run: `OLLAMA_URL=http://<host>:11434 node scripts/capture-local-outputs.mjs [--module 02]` reruns them in Docker
   (`python:3.12-slim`, pinned packages) and the test fails if a listing's code changed without a new capture.
 
 `src/core/deep.ts` enforces the depth standard (why 150–450 words, concept 700–1,700, a common mistake, 2–3 checks,
