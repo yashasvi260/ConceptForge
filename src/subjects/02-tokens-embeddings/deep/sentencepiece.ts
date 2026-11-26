@@ -3,14 +3,14 @@ import { localListing, part } from "./files";
 
 export const sentencepiece: DeepLesson = {
   why: [
-    "BPE and WordPiece both begin by splitting text on spaces. That quietly assumes a language puts spaces between words, and Chinese, Japanese and Thai do not. It also makes decoding guess where spaces belong. **SentencePiece**, a tokenizer library from Google, removes the assumption: it treats the input as one raw stream of characters, turns every space into a visible symbol `▁`, and learns pieces that may include it. Decoding is then trivial and exact: join the pieces and turn `▁` back into spaces.",
-    "SentencePiece can train BPE, but it is best known for a different algorithm, **Unigram**. Where BPE builds up from characters by merging, Unigram works top-down: it starts with a very large set of candidate pieces, gives each a probability, and repeatedly throws away the pieces that matter least. To tokenize, it does not replay merges; it searches all possible splits for the one with the highest total probability.",
-    "You will meet both ideas in real models. T5, ALBERT and XLNet use SentencePiece Unigram; Llama 1 and 2 used SentencePiece BPE; and the `▁` marker appears in their outputs. Unigram also enables a training trick, sampling different splits of the same text, that makes models more robust. This step scores competing splits, writes the Viterbi search that finds the best one, and measures which pieces Unigram training would prune.",
+    "BPE and WordPiece both start by splitting text on spaces. Did you notice the hidden assumption? It assumes a language puts spaces between words, and Chinese, Japanese and Thai don't. It also forces decoding to guess where spaces belong.",
+    "**SentencePiece**, a tokenizer library from Google, drops that assumption. It treats the input as one raw stream of characters, turns every space into a visible symbol `▁`, and learns pieces that can include it. Decoding becomes trivial and exact: join the pieces and turn `▁` back into spaces.",
+    "SentencePiece can train BPE, but it's best known for a different algorithm, **Unigram**. Where BPE builds up from characters by merging, Unigram works top-down: start with a huge set of candidate pieces, give each a probability, and keep throwing away the pieces that matter least. To tokenize, it doesn't replay merges; it searches all possible splits for the most probable one. T5, ALBERT and XLNet use SentencePiece Unigram; Llama 1 and 2 used SentencePiece BPE, and that `▁` marker shows up in their outputs. In this step you'll score competing splits, write the Viterbi search that finds the best one, and measure which pieces Unigram training would prune.",
   ],
   worked: [
     {
       kind: "text",
-      text: "This step uses the Unigram view's **small illustrative vocabulary** (86 pieces with made-up counts, chosen for teaching; real models learn tens of thousands of pieces). Each piece has a log-probability. A split's score is the sum of its pieces' log-probabilities, so higher (closer to 0) is more probable. Four ways to split `hello world`:",
+      text: "Let's score some splits. This step uses the Unigram view's **small illustrative vocabulary** (86 pieces with made-up counts, chosen for teaching; real models learn tens of thousands of pieces). Each piece has a log-probability. A split's score is the sum of its pieces' log-probabilities, so higher (closer to 0) is more probable. Four ways to split `hello world`:",
     },
     {
       kind: "table",
@@ -30,7 +30,7 @@ export const sentencepiece: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Multiplying probabilities (adding log-probabilities) penalises every extra piece, so splits with fewer, common pieces win by a wide margin. Character-by-character is about e^-40 times less likely: essentially impossible. Viterbi finds the best split without listing them all:",
+      text: "Notice the pattern? Multiplying probabilities (adding log-probabilities) penalises every extra piece, so splits with fewer, common pieces win by a wide margin. Character-by-character is about e^-40 times less likely: essentially impossible. Viterbi finds the best split without listing them all:",
     },
     {
       kind: "table",
@@ -49,17 +49,22 @@ export const sentencepiece: DeepLesson = {
     {
       heading: "SentencePiece: spaces are just another symbol",
       paragraphs: [
-        "SentencePiece first **normalizes** the text (for example collapsing repeated spaces and applying Unicode normalisation), then replaces each space with `▁` (U+2581, a character chosen because it almost never appears in real text) and marks the start of the text the same way. `hello world` becomes `▁hello▁world`. From then on the space is an ordinary symbol, so pieces like `▁hello` (\"hello at the start of a word\") and `llo` (\"llo inside a word\") are naturally different.",
-        "This makes the tokenizer **language-independent**: it never needs to know where words are, so Japanese `日本語` and English are handled by the same code. It also makes decoding exact up to normalization: join the pieces and turn every `▁` back into a space. There is no guessing about whether a space belonged before a piece.",
-        "SentencePiece is a library and a file format, not a single algorithm. A `.model` file holds the normalization rules, the vocabulary and either BPE merges or Unigram probabilities. Llama 2's tokenizer, for example, is a SentencePiece BPE model with **byte fallback**: characters missing from the vocabulary are spelled as raw bytes, the same idea as step 5.",
+        "SentencePiece first **normalizes** the text (for example collapsing repeated spaces and applying Unicode normalisation), then replaces each space with `▁` (U+2581, chosen because it almost never appears in real text) and marks the start of the text the same way. `hello world` becomes `▁hello▁world`. From then on, the space is an ordinary symbol, so pieces like `▁hello` (\"hello at the start of a word\") and `llo` (\"llo inside a word\") are naturally different.",
+        "Why does that matter? It makes the tokenizer **language-independent**: it never needs to know where words are, so Japanese `日本語` and English go through the same code. And decoding is exact (up to normalization): join the pieces and turn every `▁` back into a space. No guessing whether a space belonged before a piece.",
+        "One more thing: SentencePiece is a library and a file format, not a single algorithm. A `.model` file holds the normalization rules, the vocabulary, and either BPE merges or Unigram probabilities. Llama 2's tokenizer, for instance, is a SentencePiece BPE model with **byte fallback**: characters missing from the vocabulary are spelled as raw bytes, the same idea as step 5.",
       ],
+      lab: {
+        view: "sp-normalize",
+        label: "The ▁ symbol",
+        task: "Type text with several spaces in a row and some Japanese. What does SentencePiece see? Does the text come back exactly?",
+      },
     },
     {
       heading: "Unigram: every piece has a probability",
       paragraphs: [
-        "A Unigram tokenizer models text as a sequence of pieces drawn independently, each with its own probability p(piece). The probability of a whole split is the product of its pieces' probabilities, so in log space it is a sum. Different splits of the same text get different scores, and the tokenizer simply picks the highest.",
-        "Two effects fall out of this. Fewer pieces usually win, because every extra factor is a probability below 1. And common pieces win over rare ones, because their probabilities are higher. In the worked example `▁hello ▁world` beats `▁hell o ▁world` by a factor of about 160, entirely from those two effects.",
-        "It helps to line up the three algorithms. **BPE** stores an ordered merge list and encodes by replaying it, so the first merges learned always take priority. **WordPiece** stores only a vocabulary and encodes by grabbing the longest known piece from the left. **Unigram** stores a probability for every piece and encodes by searching for the most probable split of the whole word. All three produce subwords from a fixed vocabulary; they differ in what is stored and in how a split is chosen, which is why the same word can come out differently in GPT, BERT and T5. The \"Run it locally\" listing shows it: `unaffable` is `un aff able` in GPT-2, `una ##ffa ##ble` in BERT and `▁un aff able` in T5.",
+        "A Unigram tokenizer models text as a sequence of pieces drawn independently, each with its own probability p(piece). The probability of a whole split is the product of its pieces' probabilities, which in log space becomes a sum. Different splits of the same text get different scores, and the tokenizer simply picks the highest.",
+        "Two effects fall straight out of this. Fewer pieces usually win, because every extra factor is a probability below 1. And common pieces beat rare ones, because their probabilities are higher. In the worked example, `▁hello ▁world` beats `▁hell o ▁world` by a factor of about 160, entirely from those two effects.",
+        "It helps to line up all three algorithms side by side. **BPE** stores an ordered merge list and replays it, so the first merges learned always take priority. **WordPiece** stores only a vocabulary and grabs the longest known piece from the left. **Unigram** stores a probability for every piece and searches for the most probable split of the whole word. All three produce subwords from a fixed vocabulary; they differ in what's stored and how a split is chosen. That's why the same word can come out differently in GPT, BERT and T5. The \"Run it locally\" listing shows it: `unaffable` is `un aff able` in GPT-2, `una ##ffa ##ble` in BERT and `▁un aff able` in T5.",
       ],
       formula: {
         expr: "log P(split) = Σ_i log p(piece_i)          best split = argmax over all splits of log P(split)",
@@ -69,13 +74,20 @@ export const sentencepiece: DeepLesson = {
         ],
         example: "log p(▁hell) + log p(o) + log p(▁world) = -14.637, versus -9.570 for ▁hello ▁world.",
       },
-      mistake: "Thinking Unigram picks the split with the fewest pieces. It picks the most probable split; that is usually short, but a split into two rare pieces can lose to three common ones.",
+      mistake:
+        "Thinking Unigram picks the split with the fewest pieces. It picks the most probable split; that is usually short, but a split into two rare pieces can lose to three common ones.",
+      lab: {
+        view: "unigram",
+        label: "Splits",
+        task: "Type `hello world` and compare the top three splits and their probabilities with the table. Then try a word that isn't in the small vocabulary: how does the best split fall back?",
+      },
     },
     {
       heading: "Viterbi: the best split without trying them all",
       paragraphs: [
-        "A word of n characters has 2^(n−1) possible splits, far too many to list. The **Viterbi** algorithm avoids that with one observation: the best split of the first `end` characters must consist of the best split of some shorter prefix plus one final piece. So it fills a table: `best[end]` is the highest score for the first `end` characters, computed by trying every possible last piece `s[start:end]` and adding it to `best[start]`. A second table remembers where the winning last piece started, so the split can be read back from the end.",
-        "The work is roughly the text length times the maximum piece length, small enough to run on every input. Single characters that are not in the vocabulary still get a (very low) score so that any text can be tokenized, which is how this step's implementation stays lossless.",
+        "Here's a problem: a word of n characters has 2^(n−1) possible splits, far too many to list. How do you find the best one?",
+        "The **Viterbi** algorithm sidesteps it with one observation: the best split of the first `end` characters must be the best split of some shorter prefix, plus one final piece. So it fills a table. `best[end]` is the highest score for the first `end` characters, found by trying every possible last piece `s[start:end]` and adding it to `best[start]`. A second table remembers where the winning last piece started, so the split can be read back from the end.",
+        "The work is roughly the text length times the longest piece length, small enough to run on every input. Single characters missing from the vocabulary still get a (very low) score, so any text can be tokenized, which is how this step's implementation stays lossless.",
       ],
       formula: {
         expr: "best[0] = 0\nbest[end] = max over start < end of ( best[start] + log p(s[start:end]) )",
@@ -85,17 +97,27 @@ export const sentencepiece: DeepLesson = {
         ],
         example: "For `▁hello▁world`, best[6] uses the piece `▁hello` (-4.741) and best[12] adds `▁world` (-4.829): -9.570.",
       },
+      lab: {
+        view: "viterbi-table",
+        label: "Viterbi table",
+        task: "Fill the table one position at a time. At which position does `▁hello` become the best way to cover the prefix? Read the last pieces backwards to recover the split.",
+      },
     },
     {
       heading: "Training by pruning, and sampling splits",
       paragraphs: [
-        "Unigram training runs the other way from BPE. It starts with a large seed vocabulary (for example all frequent substrings), estimates each piece's probability from how often it is used in the best splits of the training text (an EM procedure), and then measures, for every piece, how much the training text's total log-likelihood would drop if that piece were removed. It keeps the pieces whose removal hurts most, drops the rest (Kudo's paper keeps about 80% per round), and repeats until the vocabulary reaches the target size. Part 3 computes exactly that removal loss.",
-        "Because the model assigns probabilities to every split, it can also **sample** a split instead of always taking the best one. Training a model on varied splits of the same sentence, called **subword regularization**, teaches it that `▁hell o` and `▁hello` mean the same thing, which Kudo found helps most in low-resource and out-of-domain translation. At inference time the tokenizer goes back to the single best split.",
+        "Unigram training runs the opposite way from BPE. Start with a large seed vocabulary (for example, all frequent substrings). Estimate each piece's probability from how often it's used in the best splits of the training text (an EM procedure). Then, for every piece, measure how much the training text's total log-likelihood would drop if that piece were removed. Keep the pieces whose removal hurts most, drop the rest (Kudo's paper keeps about 80% per round), and repeat until the vocabulary reaches the target size. Part 3 computes exactly that removal loss.",
+        "And because the model gives a probability to *every* split, it can also **sample** a split instead of always taking the best one. Training a model on varied splits of the same sentence, called **subword regularization**, teaches it that `▁hell o` and `▁hello` mean the same thing. Kudo found that helps most in low-resource and out-of-domain translation. At inference time, the tokenizer goes back to the single best split.",
       ],
+      lab: {
+        view: "unigram-prune",
+        label: "Sampling splits",
+        task: "Look at the five most probable splits and press **Sample a split** several times. How often do you get the best one? Why would seeing the others help a model in training?",
+      },
     },
   ],
   guided:
-    "Type `hello world` and compare the top three segmentations and their probabilities with the table above. Then try a word that is not in the small vocabulary and see how the best split falls back to smaller pieces and single characters.",
+    "Predict how much more probable `▁hello ▁world` is than `▁hell o ▁world`, then check in **Splits**. Then open **Viterbi table** and watch the best split being built one position at a time.",
   build: {
     id: "m02-sentencepiece",
     title: "Unigram scoring, Viterbi and pruning",

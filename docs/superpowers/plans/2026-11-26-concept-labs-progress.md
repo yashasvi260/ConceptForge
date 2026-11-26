@@ -31,8 +31,8 @@ need full deep conversion as well).
 | 02 | bpe-encoding | yes | 4/4 (bpe-encode, merge-order, fertility, variants) | (this commit) |
 | 02 | bytes | yes | 4/4 (bytes, byte-tax, byte-standins, stream-decode) | (this commit) |
 | 02 | wordpiece | yes | 4/4 (wordpiece, wp-unk, wp-score, wp-fertility) | (this commit) |
-| 02 | sentencepiece | | | |
-| 02 | special-tokens | | | |
+| 02 | sentencepiece | yes | 4/4 (sp-normalize, unigram, viterbi-table, unigram-prune) | (this commit) |
+| 02 | special-tokens | yes | 4/4 (special-ids, chat-template, special, padding-mask) | (this commit) |
 | 02 | playground | | | |
 | 02 | quirks | | | |
 | 02 | lookup-table | | | |

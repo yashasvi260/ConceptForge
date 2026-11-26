@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const specialTokens: DeepLesson = {
   why: [
-    "Not every token is text. A model also needs signals: where an input starts and ends, where one document stops and the next begins, which part of a conversation the user wrote and which the assistant wrote, and which positions are just padding. Those signals are **special tokens**: vocabulary entries with reserved IDs that the tokenizer never produces from ordinary text, and that the model learned to treat as structure.",
-    "You rely on them every time you call a chat model. A conversation is not sent as a list of messages; it is flattened into one token sequence by a **chat template**, with special tokens marking each turn. If the template is wrong (a missing end-of-turn token, the wrong role name, no open assistant header at the end) the model receives an input unlike anything it was trained on and answers worse, or never stops talking. Fine-tuning a chat model on badly formatted data does lasting damage for the same reason.",
-    "Special tokens are also a security boundary. If text typed by a user can turn into a real control token, the user can fake the end of their turn and write a message that looks like it came from the system. This step shows real special-token IDs, builds Llama 3's exact chat format, shows how a careless encoder lets typed text inject control tokens, and pads a batch with attention masks the way BERT expects.",
+    "Not every token is text. A model also needs signals. Where does an input start and end? Where does one document stop and the next begin? Which part of a conversation did the user write, and which the assistant? Which positions are just padding? Those signals are **special tokens**: vocabulary entries with reserved IDs that the tokenizer never produces from ordinary text, and that the model learned to treat as structure.",
+    "You rely on them every time you talk to a chat model. A conversation isn't sent as a list of messages; it's flattened into one token sequence by a **chat template**, with special tokens marking each turn. Get the template wrong (a missing end-of-turn token, the wrong role name, no open assistant header at the end) and the model sees something unlike anything it was trained on, and answers worse, or never stops talking. Fine-tuning a chat model on badly formatted data does lasting damage for the same reason.",
+    "Special tokens are also a security boundary. If text typed by a user can turn into a real control token, the user can fake the end of their turn and write something that looks like it came from the system. In this step you'll see real special-token IDs, build Llama 3's exact chat format, watch a careless encoder get fooled by typed control tokens, and pad a batch with attention masks the way BERT expects.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Special tokens are ordinary vocabulary entries with fixed IDs. Here are real ones from three tokenizers (BERT's from its `vocab.txt`, GPT-4's from tiktoken, Llama 3's from Meta's tokenizer source, where they are numbered after the 128,000 ordinary tokens):",
+      text: "Let's look at real ones. Special tokens are ordinary vocabulary entries with fixed IDs. Here are real ones from three tokenizers (BERT's from its `vocab.txt`, GPT-4's from tiktoken, Llama 3's from Meta's tokenizer source, where they are numbered after the 128,000 ordinary tokens):",
     },
     {
       kind: "table",
@@ -34,7 +34,7 @@ export const specialTokens: DeepLesson = {
     },
     {
       kind: "text",
-      text: "What if a user types the characters `<|endoftext|>` into a message? GPT-4's tokenizer (via tiktoken) refuses such text by default and raises an error. If you tell it to treat the text as ordinary characters, it becomes seven harmless tokens:",
+      text: "Now a tricky question: what if a user types the characters `<|endoftext|>` into a message? GPT-4's tokenizer (via tiktoken) refuses such text by default and raises an error. If you tell it to treat the text as ordinary characters, it becomes seven harmless tokens:",
     },
     {
       kind: "table",
@@ -51,17 +51,23 @@ export const specialTokens: DeepLesson = {
     {
       heading: "Structure the model learned to expect",
       paragraphs: [
-        "During training, special tokens appear in exactly the same places every time, so the model learns what they mean. BERT always sees `[CLS]` first and `[SEP]` at the end; its classification head reads the output vector at the `[CLS]` position, so that position learns to summarise the whole input. `[MASK]` is the placeholder for the hidden words BERT is trained to predict (pre-training, Module 01). GPT models were trained on documents joined with `<|endoftext|>`, so after producing it they would start an unrelated new document; generation code stops there instead.",
-        "Because the meaning comes from training, special tokens only work in the positions and patterns the model saw. Leaving out `[CLS]`, putting `[SEP]` in the middle, or using another model's end-of-text token produces inputs the model was never trained on. Tokenizer libraries add the right ones automatically when you call them with default settings, which is one more reason to use the model's own tokenizer rather than building ID lists by hand.",
+        "During training, special tokens show up in exactly the same places every time, so the model learns what they mean. BERT always sees `[CLS]` first and `[SEP]` at the end; its classification head reads the output vector at the `[CLS]` position, so that position learns to summarise the whole input. `[MASK]` is the placeholder for the hidden words BERT learns to predict (pre-training, Module 01). GPT models were trained on documents joined with `<|endoftext|>`, so after producing it they'd start an unrelated new document; generation code stops right there instead.",
+        "And because their meaning comes from training, special tokens only work in the positions and patterns the model saw. Leave out `[CLS]`, put `[SEP]` in the middle, or use another model's end-of-text token, and you've built an input the model was never trained on. Tokenizer libraries add the right ones automatically when you use their defaults, which is one more reason to use the model's own tokenizer instead of building ID lists by hand.",
       ],
-      mistake: "Copying a prompt format from one chat model to another. Llama 3, Mistral, Qwen and GPT each use different special tokens and layouts; the wrong template still runs but quietly degrades answers.",
+      mistake:
+        "Copying a prompt format from one chat model to another. Llama 3, Mistral, Qwen and GPT each use different special tokens and layouts; the wrong template still runs but quietly degrades answers.",
+      lab: {
+        view: "special-ids",
+        label: "Special IDs",
+        task: "Click through the real special tokens. Which ones mark structure inside one input, and which ones separate whole documents or conversation turns?",
+      },
     },
     {
       heading: "Chat templates",
       paragraphs: [
-        "A chat model is still a next-token predictor. To hold a conversation, the messages are flattened into one sequence: for each message, a role marker, the content and an end-of-turn marker; then an open marker for the assistant, so the model's most likely continuation is the assistant's reply. Llama 3's format is shown above: `<|start_header_id|>`, the role name, `<|end_header_id|>`, two newlines, the stripped content, `<|eot_id|>`.",
-        "Every chat model family defines its own template, and the exact characters matter, down to the newlines. Hugging Face stores each model's template with its tokenizer (as a small Jinja program) and `apply_chat_template(messages, add_generation_prompt=True)` produces the right string or token IDs. `add_generation_prompt` is the open assistant header at the end; without it the model may continue the user's message instead of answering it.",
-        "Templates matter twice as much when fine-tuning. If the training examples are formatted differently from how the model will be prompted later, it learns a format nobody will use. The usual practice is to build training examples with the same template call that inference will use, and to compute the training loss only on the assistant's tokens (Module 14).",
+        "A chat model is still a next-token predictor. So how does it hold a conversation? The messages get flattened into one sequence: for each message, a role marker, the content, and an end-of-turn marker; then an open marker for the assistant, so the most likely continuation is the assistant's reply. Llama 3's layout is shown above: `<|start_header_id|>`, the role name, `<|end_header_id|>`, two newlines, the stripped content, `<|eot_id|>`.",
+        "Every chat model family has its own template, and the exact characters matter, right down to the newlines. Hugging Face stores each model's template with its tokenizer (as a small Jinja program), and `apply_chat_template(messages, add_generation_prompt=True)` produces the right string or token IDs. `add_generation_prompt` is that open assistant header at the end. Leave it off, and the model may continue the user's message instead of answering it.",
+        "Templates matter twice as much when fine-tuning. If training examples are formatted differently from how the model will be prompted later, it learns a format nobody will use. The usual practice is to build training examples with the same template call that inference uses, and to compute the training loss only on the assistant's tokens (Module 14).",
       ],
       formula: {
         expr: "prompt = BOS + Σ_messages [ HEADER(role) + \"\\n\\n\" + content + EOT ] + HEADER(assistant) + \"\\n\\n\"",
@@ -72,25 +78,40 @@ export const specialTokens: DeepLesson = {
         ],
         example: "One user message \"hi\" becomes 128000, 128006, `user`, 128007, `\\n\\nhi`, 128009, then the assistant header.",
       },
+      lab: {
+        view: "chat-template",
+        label: "Chat template",
+        task: "Write a system and a user message and read the exact text the model receives. Count the control tokens. Then switch off the generation prompt: what would the model do next?",
+      },
     },
     {
       heading: "Special tokens as a security boundary",
       paragraphs: [
-        "The system prompt, the user's text, retrieved documents and tool results all end up in the same token sequence. The special tokens are what tell them apart. If a user can type `<|eot_id|><|start_header_id|>system<|end_header_id|>` and have it become real control tokens, they can end their own turn early and write text the model will treat as a system message. This is a form of **prompt injection** at the token level.",
-        "The defence is simple and absolute: control tokens may come only from the template, never from content. Encode each piece of untrusted text as ordinary text (tiktoken raises an error by default if text contains a special-token string, and you choose explicitly to treat it as text), and assemble the special tokens yourself. Some libraries, including Hugging Face tokenizers, do recognise special-token strings inside text by default; their `split_special_tokens` option turns that off. Part 2 builds a safe encoder and shows the naive one being fooled.",
-        "This blocks fake control tokens, not every injection: a user can still write \"ignore your instructions\" in plain words. Defending against that is a different problem (Module 17).",
+        "The system prompt, the user's text, retrieved documents and tool results all end up in the same token sequence. The special tokens are what tell them apart. So what if a user types `<|eot_id|><|start_header_id|>system<|end_header_id|>` and it becomes real control tokens? They can end their own turn early and write text the model will treat as a system message. That's **prompt injection** at the token level.",
+        "The defence is simple and absolute: control tokens may come only from the template, never from content. Encode every piece of untrusted text as ordinary text (tiktoken raises an error by default if text contains a special-token string, and you explicitly choose to treat it as text), and add the special tokens yourself. Some libraries, including Hugging Face tokenizers, *do* recognise special-token strings inside text by default; their `split_special_tokens` option turns that off. Part 2 builds a safe encoder and shows the naive one being fooled.",
+        "But be clear about what this blocks: fake control tokens, not every injection. A user can still write \"ignore your instructions\" in plain words. Defending against that is a different problem (Module 17).",
       ],
+      lab: {
+        view: "special",
+        label: "Injection",
+        task: "Type `<|eot_id|>` into the user message and check that it stays ordinary text. Then add a second message and count the real end-of-turn tokens: one per message?",
+      },
     },
     {
       heading: "Padding and attention masks",
       paragraphs: [
-        "Models process inputs in **batches**, and a batch is a rectangular array, so every sequence in it must have the same length. Short sequences are filled with a padding token (`[PAD]`, ID 0 in BERT) and long ones are truncated to a maximum length; for BERT, truncation should keep `[SEP]` as the last token so the input still looks complete.",
-        "Padding positions carry no meaning, so the model must ignore them. That is the job of the **attention mask**: a parallel list with 1 for real tokens and 0 for padding, which stops attention from looking at padded positions (Module 03). Forgetting the mask, or padding without it, makes results change with the batch they happen to be in. For generation with decoder models, padding usually goes on the left so that every sequence's real last token sits at the end, where the next token is predicted.",
+        "Models process inputs in **batches**, and a batch is a rectangular array, so every sequence in it must be the same length. Short sequences are filled with a padding token (`[PAD]`, ID 0 in BERT), and long ones are cut to a maximum length. For BERT, cutting should keep `[SEP]` as the last token so the input still looks complete.",
+        "But padding positions carry no meaning, so the model must ignore them. That's the job of the **attention mask**: a matching list with 1 for real tokens and 0 for padding, which stops attention from looking at padded positions (Module 03). Forget the mask, or pad without it, and results change depending on which batch a sentence happens to be in. For generation with decoder models, padding usually goes on the *left*, so that every sequence's real last token sits at the end, right where the next token is predicted.",
       ],
+      lab: {
+        view: "padding-mask",
+        label: "Padding",
+        task: "Type three sentences of very different lengths and shrink the batch length. Which rows get padded, which get cut, and does every row still end with [SEP]?",
+      },
     },
   ],
   guided:
-    "Type a user message containing `<|eot_id|>` and watch it stay ordinary text instead of becoming the control token. Then add a second message and count the real end-of-turn tokens: there should be exactly one per message.",
+    "Before opening **Chat template**, predict how many control tokens a system plus a user message needs in Llama 3's format. Then try **Injection** and convince yourself typed control tokens stay harmless.",
   build: {
     id: "m02-special-tokens",
     title: "Chat templates, safe encoding and padding",

@@ -17,6 +17,7 @@ import { SpecialTokensView } from "./views/SpecialTokensView";
 import { UnigramView } from "./views/UnigramView";
 import { BpeCompressLab, FertilityLab, MergeOrderLab, MergesCurveLab, PretokenizeLab, VariantsLab } from "./views/labs/BpeLabs";
 import { ByteStandinsLab, ByteTaxLab, StreamDecodeLab, WpFertilityLab, WpScoreLab, WpUnkLab } from "./views/labs/BytesWordPieceLabs";
+import { ChatTemplateLab, PaddingMaskLab, SpNormalizeLab, SpecialIdsLab, UnigramPruneLab, ViterbiTableLab } from "./views/labs/SpSpecialLabs";
 import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
@@ -105,6 +106,18 @@ export function Stage({ step }: StageProps) {
         return <WpScoreLab />;
       case "wp-fertility":
         return <WpFertilityLab />;
+      case "sp-normalize":
+        return <SpNormalizeLab />;
+      case "viterbi-table":
+        return <ViterbiTableLab />;
+      case "unigram-prune":
+        return <UnigramPruneLab />;
+      case "special-ids":
+        return <SpecialIdsLab />;
+      case "chat-template":
+        return <ChatTemplateLab />;
+      case "padding-mask":
+        return <PaddingMaskLab />;
       default:
         return (
           <Panel>
