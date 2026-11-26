@@ -125,6 +125,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "special-tokens",
+    deep: true,
     title: "Special tokens and chat templates",
     summary: "Some tokens aren't text at all: they're signals like \"start\", \"end\" or \"next speaker\".",
     body: [

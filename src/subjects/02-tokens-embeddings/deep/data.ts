@@ -27,6 +27,8 @@ export const deepData: Record<string, unknown> = {
   wordpiece: { ...tokens.wordpiece, corpus: DEFAULT_CORPUS },
   /** Step 7's exercise data: the Unigram view's (illustrative) piece log-probabilities. */
   unigram: { vocab: UNIGRAM_VOCAB, unknown_char_logprob: UNKNOWN_CHAR_LOGPROB },
+  /** Step 8's exercise data: real special-token IDs (BERT, GPT-4, Llama 3). */
+  special: tokens.special,
   /** Step 2's exercise data: real vocabulary sizes, BERT ids and model sizes. */
   vocab: { sizes: tokens.vocab_sizes, bert_ids: tokens.bert_ids, models },
 };

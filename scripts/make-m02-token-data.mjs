@@ -39,7 +39,25 @@ for (const w of WP_WORDS) {
     if (bertIndex.has(sub)) wpSlice[sub] = bertIndex.get(sub);
   }
 }
+/**
+ * Llama 3's special tokens, quoted from Meta's tokenizer source
+ * (https://github.com/meta-llama/llama3/blob/main/llama/tokenizer.py): they are numbered after the 128,000
+ * ordinary tokens in this list order (0 begin_of_text, 1 end_of_text, 2–5 reserved, 6 start_header_id,
+ * 7 end_header_id, 8 reserved, 9 eot_id), with 256 special slots in all (128,256 = Llama 3's vocabulary).
+ */
+const LLAMA3_ORDER = ["<|begin_of_text|>", "<|end_of_text|>", null, null, null, null, "<|start_header_id|>", "<|end_header_id|>", null, "<|eot_id|>"];
+const llama3 = Object.fromEntries(LLAMA3_ORDER.map((t, i) => [t, 128000 + i]).filter(([t]) => t));
+const endText = "<|endoftext|>";
 const out = {
+  special: {
+    llama3,
+    llama3_vocab: 128000 + 256,
+    bert: Object.fromEntries(["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"].map((t) => [t, bertVocab.indexOf(t)])),
+    gpt4_endoftext: {
+      special_id: cl100k.special_tokens[endText],
+      as_plain_text: enc.cl100k_base.encode(endText, [], []).map((id) => ({ id, text: enc.cl100k_base.decode([id]) })),
+    },
+  },
   wordpiece: { words: WP_WORDS, vocab: wpSlice },
   byte_tokens: Object.fromEntries(BYTE_TEXTS.map((t) => [t, { cl100k_base: byteTokens(enc.cl100k_base, t), o200k_base: byteTokens(enc.o200k_base, t) }])),
   vocab_sizes: { cl100k_base: nVocab(cl100k), o200k_base: nVocab(o200k), bert_base_uncased: bertVocab.length },

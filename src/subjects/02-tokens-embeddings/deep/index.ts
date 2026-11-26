@@ -4,6 +4,7 @@ import { bpeTraining } from "./bpe-training";
 import { bytesLesson } from "./bytes";
 import { deepData } from "./data";
 import { sentencepiece } from "./sentencepiece";
+import { specialTokens } from "./special-tokens";
 import { vocabulary } from "./vocabulary";
 import { whyNumbers } from "./why-numbers";
 import { wordpiece } from "./wordpiece";
@@ -18,6 +19,7 @@ export const content: DeepContent = {
     bytes: bytesLesson,
     wordpiece,
     sentencepiece,
+    "special-tokens": specialTokens,
   },
   data: deepData,
 };
