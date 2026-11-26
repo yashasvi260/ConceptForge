@@ -14,7 +14,7 @@ import { deepData } from "./data";
 import { steps } from "../steps";
 
 /** Steps converted so far; the last content task asserts this is all 12. */
-const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings"];
+const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings", "context", "architectures", "encoder-decoder"];
 
 const WORKED = import.meta.glob("./worked/*.py", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 

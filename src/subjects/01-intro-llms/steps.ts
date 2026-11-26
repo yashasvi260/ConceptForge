@@ -1,8 +1,11 @@
 import type { LessonStep } from "../../core/types";
 import { anatomy } from "./deep/anatomy";
+import { architectures } from "./deep/architectures";
 import { bigPicture } from "./deep/big-picture";
+import { context } from "./deep/context";
 import { bagOfWords } from "./deep/bag-of-words";
 import { denseEmbeddings } from "./deep/dense-embeddings";
+import { encoderDecoder } from "./deep/encoder-decoder";
 import { howLarge } from "./deep/how-large";
 import { trainVsUse } from "./deep/train-vs-use";
 
@@ -109,6 +112,7 @@ export const steps: LessonStep[] = [
     tryIt: "Change one sentence (keep the word `bank`) and see how far its vector moves.",
     keyTakeaway: "Modern models give each token a vector that depends on its context: that's how `bank` gets disambiguated.",
     view: "context",
+    deep: context,
   },
   {
     id: "architectures",
@@ -122,6 +126,7 @@ export const steps: LessonStep[] = [
     tryIt: "Switch architectures and click a row to see what that token is allowed to look at.",
     keyTakeaway: "Encoder = bidirectional understanding (BERT). Decoder = causal, left-to-right generation (GPT, Llama).",
     view: "arch",
+    deep: architectures,
   },
   {
     id: "encoder-decoder",
@@ -135,6 +140,7 @@ export const steps: LessonStep[] = [
     tryIt: "Press `Next token` to watch the decoder write the output while looking back at the encoded input.",
     keyTakeaway: "Encoder-decoder: read the whole input first, then generate an output that attends back to it.",
     view: "encdec",
+    deep: encoderDecoder,
   },
   {
     id: "representation-vs-generative",
