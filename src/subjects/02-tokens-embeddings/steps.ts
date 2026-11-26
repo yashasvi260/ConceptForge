@@ -140,6 +140,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "playground",
+    deep: true,
     title: "Real tokenizers: languages, code and numbers",
     summary: "See exactly how GPT-4o and GPT-4 tokenize your text, with real IDs.",
     body: [
