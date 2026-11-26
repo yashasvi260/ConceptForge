@@ -14,7 +14,7 @@ import { deepData } from "./data";
 import { steps } from "../steps";
 
 /** Steps converted so far; the last content task asserts this is all 12. */
-const DEEP_STEPS = ["big-picture", "anatomy", "how-large"];
+const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings"];
 
 const WORKED = import.meta.glob("./worked/*.py", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 
@@ -24,11 +24,15 @@ beforeAll(async () => {
   await py.loadPackage("numpy", { messageCallback: () => {} });
 }, 180_000);
 
+/** Runs a worked-example script with the same DATA map the page uses (DATA["minilm"], …). */
 function runScript(src: string): string {
   let out = "";
   py.setStdout({ batched: (s) => (out += s + "\n") });
   try {
-    py.runPython(src, { globals: py.toPy({}) });
+    const globals = py.toPy({});
+    globals.set("_data_json", JSON.stringify(deepData));
+    py.runPython("import json\nDATA = json.loads(_data_json)", { globals });
+    py.runPython(src, { globals });
   } finally {
     py.setStdout();
   }

@@ -1,7 +1,10 @@
 import type { LessonStep } from "../../core/types";
 import { anatomy } from "./deep/anatomy";
 import { bigPicture } from "./deep/big-picture";
+import { bagOfWords } from "./deep/bag-of-words";
+import { denseEmbeddings } from "./deep/dense-embeddings";
 import { howLarge } from "./deep/how-large";
+import { trainVsUse } from "./deep/train-vs-use";
 
 /** Facts checked in docs/research/part1-sources.md; similarities are computed live with MiniLM. */
 export const steps: LessonStep[] = [
@@ -62,6 +65,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Training writes the weights (once, expensive); inference reads them (per token, cheap).",
     callout: "train ≈ 6·N·D FLOPs · inference ≈ 2·N FLOPs per token",
     view: "trainuse",
+    deep: trainVsUse,
   },
   {
     id: "bag-of-words",
@@ -76,6 +80,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Bag-of-Words counts words: fast and simple, but it ignores meaning and word order.",
     callout: "similarity = cosine(count vector A, count vector B)",
     view: "bow",
+    deep: bagOfWords,
   },
   {
     id: "dense-embeddings",
@@ -90,6 +95,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Embeddings place similar meanings close together, so `film` and `movie` finally count as related.",
     callout: "MiniLM: text → 384 numbers, similarity = cosine",
     view: "dense",
+    deep: denseEmbeddings,
   },
   {
     id: "context",

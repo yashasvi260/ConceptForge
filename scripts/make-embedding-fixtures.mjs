@@ -29,6 +29,32 @@ if (opt("dataset")) {
   process.exit(0);
 }
 
+// Deep-lesson mode: Module 01 exercise data (sentence vectors + every "bank" token vector), 4 decimals.
+//   node scripts/make-embedding-fixtures.mjs --deep-out src/subjects/01-intro-llms/deep/data/minilm.json
+const DEEP_SENTENCES = [
+  "The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog",
+  "How do I reset my password?", "I forgot my login details", "I can't sign in to my account",
+  "What's the weather like tomorrow?", "Our quarterly revenue grew by 12%",
+  "My card was charged twice", "I see a payment I don't recognise", "How do I send money abroad?", "What is the interest rate on my mortgage?",
+];
+const BANK_SENTENCES = ["The bank approved the loan", "I deposited cash at the bank", "The river bank flooded", "We had a picnic on the river bank"];
+if (opt("deep-out")) {
+  const r4 = (v) => v.map((x) => Math.round(x * 1e4) / 1e4);
+  const sv = (await pipe(DEEP_SENTENCES, { pooling: "mean", normalize: true })).tolist();
+  const sentences = Object.fromEntries(DEEP_SENTENCES.map((t, i) => [t, r4(sv[i])]));
+  const bank = {};
+  for (const t of BANK_SENTENCES) {
+    const rows = (await pipe(t, { pooling: "none" })).tolist()[0].slice(1, -1);
+    const toks = pipe.tokenizer.tokenize(t);
+    const i = toks.indexOf("bank");
+    if (i < 0) throw new Error(`no "bank" token in ${t}`);
+    bank[t] = r4(rows[i]);
+  }
+  writeFileSync(opt("deep-out"), JSON.stringify({ model: "Xenova/all-MiniLM-L6-v2 q8", sentences, bank }));
+  console.log(`wrote ${DEEP_SENTENCES.length} sentence vectors and ${BANK_SENTENCES.length} "bank" token vectors to ${opt("deep-out")}`);
+  process.exit(0);
+}
+
 const SENTENCES = [
   "The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog",
   "This is a positive review.", "This is a negative review.", "This movie was fantastic, I loved every minute!",
