@@ -14,7 +14,7 @@ import { deepData } from "./data";
 import { steps } from "../steps";
 
 /** Steps converted so far; the last content task asserts this is all 12. */
-const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings", "context", "architectures", "encoder-decoder"];
+const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings", "context", "architectures", "encoder-decoder", "representation-vs-generative", "pretraining-finetuning", "recap"];
 
 const WORKED = import.meta.glob("./worked/*.py", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 
@@ -80,6 +80,14 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
       expect(p.hints.length, `${p.id} hints`).toBeGreaterThanOrEqual(1);
       expect(p.solution.split("\n").length, `${p.id} solution length`).toBeLessThanOrEqual(36);
     }
+  });
+});
+
+describe("Module 01 coverage", () => {
+  it("every step is a deep lesson, and each exercise id is unique", () => {
+    expect(DEEP_STEPS).toEqual(steps.map((s) => s.id));
+    const ids = steps.map((s) => s.deep!.build.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 

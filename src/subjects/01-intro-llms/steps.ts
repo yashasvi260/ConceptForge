@@ -7,6 +7,9 @@ import { bagOfWords } from "./deep/bag-of-words";
 import { denseEmbeddings } from "./deep/dense-embeddings";
 import { encoderDecoder } from "./deep/encoder-decoder";
 import { howLarge } from "./deep/how-large";
+import { pretrainingFinetuning } from "./deep/pretraining-finetuning";
+import { recap } from "./deep/recap";
+import { representationVsGenerative } from "./deep/representation-vs-generative";
 import { trainVsUse } from "./deep/train-vs-use";
 
 /** Facts checked in docs/research/part1-sources.md; similarities are computed live with MiniLM. */
@@ -154,6 +157,7 @@ export const steps: LessonStep[] = [
     tryIt: "Type a review and see which description MiniLM finds closer. Then read the generative version.",
     keyTakeaway: "Representation models give vectors to compute with; generative models give text. Many systems use both.",
     view: "repgen",
+    deep: representationVsGenerative,
   },
   {
     id: "pretraining-finetuning",
@@ -168,6 +172,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Pre-train once on raw text (next-token or masked-word prediction), then fine-tune cheaply for each task.",
     callout: "BERT-Base: 12 layers, 768 hidden size, 12 heads, 110M parameters",
     view: "training",
+    deep: pretrainingFinetuning,
   },
   {
     id: "recap",
@@ -180,5 +185,6 @@ export const steps: LessonStep[] = [
     tryIt: "Before moving on, explain the loop on the right in your own words. Then take the Challenge.",
     keyTakeaway: "Every later module zooms into one link of this loop, or uses the whole loop for a real task.",
     view: "recap",
+    deep: recap,
   },
 ];
