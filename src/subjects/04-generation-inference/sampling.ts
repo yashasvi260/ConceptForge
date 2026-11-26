@@ -1,4 +1,4 @@
-import { softmax } from "./attention";
+import { softmax } from "../03-transformer-internals/attention";
 
 export interface Candidate {
   token: string;

@@ -93,7 +93,7 @@ Standards are enforced by tests (`core/deep.ts`, each module's `deep.test.ts`):
   compute and memory, using computed values.
 - **Build:** a sampler that implements every decoding rule, and a generation loop with a KV cache that gives the same
   output as the loop without one.
-- **Note:** Module 03's current *decoding* and *KV cache* steps move here when Modules 3 and 4 are converted to deep lessons.
+- **Note:** Module 03's *logits*, *decoding* and *KV cache* steps moved here (short format, 2026-11-26); the deep conversion adds the generation loop and long context.
 
 ### Module 5: How Models Learn (`05-how-models-learn`) — new
 - **Concepts:**

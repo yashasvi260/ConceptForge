@@ -12,8 +12,9 @@ menu as "coming soon".
 | --- | --- | --- |
 | I · Understanding Language Models | **01 Introduction to Language Models** | **Deep lessons**: 12 long-form steps (why → worked example → concept with the live view → **Build it** in Python in the page → check → one sentence), ending in a mini-project that builds a tiny language model end to end. Covers the LLM loop, anatomy, exact parameter counts (GPT-2, Llama 3 8B, GPT-3), training vs using, Bag-of-Words, real MiniLM embeddings, context, the three families, cross-attention, representation vs generative, pre-training vs fine-tuning |
 | | **02 Tokens and Embeddings** | **Deep lessons**: 14 long-form steps (merged from 20; steps with two views get a view switcher). Tokens: three ways to chop text, the vocabulary and its cost, BPE training and encoding (checked against the page's own trainer), bytes and UTF-8, WordPiece on a slice of BERT's real vocabulary, SentencePiece/Unigram with Viterbi, special tokens and Llama 3's chat template, real GPT-4/GPT-4o counts, cost and context limits. Embeddings: the lookup table, real MiniLM contextual vectors, mean pooling that reproduces MiniLM exactly, and a mini-project: semantic search evaluated with hit@k and MRR |
-| | **03 Inside the Transformer Block** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
-| | 04 How LLMs Generate · 05 How Models Learn | coming soon (Module 03's decoding and KV cache steps move to 04 when it is built) |
+| | **03 Inside the Transformer Block** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU |
+| | **04 How LLMs Generate** | Logits, decoding controls (temperature, top-k, top-p), KV cache on/off cost (moved from Module 03; old `#/03-transformer-internals/10` and `/11` links redirect here) |
+| | 05 How Models Learn | coming soon |
 | II · Using Pretrained Language Models | **06 Text Classification** | 60 bank tickets: a classifier head trained live on MiniLM vectors, zero-shot with editable label descriptions, gemma4 by prompting (recorded, with real token probabilities); 3-way comparator |
 | | **07 Clustering & Topics** | 78 comments: real UMAP (umap-js) → HDBSCAN (tested against scikit-learn) → c-TF-IDF keywords → topic names recorded from gemma4; sliders and add-your-own |
 | | **08 Prompt Engineering** | 16 prompt combinations × 8 tickets × 4 samples, recorded from gemma4:12b and qwen2.5-coder:1.5b: builder, probability inspector, chaining |
@@ -100,7 +101,8 @@ src/
     _template/        starter copied by the create-subject script
     01-intro-llms/ … one folder per built module: logic (+ tests), views/, steps.ts, challenges.ts
     02-tokens-embeddings/   tokenizers (bpe, wordpiece, unigram, real GPT) + embedding views, data/ (BERT vocab)
-    03-transformer-internals/  positional, attention, norms, ffn, sampling, kvcache maths + views
+    03-transformer-internals/  positional, attention, norms, ffn maths + views
+    04-generation-inference/   sampling, kvcache maths + logits/decoding/KV-cache views
     06-text-classification/    tickets, classifier head, zero-shot, recorded gemma4 answers
     07-clustering-topics/      UMAP wrapper, HDBSCAN, c-TF-IDF, precomputed default layout
     08-prompt-engineering/     prompt builder (buildPrompt.mjs shared with the recording job), scoring, 2 recorded experiments

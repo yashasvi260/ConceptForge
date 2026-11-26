@@ -4,6 +4,7 @@ import s03TransformerInternals from "../subjects/03-transformer-internals";
 import textClassification from "../subjects/06-text-classification";
 import clusteringTopics from "../subjects/07-clustering-topics";
 import promptEngineering from "../subjects/08-prompt-engineering";
+import s04GenerationInference from "../subjects/04-generation-inference";
 // @register-import — add new subject imports above this line
 import type { SubjectModule } from "./types";
 
@@ -17,6 +18,7 @@ const REGISTERED: SubjectModule[] = [
   textClassification,
   clusteringTopics,
   promptEngineering,
+  s04GenerationInference,
   // @register-subject — add new subjects above this line
 ];
 

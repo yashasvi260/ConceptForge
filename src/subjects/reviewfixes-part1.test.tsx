@@ -9,8 +9,8 @@ import { challenges as m02Challenges } from "./02-tokens-embeddings/challenges";
 import { Stage as M02Stage } from "./02-tokens-embeddings/Stage";
 import { steps as m03Steps } from "./03-transformer-internals/steps";
 import { Stage as M03Stage } from "./03-transformer-internals/Stage";
-import { NEXT } from "./03-transformer-internals/views/InternalsViews";
-import { applySampling } from "./03-transformer-internals/sampling";
+import { NEXT } from "./04-generation-inference/views/GenerationViews";
+import { applySampling } from "./04-generation-inference/sampling";
 
 const text = (steps: { id: string; summary: string; body: string[]; keyTakeaway?: string; tryIt?: string }[], id: string) => {
   const s = steps.find((x) => x.id === id)!;
@@ -84,7 +84,7 @@ describe("F4 + copy accuracy", () => {
 });
 
 describe("F16 + F19: modules agree with each other", () => {
-  it("Module 01's illustrative probabilities match Module 03's computation", () => {
+  it("Module 01's illustrative probabilities match Module 04's computation", () => {
     const i = at(m01Steps, "map");
     render(<M01Stage step={{ ...m01Steps[i]!, view: "map" }} stepIndex={i} />);
     const top = applySampling(NEXT, { temperature: 1, topK: 0, topP: 1 })[0]!;

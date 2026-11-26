@@ -1,0 +1,58 @@
+import type { ChallengeItem } from "../../core/types";
+
+export const challenges: ChallengeItem[] = [
+  {
+    id: "top-p",
+    prompt: "With top-p = 0.9, which tokens can be sampled?",
+    options: ["The 9 most likely tokens", "The smallest set of most-likely tokens whose probabilities add up to at least 0.9", "Any token with probability ≥ 0.9", "All tokens, re-weighted"],
+    correctIndex: 1,
+    hint: "Nucleus sampling adapts to the shape of the distribution.",
+    explanation: "Top-p keeps a dynamic nucleus and truncates the unreliable tail (Holtzman et al. 2020).",
+    relatedStepId: "decoding",
+  },
+  {
+    id: "kv-cache",
+    prompt: "What does the KV cache trade?",
+    options: ["Accuracy for speed", "Memory for compute: past keys/values are stored instead of recomputed", "Vocabulary size for context length", "Nothing; it's free"],
+    correctIndex: 1,
+    hint: "What would you have to redo for every new token without it?",
+    explanation: "Each token's K and V are computed once and reused; the cost is memory that grows with context length.",
+    relatedStepId: "kv-cache",
+  },
+  {
+    id: "logits-count",
+    prompt: "GPT-4o's vocabulary has about 200,000 entries. How many logits does it produce for one next-token prediction?",
+    options: ["One", "One per layer", "About 200,000: one score per vocabulary entry", "One per token already in the context"],
+    correctIndex: 2,
+    hint: "The output matrix has one column per vocabulary entry.",
+    explanation: "The final vector is multiplied by the output matrix, giving one score (logit) for every possible next token; softmax turns them into probabilities.",
+    relatedStepId: "logits",
+  },
+  {
+    id: "temperature-low",
+    prompt: "What does a temperature below 1 do to the next-token distribution?",
+    options: ["Flattens it, so rare tokens get more likely", "Sharpens it, so the most likely tokens get even more likely", "Removes the least likely tokens", "Nothing; it only changes speed"],
+    correctIndex: 1,
+    hint: "Temperature divides the logits before softmax. What happens to the gaps between them when you divide by 0.5?",
+    explanation: "Dividing by T < 1 widens the gaps between logits, so softmax concentrates probability on the top tokens; T > 1 flattens it.",
+    relatedStepId: "decoding",
+  },
+  {
+    id: "greedy",
+    prompt: "Which decoding setting makes the output the same every time for the same prompt?",
+    options: ["Top-p = 0.9", "Temperature = 1.5", "Greedy decoding (always take the most likely token)", "Top-k = 50"],
+    correctIndex: 2,
+    hint: "Which rule involves no random choice at all?",
+    explanation: "Greedy takes the single most likely token at every step, so there is nothing random left; it is predictable but tends to repeat itself.",
+    relatedStepId: "decoding",
+  },
+  {
+    id: "kv-growth",
+    prompt: "You double the context length a model is serving. What happens to its KV cache memory for that sequence?",
+    options: ["It stays the same", "It doubles: one K and V per token, per layer, per KV head", "It quadruples", "It halves"],
+    correctIndex: 1,
+    hint: "Look at the formula: which term is the number of tokens?",
+    explanation: "cache bytes = 2 · L · H_kv · d_head · T · b, which is linear in T: twice the tokens, twice the memory.",
+    relatedStepId: "kv-cache",
+  },
+];

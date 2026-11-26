@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { StageProps } from "../../core/types";
 import { tokenizeWords } from "./attention";
 import { AttentionView, MultiHeadView, QkvView, type AttentionState } from "./views/AttentionViews";
-import { FfnView, ForwardView, GqaView, KvCacheView, LogitsView, NormView, PositionalView, RecapView, SamplingView } from "./views/InternalsViews";
+import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } from "./views/InternalsViews";
 
 export function Stage({ step }: StageProps) {
   const [text, setText] = useState("The bank approved the loan");
@@ -34,12 +34,6 @@ export function Stage({ step }: StageProps) {
         return <NormView />;
       case "ffn":
         return <FfnView />;
-      case "logits":
-        return <LogitsView />;
-      case "sampling":
-        return <SamplingView />;
-      case "kvcache":
-        return <KvCacheView />;
       case "recap":
         return <RecapView />;
       default:

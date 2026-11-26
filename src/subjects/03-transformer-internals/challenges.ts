@@ -79,22 +79,4 @@ export const challenges: ChallengeItem[] = [
     explanation: "FFN_SwiGLU(x) = (Swish₁(xW) ⊙ xV)W₂ (Shazeer 2020).",
     relatedStepId: "ffn",
   },
-  {
-    id: "top-p",
-    prompt: "With top-p = 0.9, which tokens can be sampled?",
-    options: ["The 9 most likely tokens", "The smallest set of most-likely tokens whose probabilities add up to at least 0.9", "Any token with probability ≥ 0.9", "All tokens, re-weighted"],
-    correctIndex: 1,
-    hint: "Nucleus sampling adapts to the shape of the distribution.",
-    explanation: "Top-p keeps a dynamic nucleus and truncates the unreliable tail (Holtzman et al. 2020).",
-    relatedStepId: "decoding",
-  },
-  {
-    id: "kv-cache",
-    prompt: "What does the KV cache trade?",
-    options: ["Accuracy for speed", "Memory for compute: past keys/values are stored instead of recomputed", "Vocabulary size for context length", "Nothing; it's free"],
-    correctIndex: 1,
-    hint: "What would you have to redo for every new token without it?",
-    explanation: "Each token's K and V are computed once and reused; the cost is memory that grows with context length.",
-    relatedStepId: "kv-cache",
-  },
 ];

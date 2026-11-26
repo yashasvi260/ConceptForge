@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Repeat } from "lucide-react";
 import { Panel } from "../../../components/ui";
 import { PART_TITLES, TRACK, moduleLabel } from "../../../core/track";
-import { applySampling } from "../../03-transformer-internals/sampling";
-import { NEXT } from "../../03-transformer-internals/views/InternalsViews";
+import { applySampling } from "../../04-generation-inference/sampling";
+import { NEXT } from "../../04-generation-inference/views/GenerationViews";
 
-// Same illustrative logits as Module 03's logits step, so both modules show the same numbers.
+// Same illustrative logits as Module 04's logits step, so both modules show the same numbers.
 const top3 = applySampling(NEXT, { temperature: 1, topK: 0, topP: 1 })
   .slice(0, 3)
   .map((c) => `${c.token.trim()} ${Math.round(c.finalProb * 100)}%`)

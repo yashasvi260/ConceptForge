@@ -15,6 +15,15 @@ export interface Route {
 
 export const HOME_HASH = "#/";
 
+/**
+ * Lessons that moved to another module: old 1-based step number → [new module, new 0-based index].
+ * Module 03's decoding and KV-cache steps moved to Module 04 (curriculum v2). Old step 9 (logits) is not
+ * redirected, because 9 is now Module 03's recap.
+ */
+const MOVED_STEPS: Record<string, Record<number, [string, number]>> = {
+  "03-transformer-internals": { 10: ["04-generation-inference", 1], 11: ["04-generation-inference", 2] },
+};
+
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const subjectId = resolveId(parts[0] ?? null);
@@ -22,6 +31,8 @@ export function parseHash(hash: string): Route {
   const second = parts[1];
   if (second === "quiz" || second === "challenge") return { view: "module", subjectId, stepIndex: null, mode: "challenge" };
   const n = second !== undefined ? Number.parseInt(second, 10) : Number.NaN;
+  const moved = MOVED_STEPS[subjectId]?.[n];
+  if (moved) return { view: "module", subjectId: moved[0], stepIndex: moved[1], mode: "lesson" };
   return { view: "module", subjectId, stepIndex: Number.isFinite(n) && n >= 1 ? n - 1 : null, mode: "lesson" };
 }
 

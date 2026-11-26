@@ -1,18 +1,18 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import App from "../../App";
 import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["forward", "positional", "qkv", "attention", "multihead", "gqa", "norm", "ffn", "logits", "sampling", "kvcache", "recap"];
+const VIEWS = ["forward", "positional", "qkv", "attention", "multihead", "gqa", "norm", "ffn", "recap"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);
 };
 
 describe("Module 03 content", () => {
-  it("has 12 steps in order, ≥ 6 hinted challenges and a bridge", () => {
+  it("has 9 steps in order, ≥ 6 hinted challenges and a bridge", () => {
     expect(subject.moduleNumber).toBe(3);
     expect(steps.map((s) => s.view)).toEqual(VIEWS);
     for (const s of steps) {
@@ -51,24 +51,6 @@ describe("Module 03 views", () => {
     expect(upper().some((p) => p > 0)).toBe(true);
   });
 
-  it("sampling sliders change the probability bars", () => {
-    renderStep("sampling");
-    const bars = () => within(screen.getByTestId("sampling-bars")).getAllByText(/%|cut/).map((e) => e.textContent).join(",");
-    const before = bars();
-    fireEvent.change(screen.getByRole("slider", { name: "Temperature" }), { target: { value: "2" } });
-    expect(bars()).not.toBe(before);
-    fireEvent.change(screen.getByRole("slider", { name: "Top-K" }), { target: { value: "1" } });
-    expect(bars()).toMatch(/cut/);
-  });
-
-  it("KV cache toggle changes the totals", () => {
-    renderStep("kvcache");
-    const total = () => screen.getByTestId("kv-dots").textContent;
-    const on = total();
-    fireEvent.click(screen.getByRole("switch", { name: "KV cache" }));
-    expect(total()).not.toBe(on);
-  });
-
   it("GQA view: fewer KV heads means less cache memory", () => {
     renderStep("gqa");
     const mem = () => screen.getByTestId("gqa-memory").textContent;
@@ -77,8 +59,4 @@ describe("Module 03 views", () => {
     expect(mem()).not.toBe(full);
   });
 
-  it("logits view is labelled illustrative", () => {
-    renderStep("logits");
-    expect(screen.getAllByText(/illustrative/i).length).toBeGreaterThan(0);
-  });
 });
