@@ -10,6 +10,17 @@ The owner wants the site to be **a quick but complete guide to LLMs**. Someone w
 **come out able to implement what they learnt**. Module 01 is the pilot. Once the owner has worked through it and
 approved it, the same pattern goes to every built module (02–06) and to every new one (07–09 and later).
 
+## Amendment (2026-11-26): split layout
+
+The owner tried layout A (one scrolling page) and rejected it: it lost the reading-on-the-left, practical-on-the-right
+feel. Deep steps now keep all six sections and all their depth, but split: the reading scrolls on the left (sections 1–6;
+"Build it" there is a short card with the exercise title, parts passed and an **Open the exercise** button), and a
+practice panel stays in view on the right with two tabs, **Interactive** (the Stage, shown first on every step) and
+**Build it · Python** (the exercise and the "Run it locally" listings). The guided task in "The concept" has a **Try it
+in the interactive view** button. Both tabs stay mounted, so switching keeps code and results. On phones the panel
+sits under the reading and the buttons scroll to it. Moving to another deep step scrolls to the top. Where the text
+below says "one scrolling page" or puts the Stage inside "The concept", this amendment wins.
+
 ## Goals
 
 - **Every step in Module 01 becomes one scrolling lesson page** (owner chose layout A) with six fixed sections, in this order:

@@ -32,8 +32,10 @@ runs your own prompts live. The site never contacts Ollama until you click it; i
 Ollama with `OLLAMA_ORIGINS` set to the site's origin (e.g. `https://yashasvi260.github.io`).
 Every specific fact is checked against primary sources; see `docs/research/`.
 
-**Deep lessons: understand it, then build it (Module 01).** A step with a `deep` field renders as one scrolling page
-with six sections. Its **Build it** exercise is real Python, run in the page by [Pyodide](https://pyodide.org)
+**Deep lessons: understand it, then build it (Module 01).** A step with a `deep` field renders as a
+split page: the six-section reading scrolls on the left, and a practice panel stays in view on the right with two
+tabs, **Interactive** (the step's live view) and **Build it · Python**. Prompts in the reading open the right tab;
+on a phone the panel sits under the reading. Its **Build it** exercise is real Python, run in the page by [Pyodide](https://pyodide.org)
 (`314.0.7`, loaded from jsDelivr on the first press of Run, about 10 MB, in a Web Worker with a 10-second limit per
 run). The learner edits starter code with `TODO`s; private checks (which learner code cannot overwrite) say pass or
 fail; hints and the solution are a click away. Three rules keep it honest, and tests enforce all three:

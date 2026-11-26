@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SUBJECTS } from "../../core/registry";
@@ -36,27 +36,34 @@ const DEEP: DeepLesson = {
 const subject = SUBJECTS[0]!;
 const step: LessonStep = { id: "s", title: "Anatomy of an LLM", summary: "The short version.", body: [], view: "x", deep: true };
 
-function renderPage() {
-  return render(
+function page(at: LessonStep = step, passedParts: string[] = []) {
+  return (
     <PyRunnerProvider run={vi.fn()}>
       <DeepLessonPage
         subject={subject}
-        step={step}
+        step={at}
         lesson={DEEP}
         stepIndex={1}
         total={12}
         isBuilt={() => true}
         onOpenModule={() => {}}
         data={undefined}
-        passedParts={[]}
+        passedParts={passedParts}
         onPartPassed={() => {}}
         footer={<p>footer here</p>}
       >
         <p>the stage</p>
       </DeepLessonPage>
-    </PyRunnerProvider>,
+    </PyRunnerProvider>
   );
 }
+
+function renderPage(passedParts: string[] = []) {
+  return render(page(step, passedParts));
+}
+
+const tab = (name: string) => screen.getByRole("tab", { name });
+const openBuild = () => userEvent.click(tab("Build it · Python"));
 
 describe("DeepLessonPage", () => {
   it("shows the title, summary and the six sections in order", () => {
@@ -77,20 +84,80 @@ describe("DeepLessonPage", () => {
     expect(screen.getByRole("note", { name: "Common mistake" })).toHaveTextContent("It is not a dictionary of meanings.");
   });
 
-  it("puts the stage inside the concept, after the first part, with the guided task", () => {
+  it("keeps the reading in its own column, beside a practice panel that opens on the interactive view", () => {
     renderPage();
-    const region = screen.getByRole("region", { name: "Interactive stage" });
-    expect(region).toHaveTextContent("the stage");
-    expect(screen.getByText("Predict which part grows, then click it.")).toBeInTheDocument();
-    const order = [screen.getByText("A table of vectors."), region, screen.getByText("Order matters.")];
-    expect(order[0]!.compareDocumentPosition(order[1]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(order[1]!.compareDocumentPosition(order[2]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const reading = screen.getByRole("article", { name: "Lesson" });
+    expect(within(reading).getByText("A table of vectors.")).toBeInTheDocument();
+    expect(within(reading).getByText("Order matters.")).toBeInTheDocument();
+    const panel = screen.getByRole("complementary", { name: "Practice" });
+    expect(within(panel).getByRole("tablist")).toBeInTheDocument();
+    expect(tab("Interactive")).toHaveAttribute("aria-selected", "true");
+    expect(tab("Build it · Python")).toHaveAttribute("aria-selected", "false");
+    expect(within(panel).getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage");
+    expect(within(reading).queryByText("the stage")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Look it up" })).toBeNull();
+  });
+
+  it("switches the panel to the Python exercise and back", async () => {
+    renderPage();
+    await openBuild();
+    expect(tab("Build it · Python")).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("heading", { name: "Look it up" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Interactive stage" })).toBeNull();
+    await userEvent.click(tab("Interactive"));
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toBeInTheDocument();
+  });
+
+  it("keeps the exercise mounted while the interactive view is shown, so code and results survive", async () => {
+    renderPage();
+    await openBuild();
+    const box = screen.getByLabelText("Code for part 1");
+    await userEvent.clear(box);
+    await userEvent.type(box, "x = 5");
+    await userEvent.click(tab("Interactive"));
+    await openBuild();
+    expect(screen.getByLabelText("Code for part 1")).toHaveValue("x = 5");
+  });
+
+  it("points from the reading to the panel: the guided task opens the interactive view, Build it opens the exercise", async () => {
+    renderPage();
+    const reading = screen.getByRole("article", { name: "Lesson" });
+    expect(within(reading).getByText("Predict which part grows, then click it.")).toBeInTheDocument();
+    await userEvent.click(within(reading).getByRole("button", { name: /Open the exercise/ }));
+    expect(tab("Build it · Python")).toHaveAttribute("aria-selected", "true");
+    await userEvent.click(within(reading).getByRole("button", { name: /Try it in the interactive view/ }));
+    expect(tab("Interactive")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("says in the reading how many exercise parts are passed", () => {
+    renderPage(["p1"]);
+    const reading = screen.getByRole("article", { name: "Lesson" });
+    expect(within(reading).getByText("Look it up")).toBeInTheDocument();
+    expect(within(reading).getByText("1 of 1 parts passed")).toBeInTheDocument();
+  });
+
+  it("moves between the panel tabs with the arrow keys", () => {
+    renderPage();
+    tab("Interactive").focus();
+    fireEvent.keyDown(tab("Interactive"), { key: "ArrowRight" });
+    expect(tab("Build it · Python")).toHaveAttribute("aria-selected", "true");
+    expect(tab("Build it · Python")).toHaveFocus();
+    fireEvent.keyDown(tab("Build it · Python"), { key: "ArrowLeft" });
+    expect(tab("Interactive")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("goes back to the interactive view on the next step", async () => {
+    const { rerender } = renderPage();
+    await openBuild();
+    rerender(page({ ...step, id: "s2", title: "Next one" }));
+    expect(tab("Interactive")).toHaveAttribute("aria-selected", "true");
   });
 
   it("shows the exercise, the local listing with captured output, and copies its code", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     renderPage();
+    await openBuild();
     expect(screen.getByRole("heading", { name: "Look it up" })).toBeInTheDocument();
     expect(screen.getByText("pip install transformers==4.0.0")).toBeInTheDocument();
     expect(screen.getByText("Output (captured from a real run)")).toBeInTheDocument();

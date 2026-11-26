@@ -25,7 +25,7 @@ export interface LessonStep {
   section?: string;
   /** Formula or metric shown in a monospace callout (e.g. "softmax(QKᵀ/√d)·V"). */
   callout?: string;
-  /** True for a six-section deep lesson: the player renders a scrolling lesson page whose content
+  /** True for a six-section deep lesson: the player renders the reading beside a practice panel, with content that
    *  comes from the subject's `loadDeep()` (loaded on demand, so lesson text stays out of the main bundle). */
   deep?: boolean;
 }

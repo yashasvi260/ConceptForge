@@ -108,6 +108,11 @@ export default function App() {
     if (isDeep && autoPlay) setAutoPlay(false);
   }, [isDeep, autoPlay]);
 
+  // A deep step is a long read: the next one starts at its top, not where the last one was left.
+  useEffect(() => {
+    if (isDeep) window.scrollTo?.(0, 0);
+  }, [isDeep, subject.id, loc.stepIndex]);
+
   // Persist progress whenever it changes (the ref lets event handlers read the latest value).
   const progressRef = useRef(progress);
   useEffect(() => {

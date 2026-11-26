@@ -287,7 +287,7 @@ describe("App shell: deep lesson steps", () => {
     resetDeepCache();
   });
 
-  it("loads the lesson on demand, then renders a scrolling page instead of the split view, without Auto-Play", async () => {
+  it("loads the lesson on demand, then renders the reading beside the practice panel, without Auto-Play", async () => {
     render(<App />);
     expect(loads).toBe(0); // nothing is fetched on the course page
     act(() => {
@@ -298,6 +298,7 @@ describe("App shell: deep lesson steps", () => {
     expect(await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" })).toBeInTheDocument();
     expect(loads).toBe(1);
     expect(screen.queryByRole("main", { name: "Interactive stage" })).toBeNull();
+    expect(screen.getByRole("complementary", { name: "Practice" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Interactive stage" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start auto-play" })).toBeNull();
   });
@@ -325,6 +326,17 @@ describe("App shell: deep lesson steps", () => {
     expect(ev.defaultPrevented).toBe(false);
     fireEvent.keyDown(window, { key: "ArrowRight" });
     expect(screen.getByText(counter(2))).toBeInTheDocument();
+  });
+
+  it("starts the next deep step at the top of its reading", async () => {
+    openFirst();
+    render(<App />);
+    await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" });
+    const scroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    expect(screen.getByText(counter(2))).toBeInTheDocument();
+    expect(scroll).toHaveBeenCalledWith(0, 0);
+    scroll.mockRestore();
   });
 
   it("marks the step on the step bar once its exercise is passed", async () => {
