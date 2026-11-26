@@ -20,7 +20,7 @@ afterEach(() => {
 });
 
 function stage() {
-  return screen.getByRole("main", { name: "Interactive stage" });
+  return screen.queryByRole("main", { name: "Interactive stage" }) ?? screen.getByRole("region", { name: "Interactive stage" });
 }
 
 /** Click every switch/radio/preset and nudge every slider inside the stage. */

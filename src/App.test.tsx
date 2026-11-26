@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App, { AUTOPLAY_MS } from "./App";
 import { SUBJECTS } from "./core/registry";
 import { LAST_SUBJECT_KEY, PROGRESS_KEY } from "./core/storage";
@@ -13,6 +13,12 @@ const stepTitle = () => screen.getByRole("heading", { level: 2 }).textContent;
 const onCourse = () => screen.queryByRole("heading", { level: 1, name: "LLM Mastery" });
 const openFirst = () => {
   window.location.hash = `#/${first.id}/1`;
+};
+/** A module that still uses the split layout (Auto-Play and key takeaway live there). */
+const plain = SUBJECTS.find((s) => s.steps.every((st) => !st.deep))!;
+const plainCounter = (i: number) => new RegExp(`Step ${i} / ${plain.steps.length}`);
+const openPlain = () => {
+  window.location.hash = `#/${plain.id}/1`;
 };
 
 describe("App shell: course overview", () => {
@@ -67,7 +73,7 @@ describe("App shell: course overview", () => {
   it("going home stops auto-play", () => {
     vi.useFakeTimers();
     try {
-      openFirst();
+      openPlain();
       render(<App />);
       fireEvent.keyDown(window, { key: " ", code: "Space" });
       expect(screen.getByRole("button", { name: "Pause auto-play" })).toBeInTheDocument();
@@ -75,8 +81,8 @@ describe("App shell: course overview", () => {
       act(() => {
         vi.advanceTimersByTime(AUTOPLAY_MS * 2 + 10);
       });
-      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^Module 01.*${first.title}`) }));
-      expect(screen.getByText(counter(1))).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^Module ${String(plain.moduleNumber).padStart(2, "0")}.*${plain.title}`) }));
+      expect(screen.getByText(plainCounter(1))).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Start auto-play" })).toBeInTheDocument();
     } finally {
       vi.useRealTimers();
@@ -161,14 +167,14 @@ describe("App shell: module player", () => {
   it.skipIf(total < 3)("Space toggles auto-play, which advances on a timer", () => {
     vi.useFakeTimers();
     try {
-      openFirst();
+      openPlain();
       render(<App />);
       fireEvent.keyDown(window, { key: " ", code: "Space" });
       expect(screen.getByRole("button", { name: "Pause auto-play" })).toBeInTheDocument();
       act(() => {
         vi.advanceTimersByTime(AUTOPLAY_MS + 10);
       });
-      expect(screen.getByText(counter(2))).toBeInTheDocument();
+      expect(screen.getByText(plainCounter(2))).toBeInTheDocument();
       fireEvent.keyDown(window, { key: " ", code: "Space" });
       expect(screen.getByRole("button", { name: "Start auto-play" })).toBeInTheDocument();
     } finally {
@@ -238,10 +244,59 @@ describe("App shell: module player", () => {
   });
 
   it("shows the step's key takeaway when it has one", () => {
-    const withTakeaway = first.steps.findIndex((s) => s.keyTakeaway);
+    const withTakeaway = plain.steps.findIndex((s) => s.keyTakeaway);
     if (withTakeaway < 0) return;
-    window.location.hash = `#/${first.id}/${withTakeaway + 1}`;
+    window.location.hash = `#/${plain.id}/${withTakeaway + 1}`;
     render(<App />);
-    expect(screen.getByRole("note", { name: "Key takeaway" })).toHaveTextContent(first.steps[withTakeaway]!.keyTakeaway!.replace(/`/g, ""));
+    expect(screen.getByRole("note", { name: "Key takeaway" })).toHaveTextContent(plain.steps[withTakeaway]!.keyTakeaway!.replace(/`/g, ""));
+  });
+});
+
+describe("App shell: deep lesson steps", () => {
+  const deepStep = first.steps[0]!;
+  const DEEP = {
+    why: ["w"],
+    worked: [],
+    concept: [{ heading: "H", paragraphs: ["p"] }],
+    guided: "g",
+    build: { id: "deep-test-ex", title: "Ex", packages: [], parts: [{ id: "p1", prompt: "x", starter: "", solution: "", checks: "", hints: [] }] },
+    local: [],
+    checks: [],
+    oneSentence: "s",
+    deeper: [],
+  } satisfies NonNullable<typeof deepStep.deep>;
+  let saved: typeof deepStep.deep;
+  beforeEach(() => {
+    saved = deepStep.deep;
+    deepStep.deep = DEEP;
+  });
+  afterEach(() => {
+    deepStep.deep = saved;
+  });
+
+  it("renders a scrolling lesson page instead of the split view, without Auto-Play", () => {
+    openFirst();
+    render(<App />);
+    expect(screen.getByRole("heading", { level: 3, name: "1 · Why it exists" })).toBeInTheDocument();
+    expect(screen.queryByRole("main", { name: "Interactive stage" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Start auto-play" })).toBeNull();
+  });
+
+  it("leaves Space to the browser on a deep step, and arrows still step", () => {
+    openFirst();
+    render(<App />);
+    const ev = new KeyboardEvent("keydown", { key: " ", code: "Space", cancelable: true });
+    window.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(false);
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    expect(screen.getByText(counter(2))).toBeInTheDocument();
+  });
+
+  it("marks the step on the step bar once its exercise is passed", () => {
+    window.localStorage.setItem("conceptforge:exercises:v1", JSON.stringify({ "deep-test-ex": ["p1"] }));
+    openFirst();
+    render(<App />);
+    expect(screen.getByRole("button", { name: `Go to step 1: ${deepStep.title}` })).toHaveAttribute("data-passed", "true");
   });
 });

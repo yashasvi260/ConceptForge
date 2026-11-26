@@ -4,6 +4,8 @@ export interface ShortcutHandlers {
   onPrev: () => void;
   onNext: () => void;
   onToggleAutoPlay: () => void;
+  /** False leaves Space to the browser (scrolling lesson pages). */
+  spaceEnabled?: boolean;
 }
 
 /** True when the key press belongs to a control that uses these keys itself. */
@@ -33,7 +35,7 @@ export function useKeyboardShortcuts(enabled: boolean, handlers: ShortcutHandler
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         ref.current.onNext();
-      } else if (e.key === " " || e.code === "Space") {
+      } else if ((e.key === " " || e.code === "Space") && ref.current.spaceEnabled !== false) {
         // A focused button activates on Space natively; leave it alone.
         if (e.target instanceof HTMLButtonElement) return;
         e.preventDefault();

@@ -12,6 +12,8 @@ export default defineConfig({
   // The GPT tokenizer vocabularies (o200k ≈ 2.3 MB, cl100k ≈ 1.1 MB) are intentionally large,
   // lazy-loaded chunks that only download on the steps that use them.
   build: { chunkSizeWarningLimit: 2500 },
+  // The Python worker is an ES module (it imports the runner core); Pyodide itself comes from the CDN.
+  worker: { format: "es" },
   test: {
     environment: "jsdom",
     globals: true,

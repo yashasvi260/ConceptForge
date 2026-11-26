@@ -15,6 +15,10 @@ interface StepControlsProps {
   onToggleAutoPlay: () => void;
   /** Called from the last step's "Take Practice Check" button. */
   onFinishSteps: () => void;
+  /** Steps whose exercise is fully passed (shown as a small mark). */
+  passedSteps?: string[];
+  /** False on scrolling lesson pages, where Auto-Play doesn't fit. */
+  showAutoPlay?: boolean;
 }
 
 /** Consecutive steps that share a section, in order (one unnamed group when steps have no sections). */
@@ -41,6 +45,8 @@ export function StepControls({
   onChange,
   onToggleAutoPlay,
   onFinishSteps,
+  passedSteps = [],
+  showAutoPlay = true,
 }: StepControlsProps) {
   const a = ACCENTS[accent];
   const atStart = index === 0;
@@ -69,6 +75,7 @@ export function StepControls({
         >
           <ChevronLeft size={16} /> Prev
         </button>
+        {showAutoPlay && (
         <button
           type="button"
           onMouseDown={keepFocus}
@@ -80,6 +87,7 @@ export function StepControls({
           {autoPlay ? <Pause size={15} /> : <Play size={15} />}
           {autoPlay ? "Pause" : "Auto-Play"}
         </button>
+        )}
 {atEnd ? (
           <button
             type="button"
@@ -119,8 +127,9 @@ export function StepControls({
                     aria-label={`Go to step ${i + 1}: ${s.title}`}
                     aria-current={current ? "step" : undefined}
                     data-filled={filled ? "true" : "false"}
+                    data-passed={passedSteps.includes(s.id) ? "true" : undefined}
                     title={s.title}
-                    className={`h-1.5 w-5 rounded-full transition-all ${
+                    className={`relative h-1.5 w-5 rounded-full transition-all ${passedSteps.includes(s.id) ? "after:absolute after:-top-1.5 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-emerald-400 " : ""}${
                       current
                         ? "bg-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.7)]"
                         : filled
@@ -140,8 +149,13 @@ export function StepControls({
           Step {index + 1} / {steps.length}
         </span>
         <span className="hidden text-xs text-slate-600 xl:inline">
-          <kbd className="rounded bg-slate-800 px-1">←</kbd> <kbd className="rounded bg-slate-800 px-1">→</kbd> step ·{" "}
-          <kbd className="rounded bg-slate-800 px-1">Space</kbd> auto-play
+          <kbd className="rounded bg-slate-800 px-1">←</kbd> <kbd className="rounded bg-slate-800 px-1">→</kbd> step
+          {showAutoPlay && (
+            <>
+              {" · "}
+              <kbd className="rounded bg-slate-800 px-1">Space</kbd> auto-play
+            </>
+          )}
         </span>
       </div>
     </div>

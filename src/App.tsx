@@ -3,7 +3,10 @@ import { AppHeader } from "./components/AppHeader";
 import { ChallengeRunner } from "./components/ChallengeRunner";
 import { ComingSoon } from "./components/ComingSoon";
 import { CourseOverview } from "./components/CourseOverview";
+import { DeepLessonPage } from "./components/deep/DeepLessonPage";
 import { SplitWorkspace } from "./components/SplitWorkspace";
+import { PyRunnerProvider } from "./py/PyRunnerContext";
+import { isExercisePassed, loadExerciseProgress, markPartPassed, type ExerciseProgress } from "./core/exerciseProgress";
 import { StepControls } from "./components/StepControls";
 import { SyllabusDrawer } from "./components/SyllabusDrawer";
 import { UpNextCard } from "./components/UpNextCard";
@@ -76,6 +79,7 @@ export default function App() {
     unbuiltFromHash(window.location.hash),
   );
   const [autoPlay, setAutoPlay] = useState(false);
+  const [exProgress, setExProgress] = useState<ExerciseProgress>(() => loadExerciseProgress());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
   useEffect(() => applyTheme(theme), [theme]);
@@ -90,6 +94,13 @@ export default function App() {
   const step = subject.steps[clampStep(loc.stepIndex, subject.steps.length)]!;
   const subjectProgress = getProgress(progress, subject.id);
   const inPlayer = loc.view === "module" && !comingSoon;
+  const isDeep = step.deep !== undefined;
+  const passedSteps = subject.steps.filter((s) => s.deep && isExercisePassed(s.deep.build, exProgress)).map((s) => s.id);
+
+  // Auto-Play doesn't fit a page you scroll through; stop it when it reaches one.
+  useEffect(() => {
+    if (isDeep && autoPlay) setAutoPlay(false);
+  }, [isDeep, autoPlay]);
 
   // Persist progress whenever it changes (the ref lets event handlers read the latest value).
   const progressRef = useRef(progress);
@@ -243,8 +254,9 @@ export default function App() {
       },
       onNext: () => goToStep(loc.stepIndex + 1),
       onToggleAutoPlay: toggleAutoPlay,
+      spaceEnabled: !isDeep,
     }),
-    [goToStep, loc.stepIndex, toggleAutoPlay],
+    [goToStep, loc.stepIndex, toggleAutoPlay, isDeep],
   );
   useKeyboardShortcuts(
     inPlayer && loc.mode === "lesson" && !drawerOpen,
@@ -265,6 +277,7 @@ export default function App() {
 
   return (
     <OllamaProvider>
+      <PyRunnerProvider>
       <div className="flex min-h-full flex-col">
         <AppHeader
           crumb={
@@ -319,18 +332,35 @@ export default function App() {
           />
         ) : loc.mode === "lesson" ? (
           <>
+            {step.deep ? (
+              <DeepLessonPage
+                subject={subject}
+                step={step}
+                stepIndex={loc.stepIndex}
+                total={subject.steps.length}
+                isBuilt={isBuilt}
+                onOpenModule={openModuleStart}
+                data={step.deep.build.data ? subject.deepData?.[step.deep.build.data] : undefined}
+                passedParts={exProgress[step.deep.build.id] ?? []}
+                onPartPassed={(partId) => setExProgress(markPartPassed(step.deep!.build.id, partId))}
+                footer={upNext}
+              >
+                <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
+              </DeepLessonPage>
+            ) : (
             <SplitWorkspace
-              subject={subject}
-              step={step}
-              stepIndex={loc.stepIndex}
-              total={subject.steps.length}
-              isBuilt={isBuilt}
-              onOpenModule={openModuleStart}
-              footer={upNext}
-            >
-              {/* key: remount per subject so each subject's control state is independent */}
-              <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
-            </SplitWorkspace>
+                subject={subject}
+                step={step}
+                stepIndex={loc.stepIndex}
+                total={subject.steps.length}
+                isBuilt={isBuilt}
+                onOpenModule={openModuleStart}
+                footer={upNext}
+              >
+                {/* key: remount per subject so each subject's control state is independent */}
+                <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
+              </SplitWorkspace>
+            )}
             <div className="sticky bottom-0 z-10">
               <StepControls
                 steps={subject.steps}
@@ -345,6 +375,8 @@ export default function App() {
                 }}
                 onToggleAutoPlay={toggleAutoPlay}
                 onFinishSteps={() => setMode("challenge")}
+                passedSteps={passedSteps}
+                showAutoPlay={!isDeep}
               />
             </div>
           </>
@@ -368,6 +400,7 @@ export default function App() {
           </div>
         )}
       </div>
+      </PyRunnerProvider>
     </OllamaProvider>
   );
 }

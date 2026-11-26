@@ -30,4 +30,16 @@ describe("StepControls", () => {
     await userEvent.click(screen.getByRole("button", { name: "Take Practice Check ✓" }));
     expect(onFinishSteps).toHaveBeenCalled();
   });
+
+  it("marks steps whose exercise is passed", () => {
+    render(<StepControls {...base} index={0} passedSteps={["b"]} />);
+    expect(screen.getByRole("button", { name: "Go to step 2: b" })).toHaveAttribute("data-passed", "true");
+    expect(screen.getByRole("button", { name: "Go to step 1: a" })).not.toHaveAttribute("data-passed");
+  });
+
+  it("can hide Auto-Play", () => {
+    render(<StepControls {...base} index={0} showAutoPlay={false} />);
+    expect(screen.queryByRole("button", { name: "Start auto-play" })).toBeNull();
+    expect(screen.queryByText("auto-play")).toBeNull();
+  });
 });

@@ -142,6 +142,8 @@ export interface SubjectModule {
    * steps through the lesson, so control state (sliders, toggles) survives step changes.
    */
   Stage: ComponentType<StageProps>;
+  /** Precomputed data for deep-lesson exercises, keyed by `Exercise.data`. */
+  deepData?: Record<string, unknown>;
 }
 
 export type PlayerMode = "lesson" | "challenge";
