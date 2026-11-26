@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { StageProps } from "../../core/types";
 import { AttentionLab, LogitsLab, NormResidualLab, PositionLab, TokenLookupLab } from "./views/AnatomyLabs";
 import { AnatomyView } from "./views/AnatomyView";
+import { FamiliesLab, FamilySizesLab, ModelCardLab, ObjectiveLab, TaskFramingLab } from "./views/ArchLabs";
 import { ArchView } from "./views/ArchView";
 import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./views/BigPictureLabs";
 import { BridgeLab, CosineLab, KeywordWinsLab, TfIdfLab, WordOrderLab } from "./views/BowLabs";
@@ -110,6 +111,16 @@ export function Stage({ step }: StageProps) {
         return <SenseByExampleLab />;
       case "arch":
         return <ArchView />;
+      case "families":
+        return <FamiliesLab />;
+      case "objectives":
+        return <ObjectiveLab />;
+      case "task-framing":
+        return <TaskFramingLab />;
+      case "family-sizes":
+        return <FamilySizesLab />;
+      case "model-card":
+        return <ModelCardLab />;
       case "encdec":
         return <EncDecView />;
       case "repgen":

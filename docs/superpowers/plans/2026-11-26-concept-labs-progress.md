@@ -19,7 +19,7 @@ need full deep conversion as well).
 | 01 | bag-of-words | yes | 6/6 (bow, cosine, word-order, tfidf, keyword-wins, bridge) | (this commit) |
 | 01 | dense-embeddings | yes | 5/5 (dense-vs-sparse, contrastive, neighbours, pooling-loses, embed-vs-llm) | (this commit) |
 | 01 | context | yes | 6/6 (bank-matrix, context-mix, context-reach, token-sentence, sense-by-example, map) | (this commit) |
-| 01 | architectures | | | |
+| 01 | architectures | yes | 6/6 (families, arch, objectives, task-framing, family-sizes, model-card) | (this commit) |
 | 01 | encoder-decoder | | | |
 | 01 | representation-vs-generative | | | |
 | 01 | pretraining-finetuning | | | |

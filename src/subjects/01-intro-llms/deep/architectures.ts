@@ -3,14 +3,14 @@ import { part } from "./files";
 
 export const architectures: DeepLesson = {
   why: [
-    "Transformers come in three shapes, and the shape decides what a model is good for. Use the wrong one and you fight it: a model built to *understand* text makes a poor writer, and a model built to *write* is a wasteful way to search a million documents.",
-    "The difference is surprisingly small. All three use the same blocks you met in the anatomy step. What changes is **who can see whom** inside attention, and **what the model is trained to predict**. An **encoder** (BERT, 2018) lets every token see every other token, and is trained to fill in blanks; it produces excellent vectors for classifying and searching. A **decoder** (GPT, Llama) lets each token see only earlier tokens, and is trained to predict the next one; it can write. An **encoder-decoder** (the original 2017 Transformer, T5) joins the two: one reads the input, the other writes the output.",
-    "Almost every chatbot today is decoder-only, and almost every semantic search system uses an encoder. Knowing why takes one attention mask and one training objective, which you will build in this step.",
+    "Transformers come in three shapes, and the shape decides what a model is good for. Pick the wrong one and you'll be fighting it. A model built to *understand* text makes a poor writer. A model built to *write* is a wasteful way to search a million documents.",
+    "Here's the surprise: the difference is tiny. All three use the same blocks you met in the anatomy step. What changes is **who can see whom** inside attention, and **what the model is trained to predict**. An **encoder** (BERT, 2018) lets every token see every other token and is trained to fill in blanks; it produces excellent vectors for classifying and searching. A **decoder** (GPT, Llama) lets each token see only earlier tokens and is trained to predict the next one; it can write. An **encoder-decoder** (the original 2017 Transformer, T5) joins the two: one half reads the input, the other writes the output.",
+    "Almost every chatbot today is a decoder, and almost every semantic search system uses an encoder. Why? It comes down to one attention mask and one training objective, and you'll build both in this step.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Take the four tokens `the cat sat down`. In attention, row i lists which positions token i may look at (1 = may look). An **encoder** allows everything:",
+      text: "Let's make this concrete. Take the four tokens `the cat sat down`. In attention, row i lists which positions token i may look at (1 = may look). An **encoder** allows everything:",
     },
     {
       kind: "table",
@@ -26,7 +26,7 @@ export const architectures: DeepLesson = {
     },
     {
       kind: "text",
-      text: "A **decoder** allows only the past and itself. This is the **causal mask** from the anatomy step, a lower triangle of ones:",
+      text: "Now a **decoder**. It allows only the past and itself. This is the **causal mask** from the anatomy step, a lower triangle of ones:",
     },
     {
       kind: "table",
@@ -42,7 +42,7 @@ export const architectures: DeepLesson = {
     },
     {
       kind: "text",
-      text: "The masks decide the training task. A decoder learns from **every position at once**: one sentence of 4 tokens gives 3 examples of \"given this, predict the next token\":",
+      text: "Here's why the mask matters so much: it decides the training task. A decoder learns from **every position at once**: one sentence of 4 tokens gives 3 examples of \"given this, predict the next token\":",
     },
     {
       kind: "table",
@@ -57,22 +57,28 @@ export const architectures: DeepLesson = {
     },
     {
       kind: "text",
-      text: "An encoder can't be trained that way: with the full sentence visible, \"predict the next token\" is just copying. So BERT hides tokens instead. `the cat [MASK] down` → predict `sat`, using context from **both** sides (`cat` before, `down` after). This is **masked language modelling**. BERT hides 15% of the tokens in each training sequence.",
+      text: "Could you train an encoder the same way? No! With the full sentence visible, \"predict the next token\" is just copying. So BERT hides tokens instead. `the cat [MASK] down` → predict `sat`, using context from **both** sides (`cat` before, `down` after). This is **masked language modelling**. BERT hides 15% of the tokens in each training sequence.",
     },
   ],
   concept: [
     {
       heading: "The three families",
       paragraphs: [
-        "**Encoder-only** models (BERT, RoBERTa, and sentence-embedding models like MiniLM) read the whole input at once, with every token attending to every other. Their output is a contextual vector per token, which you pool into a sentence vector or feed to a small classifier. They are fast, compact and excellent at *understanding* tasks: classification, search, clustering, named-entity tagging. They cannot naturally write free text.",
-        "**Decoder-only** models (GPT-2, GPT-3, Llama, Gemma, and most chat models) read left to right with a causal mask. Their output is a probability for the next token at every position. They generate text, and because almost any task can be phrased as text in, text out, they are the general-purpose workhorse.",
-        "**Encoder-decoder** models (the original Transformer, T5, BART) pair the two. The encoder reads the full input bidirectionally; the decoder writes the output causally while also attending to the encoder's vectors (**cross-attention**, the next step). They shine when the output is a transformation of a clearly separate input: translation, summarisation.",
+        "**Encoder-only** models (BERT, RoBERTa, and sentence-embedding models like MiniLM) read the whole input at once, every token attending to every other. What comes out is a contextual vector per token, which you pool into a sentence vector or feed to a small classifier. They're fast, compact and excellent at *understanding* tasks: classification, search, clustering, tagging names in text. What they can't naturally do is write free text.",
+        "**Decoder-only** models (GPT-2, GPT-3, Llama, Gemma, and most chat models) read left to right with a causal mask. What comes out is a probability for the next token at every position. They generate text, and since almost any task can be phrased as text in, text out, they've become the general-purpose workhorse.",
+        "**Encoder-decoder** models (the original Transformer, T5, BART) pair the two. The encoder reads the full input in both directions; the decoder writes the output left to right, while also looking at the encoder's vectors (that's **cross-attention**, next step). They shine when the output is a transformation of a clearly separate input: translation, summarisation.",
       ],
+      lab: {
+        view: "families",
+        label: "Which family?",
+        task: "Click through the tasks. For each one, guess the family before you read the answer. Which tasks could two families handle?",
+      },
     },
     {
       heading: "The mask is the only structural difference",
       paragraphs: [
-        "Inside attention, the mask is applied to the score grid before softmax: allowed positions keep their score, forbidden ones become −∞ and therefore get weight exactly 0. Same blocks, same matrices; one triangle of −∞ turns an encoder into a decoder.",
+        "So what actually turns an encoder into a decoder? Just the mask. Inside attention, it's applied to the score grid before softmax: allowed positions keep their score, forbidden ones become −∞, and so get weight exactly 0.",
+        "Same blocks. Same matrices. One triangle of −∞, and an encoder becomes a decoder.",
       ],
       formula: {
         expr: "weights = softmax(S + M),   Mᵢⱼ = 0 if allowed else −∞\ncausal:        allowed ⇔ j ≤ i\nbidirectional: allowed for every i, j",
@@ -83,40 +89,67 @@ export const architectures: DeepLesson = {
         ],
         example: "Row 1 of scores [0.0, 0.6, 3.0] with a causal mask → softmax over [0.0, 0.6] only → [0.354, 0.646, 0]. The big 3.0 at a future position is ignored.",
       },
+      lab: {
+        view: "arch",
+        label: "Who sees whom",
+        task: "Switch between the families and click different rows. In a decoder, which token can see the most? Is there a setting where a token sees nothing but itself?",
+      },
     },
     {
       heading: "What each family is trained to do",
       paragraphs: [
-        "**Next-token prediction** (decoders): every position predicts the token after it. A sequence of T tokens yields T − 1 training examples in one forward pass, and the causal mask guarantees none of them can peek at its answer. The objective matches the use: generating is just next-token prediction run in a loop.",
-        "**Masked language modelling** (encoders): hide a random 15% of tokens and predict them from both sides. Of the chosen positions, BERT replaces 80% with `[MASK]`, 10% with a random token and leaves 10% unchanged, so the model can't rely on `[MASK]` appearing at use time. Only the hidden positions produce training signal, so each sequence teaches less than it would a decoder, but every prediction uses full two-sided context.",
-        "**Span corruption** (T5, encoder-decoder): hide whole spans in the input and have the decoder write them out. It sits between the two: the encoder reads with full context, the decoder writes like a decoder.",
+        "**Next-token prediction** (decoders): every position predicts the token after it. So a sequence of T tokens gives T − 1 training examples in a single forward pass, and the causal mask guarantees none of them can peek at the answer. And notice how neatly the training matches the use: generating is just next-token prediction run in a loop.",
+        "**Masked language modelling** (encoders): hide a random 15% of the tokens and predict them from both sides. There's a clever twist. Of the chosen positions, BERT replaces 80% with `[MASK]`, 10% with a random token, and leaves 10% unchanged, so the model can't learn to rely on `[MASK]` showing up (it never does in real use). Only the hidden positions teach anything, so each sequence teaches less than it would a decoder. But every prediction gets full two-sided context.",
+        "**Span corruption** (T5, encoder-decoder): hide whole stretches of the input and have the decoder write them out. It's a middle ground: the encoder reads with full context, the decoder writes like a decoder.",
       ],
       mistake:
         "Assuming BERT-style encoders are just older, worse GPTs. They solve a different problem. For turning a million documents into vectors for search, a 22-million-weight encoder is faster, cheaper and often better than an 8-billion-weight decoder.",
+      lab: {
+        view: "objectives",
+        label: "Training examples",
+        task: "Type a sentence and switch between the three objectives. How many training examples does each one get from your sentence? Press **Mask again** a few times: which tokens does BERT hide?",
+      },
     },
     {
       heading: "Why decoders took over",
       paragraphs: [
-        "Three properties made decoder-only models the default for LLMs. **Generality**: any task phrased as text in, text out can be done by continuing text, from translation to code. **Efficient training**: every token is a training example, and training data is just raw text, which exists in near-limitless quantities. **Scaling**: research such as GPT-3 showed that larger decoders trained on more text get steadily better and pick up abilities (few-shot learning from examples in the prompt) that smaller ones lack.",
-        "Encoders did not disappear. They moved into roles where a vector is the product: search, retrieval, classification, deduplication. Real systems routinely use both: an encoder to find the right documents, a decoder to write the answer from them. That is the RAG pattern of Module 09.",
+        "If encoders are so good, why is nearly every big model today a decoder? Three reasons.",
+        "**Generality**: any task phrased as text in, text out can be done by continuing text, from translation to code. **Efficient training**: every token is a training example, and the training data is just raw text, which exists in near-limitless amounts. **Scaling**: research like GPT-3 showed that bigger decoders trained on more text get steadily better, and pick up abilities (like learning a new task from a few examples in the prompt) that smaller ones lack.",
+        "But encoders didn't disappear. They moved into jobs where a vector *is* the product: search, retrieval, classification, deduplication. Real systems routinely use both: an encoder to find the right documents, a decoder to write the answer from them. That's the RAG pattern of Module 09.",
       ],
+      lab: {
+        view: "task-framing",
+        label: "Text in, text out",
+        task: "Compare how a decoder and an encoder handle each task. Which tasks need nothing but a different prompt for the decoder? Which one does the encoder handle more naturally?",
+      },
     },
     {
       heading: "Real sizes, side by side",
       paragraphs: [
-        "The families also differ in typical size, because they are used differently. BERT-base is an encoder of 12 blocks, width 768, about 110 million parameters. MiniLM, the encoder in this page, is 6 blocks, width 384, about 22.7 million: small enough to embed text in a browser tab. T5-small, an encoder-decoder, is about 60 million. On the decoder side GPT-2 small is 124 million, and today's chat models start around a billion and run to hundreds of billions.",
-        "Encoders stay small because their job (one good vector per text) saturates early and is run over huge collections, so speed matters. Decoders grew because writing well about anything keeps improving with scale. That difference in economics, not just the mask, is why you will meet small encoders and large decoders together in nearly every real system.",
+        "The families also differ in typical size, because they're used so differently. BERT-base is an encoder of 12 blocks, width 768, about 110 million parameters. MiniLM, the encoder in this page, is 6 blocks, width 384, about 22.7 million: small enough to run in a browser tab. T5-small, an encoder-decoder, is about 60 million. On the decoder side, GPT-2 small is 124 million, and today's chat models start around a billion and run to hundreds of billions.",
+        "Why do encoders stay small? Their job, one good vector per text, stops improving much with size fairly early, and it's run over huge collections, so speed matters. Decoders kept growing because writing well about anything keeps improving with scale. That difference in economics, not just the mask, is why you'll meet small encoders and big decoders side by side in nearly every real system.",
       ],
+      lab: {
+        view: "family-sizes",
+        label: "Sizes",
+        task: "Show only encoders, then only decoders. How many times bigger is the largest decoder than the largest encoder here? Hover the bars for the exact counts.",
+      },
     },
     {
       heading: "Reading a model card",
       paragraphs: [
-        "When you meet a new model, three questions place it. Is it encoder, decoder or encoder-decoder (the card or config usually says: `BertModel`, `LlamaForCausalLM`, `T5ForConditionalGeneration`)? What was it trained to predict (masked tokens, next tokens, spans, then possibly instructions)? What does it output (vectors or text)? Those three answers tell you, before you run anything, whether it suits your task.",
+        "When you meet a new model, three questions place it.",
+        "Is it an encoder, a decoder or an encoder-decoder? (The card or config usually says: `BertModel`, `LlamaForCausalLM`, `T5ForConditionalGeneration`.) What was it trained to predict: masked tokens, next tokens, spans, and then possibly instructions? And what does it output: vectors or text? Answer those three, and you know whether it suits your task before you've run a single thing.",
       ],
+      lab: {
+        view: "model-card",
+        label: "Model card",
+        task: "Open each real config. From `architectures` alone, can you tell the family? Then find the field that tells you Llama 3 has a separate output head.",
+      },
     },
   ],
   guided:
-    "Predict first: in a decoder, which token can see the most other tokens, the first or the last? Switch between the architectures below and watch the grid change. Then find the one setting where a token can see nothing but itself.",
+    "Predict first: in a decoder, which token can see the most other tokens, the first or the last? Check in **Who sees whom**. Then open **Training examples** and count how many examples one sentence gives a decoder compared with an encoder.",
   build: {
     id: "01-architectures",
     title: "Build both masks and both training objectives",
