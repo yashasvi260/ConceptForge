@@ -16,14 +16,16 @@ const text = (steps: { id: string; summary: string; body: string[]; keyTakeaway?
   const s = steps.find((x) => x.id === id)!;
   return [s.summary, ...s.body, s.keyTakeaway, s.tryIt].join(" ");
 };
-const at = (steps: { view: string }[], view: string) => steps.findIndex((s) => s.view === view);
+/** Index of the step showing a view (merged deep steps list several views). */
+const at = (steps: { view: string; views?: { view: string }[] }[], view: string) =>
+  steps.findIndex((s) => s.view === view || s.views?.some((v) => v.view === view));
 
 describe("F3: model run errors are shown, not swallowed", () => {
   it("shows an error instead of '…' forever", async () => {
     const spy = vi.spyOn(fakeEmbedder, "embedSentences").mockRejectedValue(new Error("wasm out of memory"));
     try {
       const i = at(m02Steps, "similarity");
-      render(<M02Stage step={m02Steps[i]!} stepIndex={i} />);
+      render(<M02Stage step={{ ...m02Steps[i]!, view: "similarity" }} stepIndex={i} />);
       expect(await screen.findByRole("alert")).toHaveTextContent(/went wrong running the model/i);
     } finally {
       spy.mockRestore();
@@ -34,7 +36,7 @@ describe("F3: model run errors are shown, not swallowed", () => {
 describe("F5: long input gets a visible note", () => {
   it("similarity matrix warns when a line exceeds 256 word pieces", async () => {
     const i = at(m02Steps, "similarity");
-    render(<M02Stage step={m02Steps[i]!} stepIndex={i} />);
+    render(<M02Stage step={{ ...m02Steps[i]!, view: "similarity" }} stepIndex={i} />);
     act(() => fireEvent.change(screen.getByRole("textbox", { name: "Sentences" }), { target: { value: `short line\n${"word ".repeat(300)}` } }));
     expect(await screen.findByText(/reads only the first 256 word pieces/i)).toBeInTheDocument();
   });
@@ -56,7 +58,7 @@ describe("F4 + copy accuracy", () => {
   });
 
   it("F8: semantic search copy doesn't claim the texts share no words", () => {
-    expect(text(m02Steps, "semantic-search-preview")).not.toMatch(/no document contains those words/);
+    expect(text(m02Steps, "cheat-sheet")).not.toMatch(/no document contains those words/);
     expect(m02Challenges.find((c) => c.id === "emb-search")!.prompt).not.toMatch(/share no words/);
   });
 
@@ -73,7 +75,7 @@ describe("F4 + copy accuracy", () => {
   it("F12: the loading note counts the engine too (~30 MB)", async () => {
     const i = at(m02Steps, "similarity");
     const pending = vi.spyOn(fakeEmbedder, "embedSentences");
-    render(<M02Stage step={m02Steps[i]!} stepIndex={i} />);
+    render(<M02Stage step={{ ...m02Steps[i]!, view: "similarity" }} stepIndex={i} />);
     pending.mockRestore();
     const { ModelStatus } = await import("../ml/ModelStatus");
     render(<ModelStatus state={{ status: "loading", progress: 10, embedder: null, retry: () => {} }}>x</ModelStatus>);
