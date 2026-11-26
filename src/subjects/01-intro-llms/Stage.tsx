@@ -17,6 +17,7 @@ import { EncDecView } from "./views/EncDecView";
 import { GenerationLabView } from "./views/GenerationLabView";
 import { DataVsSizeLab, MemoryLab, NeuronLab, ParamCalcLab } from "./views/HowLargeLabs";
 import { MapView } from "./views/MapView";
+import { PerplexityLab, RecapGenerateLab, RecapTokenizeLab, SmoothingLab, VsRealLab } from "./views/RecapLabs";
 import { RecapView } from "./views/RecapView";
 import { CentroidLab, ChooseLab, CombineLab, CostGapLab, GenClassifyLab, TwoOutputsLab } from "./views/RepGenLabs";
 import { RepGenView } from "./views/RepGenView";
@@ -166,6 +167,16 @@ export function Stage({ step }: StageProps) {
         return <BaseToAssistantLab />;
       case "recap":
         return <RecapView />;
+      case "recap-tokenize":
+        return <RecapTokenizeLab />;
+      case "smoothing":
+        return <SmoothingLab />;
+      case "recap-generate":
+        return <RecapGenerateLab />;
+      case "perplexity":
+        return <PerplexityLab />;
+      case "vs-real":
+        return <VsRealLab />;
       default:
         return null;
     }

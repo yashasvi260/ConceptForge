@@ -3,9 +3,9 @@ import { part } from "./files";
 
 export const recap: DeepLesson = {
   why: [
-    "You have now met every idea an LLM is built from, one at a time: tokens, next-token probabilities, the generation loop, embeddings, attention and context, the three architecture families, training by gradient descent, pre-training and fine-tuning. Separately, each is simple. The point of this last step is to put them back together so the whole picture sticks, and to prove to yourself that you can build it.",
-    "So this step is a small project rather than a new concept. You will build a complete (tiny) language model end to end: a tokenizer, a trained model that never gives zero probability, a generation loop with temperature, and an evaluation that measures how surprised the model is by text it has never seen, before and after fine-tuning it on banking text. It is the same pipeline as a real LLM with each part shrunk to a few lines. Wherever your model is limited, the rest of the course is the upgrade.",
-    "Read the concept sections as a map: each one names a part of the mini-project, the real-model version of that part, and the module where you'll build the real thing.",
+    "Look how far you've come. You've now met every idea an LLM is built from, one at a time: tokens, next-token probabilities, the generation loop, embeddings, attention and context, the three architecture families, training by gradient descent, pre-training and fine-tuning. Each one on its own is simple. So let's put them back together, so the whole picture sticks, and so you can prove to yourself that you can build it.",
+    "This step is a small project rather than a new concept. You'll build a complete (tiny) language model end to end: a tokenizer, a trained model that never gives zero probability, a generation loop with temperature, and an evaluation that measures how surprised the model is by text it's never seen, before and after fine-tuning it on banking text. It's the same pipeline as a real LLM, with each part shrunk to a few lines.",
+    "And here's the best way to read what follows: as a map. Each section names a part of your mini-project, the real-model version of that part, and the module where you'll build the real thing. Wherever your model is limited, the rest of the course is the upgrade.",
   ],
   worked: [
     {
@@ -38,13 +38,19 @@ export const recap: DeepLesson = {
     {
       heading: "Part 1 · Tokenizer: text in, tokens out",
       paragraphs: [
-        "Your `tokenize` lowercases text and splits it into words and punctuation marks. A real tokenizer does the same job, mapping text to a fixed vocabulary of IDs, but splits into sub-word pieces learned from data (byte-pair encoding), so it never meets an unknown word: `unbelievable` becomes pieces it knows. Vocabulary size is a design choice that trades sequence length against table size. **Module 02** builds byte-pair encoding and runs the real GPT tokenizers.",
+        "Your `tokenize` lowercases text and splits it into words and punctuation marks. A real tokenizer does the same job: it maps text to a fixed vocabulary of IDs. The difference? A real one splits into sub-word pieces learned from data (byte-pair encoding), so it never meets an unknown word. `unbelievable` just becomes pieces it knows.",
+        "Vocabulary size is a design choice, trading sequence length against table size. **Module 02** builds byte-pair encoding and runs the real GPT tokenizers.",
       ],
+      lab: {
+        view: "recap-tokenize",
+        label: "Tokenizer",
+        task: "Type a sentence with a word your 25-token vocabulary has never seen. What happens to it? How would a sub-word tokenizer handle it instead?",
+      },
     },
     {
       heading: "Part 2 · Model: probabilities that are never zero",
       paragraphs: [
-        "Your `train` counts bigrams and your `prob` applies **add-one smoothing**: pretend every possible pair was seen once more than it was. That fixes step 1's fatal flaw, since unseen pairs now get a small probability instead of zero, but the model still sees only one previous token and still treats `cat` and `dog` as unrelated.",
+        "Your `train` counts bigrams, and your `prob` applies **add-one smoothing**: pretend every possible pair was seen once more than it really was. That fixes step 1's fatal flaw. Unseen pairs now get a small probability instead of zero. But notice what it doesn't fix: the model still sees only one previous token, and still treats `cat` and `dog` as unrelated.",
         "The real version replaces counting with the transformer from the anatomy step: an embedding table so similar tokens share structure, attention so every token can use the whole context, a stack of blocks, and an output head with softmax. Its probabilities are never zero either, because softmax is always positive. **Module 03** builds the transformer's internals: attention heads, the feed-forward network, normalisation and positions.",
       ],
       formula: {
@@ -55,12 +61,17 @@ export const recap: DeepLesson = {
         ],
         example: "P(cat | the) = (2 + 1) / (11 + 25) = 0.0833; P(loan | the) = (0 + 1) / 36 = 0.0278.",
       },
+      lab: {
+        view: "smoothing",
+        label: "Smoothing",
+        task: "Set the smoothing to 0 and check P(loan | the). Now raise it to 1, then 2. What does too much smoothing do to the probabilities of words that really did follow?",
+      },
     },
     {
       heading: "Part 3 · Generation: the loop, with temperature",
       paragraphs: [
-        "Your `generate` is the generation loop: compute the probabilities for the next token, choose one, append, repeat. With temperature 0 it is greedy (always the top token, repeatable); with temperature above 0 it samples from probabilities raised to the power 1 / T. T below 1 sharpens the distribution towards the top choices; above 1 flattens it so rarer tokens appear. Every LLM API exposes exactly this setting.",
-        "The real loop adds two things you'll meet later. **Top-k and top-p** sampling cut off the long tail of unlikely tokens before sampling (Module 04 lets you try them on a real model). **The KV cache** stores each token's keys and values so the model doesn't recompute the whole context for every new token (Part IV).",
+        "Your `generate` is the generation loop: compute the probabilities for the next token, choose one, append, repeat. At temperature 0 it's greedy (always the top token, fully repeatable). Above 0, it samples from the probabilities raised to the power 1 / T. Below 1 sharpens the distribution towards the top choices; above 1 flattens it so rarer tokens show up. Every LLM API exposes exactly this setting.",
+        "The real loop adds two things you'll meet later. **Top-k and top-p** sampling cut off the long tail of unlikely tokens before sampling (Module 04 lets you try them on a real model). And **the KV cache** stores each token's keys and values, so the model doesn't recompute the whole context for every new token (Part IV).",
       ],
       formula: {
         expr: "P_T(w) ∝ P(w)^(1/T)",
@@ -70,12 +81,17 @@ export const recap: DeepLesson = {
         ],
         example: "Two tokens with P = 0.6 and 0.4: at T = 0.5 they become 0.36 and 0.16, i.e. 0.69 and 0.31 after rescaling; at T = 2 they become 0.775 and 0.632, i.e. 0.55 and 0.45.",
       },
+      lab: {
+        view: "recap-generate",
+        label: "Generate",
+        task: "Generate greedily from the pre-trained model, then from the fine-tuned one. Then raise the temperature and sample a few times. Do you ever get a pair that never appeared in training?",
+      },
     },
     {
       heading: "Part 4 · Evaluation: perplexity",
       paragraphs: [
-        "Your `perplexity` is the standard measure of a language model: take the average cross-entropy (the training loss from the training step) on text the model did *not* train on, and exponentiate it. The result reads as an effective number of choices: perplexity 13 means the model is, on average, as uncertain as if it were picking uniformly among 13 tokens. Lower is better. A model that knows nothing has perplexity equal to the vocabulary size.",
-        "Measuring on **held-out** text is essential. On its own training text a model can look excellent simply by memorising; only unseen text shows whether it learned patterns that generalise. Real evaluations of LLMs add task benchmarks (accuracy on questions, code that passes tests), but perplexity on held-out text remains the basic health check during training.",
+        "Your `perplexity` is the standard measure of a language model. Take the average cross-entropy (the training loss from step 4) on text the model did *not* train on, and exponentiate it. The result reads as an effective number of choices: perplexity 13 means the model is, on average, as unsure as if it were picking uniformly among 13 tokens. Lower is better. A model that knows nothing has perplexity equal to the vocabulary size.",
+        "Measuring on **held-out** text is essential. On its own training text, a model can look excellent just by memorising. Only unseen text shows whether it learned patterns that generalise. Real evaluations of LLMs add task benchmarks (accuracy on questions, code that passes tests), but perplexity on held-out text is still the basic health check during training.",
       ],
       formula: {
         expr: "perplexity = exp( −(1/N) · Σᵢ ln P(xᵢ₊₁ | xᵢ) )",
@@ -88,20 +104,36 @@ export const recap: DeepLesson = {
       },
       mistake:
         "Reporting perplexity on the training text, or comparing perplexities between models with different tokenizers. The first rewards memorising; the second compares different units (a model that splits text into more, smaller tokens has an easier job per token). Compare on the same held-out text and the same tokenizer.",
+      lab: {
+        view: "perplexity",
+        label: "Perplexity",
+        task: "Compare perplexity on the held-out text before and after fine-tuning. Then switch to the training text: why is the score so much better there, and why shouldn't you trust it?",
+      },
     },
     {
       heading: "Your model next to a real one",
       paragraphs: [
-        "Put the numbers side by side and the shape of the upgrade is clear. Your vocabulary has 25 tokens; Llama 3's has 128,256. Your model sees 1 previous token; Llama 3 8B sees up to 8,192. Your model's “parameters” are at most 25 × 25 = 625 counts; Llama 3 8B has 8,030,261,248 learned weights. You trained on 69 tokens; it trained on over 15 trillion.",
-        "Yet the interface is identical: tokens in, a probability for every possible next token out, a loop that samples and appends, and perplexity on held-out text to tell whether it is any good. Everything that makes an LLM impressive lives inside the `prob` function, which is exactly the part the rest of the course opens up.",
+        "Now put the numbers side by side, and the shape of the upgrade becomes clear. Your vocabulary has 25 tokens; Llama 3's has 128,256. Your model sees 1 previous token; Llama 3 8B sees up to 8,192. Your model's \"parameters\" are at most 25 × 25 = 625 counts; Llama 3 8B has 8,030,261,248 learned weights. You trained on 69 tokens; it trained on over 15 trillion.",
+        "And yet the interface is identical: tokens in, a probability for every possible next token out, a loop that samples and appends, and perplexity on held-out text to tell whether it's any good. Everything that makes an LLM impressive lives inside the `prob` function, and that's exactly the part the rest of the course opens up.",
       ],
+      lab: {
+        view: "vs-real",
+        label: "Yours vs real",
+        task: "Click each row. Which gap is the biggest? Which module of the course closes it?",
+      },
     },
     {
       heading: "Fine-tuning, and where it all leads",
       paragraphs: [
-        "Your fine-tuning was continued counting on banking text, and perplexity on unseen banking text halved. Real fine-tuning is continued gradient descent, and the measurement is the same. Everything you built connects forward. **Part II** (Modules 06–11) uses pretrained models for classification, clustering, prompting, agents, retrieval and images, with inference only. **Part III** fine-tunes them properly: full fine-tuning, LoRA, instruction and preference tuning. **Part IV** serves them: quantisation, batching, caching, evaluation and safety in production.",
-        "If you can explain each of the four parts of your mini-project and name what replaces it in a real LLM, you have the map this module set out to give you.",
+        "Your fine-tuning was continued counting on banking text, and perplexity on unseen banking text halved. Real fine-tuning is continued gradient descent, and the measurement is exactly the same.",
+        "Everything you built connects forward. **Part II** (Modules 06–11) uses pretrained models for classification, clustering, prompting, agents, retrieval and images, with inference only. **Part III** fine-tunes them properly: full fine-tuning, LoRA, instruction and preference tuning. **Part IV** serves them: quantisation, batching, caching, evaluation and safety in production.",
+        "Here's your final check. Can you explain each of the four parts of your mini-project, and name what replaces it in a real LLM? Then you have the map this module set out to give you.",
       ],
+      lab: {
+        view: "map",
+        label: "Course map",
+        task: "Find where each part of your mini-project gets its real upgrade on the map. Which module are you most curious about?",
+      },
     },
   ],
   guided:
