@@ -24,8 +24,8 @@ interface DeepLessonPageProps {
   passedParts: string[];
   onPartPassed: (partId: string) => void;
   footer?: ReactNode;
-  /** The subject's interactive stage, shown in the practice panel's first tab. */
-  children: ReactNode;
+  /** Renders the subject's interactive stage for a view, shown in the practice panel's first tab. */
+  stage: (view: string) => ReactNode;
 }
 
 type PanelTab = "stage" | "build";
@@ -57,7 +57,7 @@ export function DeepLessonPage({
   passedParts,
   onPartPassed,
   footer,
-  children,
+  stage,
 }: DeepLessonPageProps) {
   const deep = lesson;
   const a = ACCENTS[subject.accent];
@@ -69,6 +69,10 @@ export function DeepLessonPage({
   const [chosen, setChosen] = useState<{ step: string; tab: PanelTab }>({ step: step.id, tab: "stage" });
   const tab: PanelTab = chosen.step === step.id ? chosen.tab : "stage";
   const select = (t: PanelTab) => setChosen({ step: step.id, tab: t });
+  // A step may offer several views; each step opens on its first.
+  const views = step.views ?? [];
+  const [viewChoice, setViewChoice] = useState<{ step: string; view: string } | null>(null);
+  const view = viewChoice?.step === step.id ? viewChoice.view : (views[0]?.view ?? step.view);
   const openFromReading = (t: PanelTab) => {
     select(t);
     revealOnSmallScreens(panelRef.current);
@@ -221,8 +225,25 @@ export function DeepLessonPage({
           </div>
           {/* Both panels stay mounted, so switching tabs keeps the stage's state and any code or run in progress. */}
           <div role="tabpanel" id={`${ids}-panel-stage`} aria-labelledby={`${ids}-tab-stage`} hidden={tab !== "stage"}>
+            {views.length > 1 && (
+              <div role="group" aria-label="Choose a view" className="flex flex-wrap gap-1.5 border-b border-slate-800 px-3 py-2">
+                {views.map((v) => (
+                  <button
+                    key={v.view}
+                    type="button"
+                    aria-pressed={v.view === view}
+                    onClick={() => setViewChoice({ step: step.id, view: v.view })}
+                    className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                      v.view === view ? `${a.border} ${a.softBg} ${a.text}` : "border-slate-700 text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <section aria-label="Interactive stage" className="stage-grid p-3 sm:p-4">
-              {children}
+              {stage(view)}
             </section>
           </div>
           <div

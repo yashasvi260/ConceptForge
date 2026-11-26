@@ -23,7 +23,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "Remember the LEGO analogy: studs, custom pieces, standard bricks.",
     explanation: "Words give huge vocabularies and [UNK] for new words; characters give very long sequences. Subwords balance the two.",
-    relatedStepId: "three-ways",
+    relatedStepId: "why-numbers",
   },
   {
     id: "vocab-tradeoff",
@@ -162,7 +162,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "Compare GPT-4 (45 tokens) and GPT-4o (14 tokens) on the same Hindi sentence.",
     explanation: "Tokenizers trained on English-heavy data have fewer pieces for other scripts. GPT-4o's bigger vocabulary cuts our Hindi example from 45 to 14 tokens.",
-    relatedStepId: "languages",
+    relatedStepId: "playground",
   },
   {
     id: "strawberry",
@@ -190,7 +190,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "Rules of thumb are fine for estimates, but not for a hard limit.",
     explanation: "Different models use different tokenizers. The context window covers prompt plus answer, so reserve `max_tokens` for the reply.",
-    relatedStepId: "practice",
+    relatedStepId: "quirks",
   },
   {
     id: "rag-chunks",
@@ -204,7 +204,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "What happens to a sentence that straddles two chunks?",
     explanation: "Overlap repeats the end of one chunk at the start of the next, so boundary sentences keep their context. Size chunks in tokens.",
-    relatedStepId: "practice",
+    relatedStepId: "quirks",
   },
   {
     id: "numbers-chunks",
@@ -241,7 +241,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 2,
     hint: "Total tokens × price ÷ 1,000,000.",
     explanation: "2,000 × 10,000 = 20 million tokens; 20 × $2.50 = $50 (input only; output tokens are usually billed separately).",
-    relatedStepId: "practice",
+    relatedStepId: "quirks",
   },
   {
     id: "emb-lookup",
@@ -283,7 +283,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 0,
     hint: "Cosine compares directions; near 1 = same direction, near 0 = unrelated.",
     explanation: "For embedding models, high cosine means close in meaning. It's not word overlap, and ~0 means unrelated rather than opposite. Thresholds vary by model.",
-    relatedStepId: "cosine-similarity",
+    relatedStepId: "sentence-embeddings",
   },
   {
     id: "emb-pooling",
@@ -306,6 +306,6 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "What is being compared: words or vectors?",
     explanation: "Semantic search ranks by embedding similarity, which captures meaning beyond exact keywords (Module 09 builds on this).",
-    relatedStepId: "semantic-search-preview",
+    relatedStepId: "cheat-sheet",
   },
 ];

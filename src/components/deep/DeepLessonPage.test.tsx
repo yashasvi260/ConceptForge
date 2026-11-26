@@ -51,9 +51,8 @@ function page(at: LessonStep = step, passedParts: string[] = []) {
         passedParts={passedParts}
         onPartPassed={() => {}}
         footer={<p>footer here</p>}
-      >
-        <p>the stage</p>
-      </DeepLessonPage>
+        stage={(view) => <p>the stage {view}</p>}
+      />
     </PyRunnerProvider>
   );
 }
@@ -151,6 +150,25 @@ describe("DeepLessonPage", () => {
     await openBuild();
     rerender(page({ ...step, id: "s2", title: "Next one" }));
     expect(tab("Interactive")).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("lets a step with several views switch between them in the Interactive tab", async () => {
+    const two: LessonStep = { ...step, view: "intro", views: [{ view: "intro", label: "Overview" }, { view: "chop", label: "Three ways" }] };
+    const { rerender } = render(page(two));
+    const switcher = screen.getByRole("group", { name: "Choose a view" });
+    expect(within(switcher).getByRole("button", { name: "Overview" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage intro");
+    await userEvent.click(within(switcher).getByRole("button", { name: "Three ways" }));
+    expect(within(switcher).getByRole("button", { name: "Three ways" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage chop");
+    rerender(page({ ...two, id: "other" }));
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage intro");
+  });
+
+  it("shows no view switcher for a step with one view", () => {
+    renderPage();
+    expect(screen.queryByRole("group", { name: "Choose a view" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Interactive stage" })).toHaveTextContent("the stage x");
   });
 
   it("shows the exercise, the local listing with captured output, and copies its code", async () => {

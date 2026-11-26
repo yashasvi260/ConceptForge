@@ -357,9 +357,8 @@ export default function App() {
                   passedParts={exProgress[lesson.build.id] ?? []}
                   onPartPassed={(partId) => setExProgress(markPartPassed(lesson.build.id, partId))}
                   footer={upNext}
-                >
-                  <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
-                </DeepLessonPage>
+                  stage={(view) => <Stage key={subject.id} step={view === step.view ? step : { ...step, view }} stepIndex={loc.stepIndex} />}
+                />
               ) : (
                 <DeepLessonLoading
                   subject={subject}

@@ -10,21 +10,23 @@ const VIEW_ORDER = [
   "cheatsheet",
 ];
 
+/** Renders a view, including the second view of a merged step (steps list their views in `views`). */
 function renderStep(view: string) {
-  const i = steps.findIndex((s) => s.view === view);
-  return render(<Stage step={steps[i]!} stepIndex={i} />);
+  const i = steps.findIndex((s) => s.view === view || s.views?.some((v) => v.view === view));
+  return render(<Stage step={{ ...steps[i]!, view }} stepIndex={i} />);
 }
 
 describe("lesson steps", () => {
-  it("has the planned steps in order (Tokens, then Embeddings, then the cheat sheet), each with try-it and takeaway", () => {
-    expect(steps.map((s) => s.view)).toEqual(VIEW_ORDER);
-    expect(steps.slice(0, 13).every((s) => s.section === "Tokens")).toBe(true);
-    expect(steps.slice(13, 19).every((s) => s.section === "Embeddings")).toBe(true);
+  it("has the planned 14 steps (Tokens, then Embeddings, then the recap), every view still reachable in order", () => {
+    expect(steps.flatMap((s) => s.views?.map((v) => v.view) ?? [s.view])).toEqual(VIEW_ORDER);
+    for (const s of steps) if (s.views) expect(s.view, s.id).toBe(s.views[0]!.view);
+    expect(steps.slice(0, 10).every((s) => s.section === "Tokens")).toBe(true);
+    expect(steps.slice(10, 13).every((s) => s.section === "Embeddings")).toBe(true);
     expect(steps.at(-1)!.section).toBe("Summary");
     for (const s of steps) {
       expect(s.tryIt, s.id).toBeTruthy();
       expect(s.keyTakeaway, s.id).toBeTruthy();
-      expect(s.body.length, s.id).toBeLessThanOrEqual(3);
+      expect(s.body.length, s.id).toBeLessThanOrEqual(6);
     }
   });
 });

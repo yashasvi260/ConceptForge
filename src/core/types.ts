@@ -28,6 +28,8 @@ export interface LessonStep {
   /** True for a six-section deep lesson: the player renders the reading beside a practice panel, with content that
    *  comes from the subject's `loadDeep()` (loaded on demand, so lesson text stays out of the main bundle). */
   deep?: boolean;
+  /** Deep steps only: the views the Interactive tab can switch between (the first is shown first). */
+  views?: { view: string; label: string }[];
 }
 
 export type WorkedBlock =

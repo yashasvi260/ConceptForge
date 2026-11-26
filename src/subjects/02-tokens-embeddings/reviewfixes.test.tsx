@@ -9,9 +9,10 @@ import { steps } from "./steps";
 import { topSegmentations } from "./unigram";
 import { createVocabLoader } from "./wordpiece";
 
+/** Renders a view, including the second view of a merged step (steps list their views in `views`). */
 const renderStep = (view: string) => {
-  const i = steps.findIndex((s) => s.view === view);
-  return render(<Stage step={steps[i]!} stepIndex={i} />);
+  const i = steps.findIndex((s) => s.view === view || s.views?.some((v) => v.view === view));
+  return render(<Stage step={{ ...steps[i]!, view }} stepIndex={i} />);
 };
 const stepText = (id: string) => {
   const s = steps.find((x) => x.id === id)!;
@@ -94,7 +95,7 @@ describe("lesson copy accuracy", () => {
   });
 
   it("F9: hedges unsourced rules of thumb", () => {
-    expect(stepText("practice")).toMatch(/rough|rule of thumb/i);
+    expect(stepText("quirks")).toMatch(/rough|rule of thumb/i);
     expect(stepText("sentencepiece")).not.toMatch(/typos/i);
   });
 });
