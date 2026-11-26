@@ -10,4 +10,4 @@ def count_bigrams(tokens):
     return counts
 
 counts = count_bigrams(tokens)
-print(counts["the"])
+print(counts.get("the"))

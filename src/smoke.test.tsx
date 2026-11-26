@@ -48,11 +48,13 @@ function exerciseControls() {
 }
 
 describe("smoke: every subject and step", () => {
-  it.each(SUBJECTS.map((s) => [s.id, s] as const))("%s renders and responds on every step", (_id, subject) => {
+  it.each(SUBJECTS.map((s) => [s.id, s] as const))("%s renders and responds on every step", async (_id, subject) => {
     window.location.hash = `#/${subject.id}/1`;
     render(<App />);
     for (let i = 0; i < subject.steps.length; i++) {
       expect(screen.getByText(new RegExp(`Step ${i + 1} / ${subject.steps.length}`))).toBeInTheDocument();
+      // Deep lessons download on demand; wait until the page (and its stage) is there.
+      if (subject.steps[i]!.deep) await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" });
       exerciseControls();
       // After poking controls the stage must still be on screen.
       expect(stage().textContent?.length ?? 0).toBeGreaterThan(20);

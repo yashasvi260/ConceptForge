@@ -8,7 +8,7 @@ def count(tokens, counts=None):
     return new
 
 def probs(counts, prev):
-    f = counts[prev]
+    f = counts.get(prev, {})
     total = sum(f.values())
     return {k: v / total for k, v in f.items()}
 

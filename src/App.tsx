@@ -3,10 +3,11 @@ import { AppHeader } from "./components/AppHeader";
 import { ChallengeRunner } from "./components/ChallengeRunner";
 import { ComingSoon } from "./components/ComingSoon";
 import { CourseOverview } from "./components/CourseOverview";
-import { DeepLessonPage } from "./components/deep/DeepLessonPage";
+import { DeepLessonLoading, DeepLessonPage } from "./components/deep/DeepLessonPage";
 import { SplitWorkspace } from "./components/SplitWorkspace";
 import { PyRunnerProvider } from "./py/PyRunnerContext";
 import { isExercisePassed, loadExerciseProgress, markPartPassed, type ExerciseProgress } from "./core/exerciseProgress";
+import { useDeepContent } from "./core/useDeepContent";
 import { StepControls } from "./components/StepControls";
 import { SyllabusDrawer } from "./components/SyllabusDrawer";
 import { UpNextCard } from "./components/UpNextCard";
@@ -94,8 +95,13 @@ export default function App() {
   const step = subject.steps[clampStep(loc.stepIndex, subject.steps.length)]!;
   const subjectProgress = getProgress(progress, subject.id);
   const inPlayer = loc.view === "module" && !comingSoon;
-  const isDeep = step.deep !== undefined;
-  const passedSteps = subject.steps.filter((s) => s.deep && isExercisePassed(s.deep.build, exProgress)).map((s) => s.id);
+  const isDeep = step.deep === true;
+  const deepState = useDeepContent(subject, inPlayer && loc.mode === "lesson" && isDeep);
+  const lessons = deepState.content?.lessons;
+  const lesson = lessons?.[step.id];
+  const passedSteps = lessons
+    ? subject.steps.filter((s) => s.deep && lessons[s.id] && isExercisePassed(lessons[s.id]!.build, exProgress)).map((s) => s.id)
+    : [];
 
   // Auto-Play doesn't fit a page you scroll through; stop it when it reaches one.
   useEffect(() => {
@@ -332,21 +338,33 @@ export default function App() {
           />
         ) : loc.mode === "lesson" ? (
           <>
-            {step.deep ? (
-              <DeepLessonPage
-                subject={subject}
-                step={step}
-                stepIndex={loc.stepIndex}
-                total={subject.steps.length}
-                isBuilt={isBuilt}
-                onOpenModule={openModuleStart}
-                data={step.deep.build.data ? subject.deepData?.[step.deep.build.data] : undefined}
-                passedParts={exProgress[step.deep.build.id] ?? []}
-                onPartPassed={(partId) => setExProgress(markPartPassed(step.deep!.build.id, partId))}
-                footer={upNext}
-              >
-                <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
-              </DeepLessonPage>
+            {isDeep ? (
+              lesson ? (
+                <DeepLessonPage
+                  subject={subject}
+                  step={step}
+                  lesson={lesson}
+                  stepIndex={loc.stepIndex}
+                  total={subject.steps.length}
+                  isBuilt={isBuilt}
+                  onOpenModule={openModuleStart}
+                  data={lesson.build.data ? deepState.content?.data[lesson.build.data] : undefined}
+                  passedParts={exProgress[lesson.build.id] ?? []}
+                  onPartPassed={(partId) => setExProgress(markPartPassed(lesson.build.id, partId))}
+                  footer={upNext}
+                >
+                  <Stage key={subject.id} step={step} stepIndex={loc.stepIndex} />
+                </DeepLessonPage>
+              ) : (
+                <DeepLessonLoading
+                  subject={subject}
+                  step={step}
+                  stepIndex={loc.stepIndex}
+                  total={subject.steps.length}
+                  error={deepState.error}
+                  onRetry={deepState.retry}
+                />
+              )
             ) : (
             <SplitWorkspace
                 subject={subject}

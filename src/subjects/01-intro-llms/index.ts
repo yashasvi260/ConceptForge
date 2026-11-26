@@ -2,7 +2,6 @@ import { Map as MapIcon } from "lucide-react";
 import { PART_TITLES } from "../../core/track";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { deepData } from "./deep/data";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
@@ -25,7 +24,8 @@ const subject: SubjectModule = {
   steps,
   challenges,
   Stage,
-  deepData,
+  // Lesson text, exercises and MiniLM data download only when a deep step is opened.
+  loadDeep: () => import("./deep").then((m) => m.content),
 };
 
 export default subject;

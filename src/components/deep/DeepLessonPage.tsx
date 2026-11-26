@@ -3,7 +3,7 @@ import { Lightbulb, Quote } from "lucide-react";
 import type { ReactNode } from "react";
 import { ACCENTS } from "../../core/accent";
 import { moduleLabel } from "../../core/track";
-import type { LessonStep, SubjectModule } from "../../core/types";
+import type { DeepLesson, LessonStep, SubjectModule } from "../../core/types";
 import { BridgeCard } from "../BridgeCard";
 import { RichText } from "../ui";
 import { WhereThisFits } from "../WhereThisFits";
@@ -13,6 +13,8 @@ import { ConceptPartView, GoDeeper, InlineChecks, LocalListingView, Prose, Secti
 interface DeepLessonPageProps {
   subject: SubjectModule;
   step: LessonStep;
+  /** The step's loaded deep content. */
+  lesson: DeepLesson;
   stepIndex: number;
   total: number;
   isBuilt: (id: string) => boolean;
@@ -30,6 +32,7 @@ interface DeepLessonPageProps {
 export function DeepLessonPage({
   subject,
   step,
+  lesson,
   stepIndex,
   total,
   isBuilt,
@@ -40,7 +43,7 @@ export function DeepLessonPage({
   footer,
   children,
 }: DeepLessonPageProps) {
-  const deep = step.deep!;
+  const deep = lesson;
   const a = ACCENTS[subject.accent];
   const [firstPart, ...restParts] = deep.concept;
   return (
@@ -120,6 +123,50 @@ export function DeepLessonPage({
         </motion.article>
       </AnimatePresence>
       {footer && <div className="mt-6">{footer}</div>}
+    </div>
+  );
+}
+
+/** Shown while a deep lesson's content downloads (or if it fails): the step's title and summary appear at once. */
+export function DeepLessonLoading({
+  subject,
+  step,
+  stepIndex,
+  total,
+  error,
+  onRetry,
+}: {
+  subject: SubjectModule;
+  step: LessonStep;
+  stepIndex: number;
+  total: number;
+  error: boolean;
+  onRetry: () => void;
+}) {
+  const a = ACCENTS[subject.accent];
+  return (
+    <div className="mx-auto w-full max-w-[880px] flex-1 px-4 py-6">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/95 p-5 shadow-xl sm:p-8">
+        <p className={`text-xs font-semibold uppercase tracking-wider ${a.text}`}>
+          {moduleLabel(subject.moduleNumber)} · {subject.title} · Step {stepIndex + 1} of {total}
+        </p>
+        <h2 className="mt-2 text-3xl font-semibold leading-tight tracking-tight text-white">{step.title}</h2>
+        <p className="mt-3 text-base text-slate-300">
+          <RichText text={step.summary} />
+        </p>
+        {error ? (
+          <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 text-sm text-rose-300">
+            Couldn't load this lesson. Check your connection.
+            <button type="button" onClick={onRetry} className="rounded-md border border-rose-400/60 px-2.5 py-1 text-xs text-rose-100">
+              Try again
+            </button>
+          </div>
+        ) : (
+          <p role="status" className="mt-6 text-sm text-slate-500">
+            Loading lesson…
+          </p>
+        )}
+      </div>
     </div>
   );
 }

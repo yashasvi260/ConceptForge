@@ -1,16 +1,4 @@
 import type { LessonStep } from "../../core/types";
-import { anatomy } from "./deep/anatomy";
-import { architectures } from "./deep/architectures";
-import { bigPicture } from "./deep/big-picture";
-import { context } from "./deep/context";
-import { bagOfWords } from "./deep/bag-of-words";
-import { denseEmbeddings } from "./deep/dense-embeddings";
-import { encoderDecoder } from "./deep/encoder-decoder";
-import { howLarge } from "./deep/how-large";
-import { pretrainingFinetuning } from "./deep/pretraining-finetuning";
-import { recap } from "./deep/recap";
-import { representationVsGenerative } from "./deep/representation-vs-generative";
-import { trainVsUse } from "./deep/train-vs-use";
 
 /** Facts checked in docs/research/part1-sources.md; similarities are computed live with MiniLM. */
 export const steps: LessonStep[] = [
@@ -26,7 +14,7 @@ export const steps: LessonStep[] = [
     tryIt: "Follow the loop on the right, then open the module list to see the whole journey.",
     keyTakeaway: "An LLM is a next-token predictor: text → tokens → vectors → transformer → probabilities → next token, repeated.",
     view: "map",
-    deep: bigPicture,
+    deep: true,
   },
   {
     id: "anatomy",
@@ -41,7 +29,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Tokenizer → embedding table → N × (attention + feed-forward) → output head → next token.",
     callout: "text → IDs → vectors → N × block → logits → next token",
     view: "anatomy",
-    deep: anatomy,
+    deep: true,
   },
   {
     id: "how-large",
@@ -56,7 +44,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Parameters are learned numbers; their count comes from the layer count and widths, and most sit in the transformer layers.",
     callout: "16-bit memory ≈ parameters × 2 bytes",
     view: "scale",
-    deep: howLarge,
+    deep: true,
   },
   {
     id: "train-vs-use",
@@ -71,7 +59,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Training writes the weights (once, expensive); inference reads them (per token, cheap).",
     callout: "train ≈ 6·N·D FLOPs · inference ≈ 2·N FLOPs per token",
     view: "trainuse",
-    deep: trainVsUse,
+    deep: true,
   },
   {
     id: "bag-of-words",
@@ -86,7 +74,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Bag-of-Words counts words: fast and simple, but it ignores meaning and word order.",
     callout: "similarity = cosine(count vector A, count vector B)",
     view: "bow",
-    deep: bagOfWords,
+    deep: true,
   },
   {
     id: "dense-embeddings",
@@ -101,7 +89,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Embeddings place similar meanings close together, so `film` and `movie` finally count as related.",
     callout: "MiniLM: text → 384 numbers, similarity = cosine",
     view: "dense",
-    deep: denseEmbeddings,
+    deep: true,
   },
   {
     id: "context",
@@ -115,7 +103,7 @@ export const steps: LessonStep[] = [
     tryIt: "Change one sentence (keep the word `bank`) and see how far its vector moves.",
     keyTakeaway: "Modern models give each token a vector that depends on its context: that's how `bank` gets disambiguated.",
     view: "context",
-    deep: context,
+    deep: true,
   },
   {
     id: "architectures",
@@ -129,7 +117,7 @@ export const steps: LessonStep[] = [
     tryIt: "Switch architectures and click a row to see what that token is allowed to look at.",
     keyTakeaway: "Encoder = bidirectional understanding (BERT). Decoder = causal, left-to-right generation (GPT, Llama).",
     view: "arch",
-    deep: architectures,
+    deep: true,
   },
   {
     id: "encoder-decoder",
@@ -143,7 +131,7 @@ export const steps: LessonStep[] = [
     tryIt: "Press `Next token` to watch the decoder write the output while looking back at the encoded input.",
     keyTakeaway: "Encoder-decoder: read the whole input first, then generate an output that attends back to it.",
     view: "encdec",
-    deep: encoderDecoder,
+    deep: true,
   },
   {
     id: "representation-vs-generative",
@@ -157,7 +145,7 @@ export const steps: LessonStep[] = [
     tryIt: "Type a review and see which description MiniLM finds closer. Then read the generative version.",
     keyTakeaway: "Representation models give vectors to compute with; generative models give text. Many systems use both.",
     view: "repgen",
-    deep: representationVsGenerative,
+    deep: true,
   },
   {
     id: "pretraining-finetuning",
@@ -172,7 +160,7 @@ export const steps: LessonStep[] = [
     keyTakeaway: "Pre-train once on raw text (next-token or masked-word prediction), then fine-tune cheaply for each task.",
     callout: "BERT-Base: 12 layers, 768 hidden size, 12 heads, 110M parameters",
     view: "training",
-    deep: pretrainingFinetuning,
+    deep: true,
   },
   {
     id: "recap",
@@ -185,6 +173,6 @@ export const steps: LessonStep[] = [
     tryIt: "Before moving on, explain the loop on the right in your own words. Then take the Challenge.",
     keyTakeaway: "Every later module zooms into one link of this loop, or uses the whole loop for a real task.",
     view: "recap",
-    deep: recap,
+    deep: true,
   },
 ];

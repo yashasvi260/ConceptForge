@@ -10,8 +10,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { validateDeep } from "../../../core/deep";
 import { PYODIDE_CDN } from "../../../py/program";
 import { runInPyodide } from "../../../py/runCore";
-import { deepData } from "./data";
 import { steps } from "../steps";
+import { content } from ".";
+
+const deepData = content.data;
 
 /** Steps converted so far; the last content task asserts this is all 12. */
 const DEEP_STEPS = ["big-picture", "anatomy", "how-large", "train-vs-use", "bag-of-words", "dense-embeddings", "context", "architectures", "encoder-decoder", "representation-vs-generative", "pretraining-finetuning", "recap"];
@@ -39,10 +41,11 @@ function runScript(src: string): string {
   return out;
 }
 
+/** Each converted step with its loaded lesson attached, so the checks below read `step.deep!`. */
 const deepSteps = DEEP_STEPS.map((id) => {
   const s = steps.find((x) => x.id === id);
   if (!s) throw new Error(`no step ${id}`);
-  return s;
+  return { ...s, deep: content.lessons[id] };
 });
 
 describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, step) => {
@@ -51,7 +54,7 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
     expect(validateDeep(step.deep!)).toEqual([]);
   });
 
-  it("each exercise solution passes and each starter does not", async () => {
+  it("each exercise solution passes and each starter fails its checks without crashing", async () => {
     const ex = step.deep!.build;
     const data = ex.data ? deepData[ex.data] : null;
     if (ex.data) expect(data, `deepData.${ex.data}`).toBeDefined();
@@ -61,7 +64,8 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
       const good = await runInPyodide(py, { ...base, learnerCode: part.solution });
       expect(good, `${part.id} solution`).toMatchObject({ status: "pass", error: null });
       const starter = await runInPyodide(py, { ...base, learnerCode: part.starter });
-      expect(starter.status, `${part.id} starter must not pass`).not.toBe("pass");
+      // The untouched starter runs without crashing and fails its checks, so a first Run shows what to fix.
+      expect(starter, `${part.id} starter must fail its checks cleanly`).toMatchObject({ status: "fail", error: null });
     }
   }, 60_000);
 
@@ -88,7 +92,7 @@ const CAPTURED = import.meta.glob("./local-outputs.json", { import: "default", e
 
 describe("run-it-locally listings", () => {
   const captured = CAPTURED["./local-outputs.json"] ?? {};
-  const listings = steps.flatMap((s) => (s.deep?.local ?? []).map((l) => [s.id, l] as const));
+  const listings = Object.entries(content.lessons).flatMap(([sid, d]) => d.local.map((l) => [sid, l] as const));
 
   it("the four planned listings are attached", () => {
     expect(listings.map(([, l]) => l.id).sort()).toEqual(["context", "dense", "encdec", "repgen"]);
@@ -109,7 +113,9 @@ describe("run-it-locally listings", () => {
 describe("Module 01 coverage", () => {
   it("every step is a deep lesson, and each exercise id is unique", () => {
     expect(DEEP_STEPS).toEqual(steps.map((s) => s.id));
-    const ids = steps.map((s) => s.deep!.build.id);
+    expect(steps.every((s) => s.deep === true)).toBe(true);
+    expect(Object.keys(content.lessons).sort()).toEqual([...DEEP_STEPS].sort());
+    const ids = Object.values(content.lessons).map((d) => d.build.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 });

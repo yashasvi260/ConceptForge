@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App, { AUTOPLAY_MS } from "./App";
 import { SUBJECTS } from "./core/registry";
 import { LAST_SUBJECT_KEY, PROGRESS_KEY } from "./core/storage";
+import type { DeepLesson, SubjectModule } from "./core/types";
+import { resetDeepCache } from "./core/useDeepContent";
 
 const first = SUBJECTS[0]!;
 const second = SUBJECTS[1]!;
@@ -206,7 +208,7 @@ describe("App shell: module player", () => {
   it("up next card opens the next built module at step 1", async () => {
     window.location.hash = `#/${first.id}/3`;
     render(<App />);
-    const card = screen.getByRole("region", { name: "Up next in syllabus" });
+    const card = await screen.findByRole("region", { name: "Up next in syllabus" });
     expect(card).toHaveTextContent(`02. ${second.title}`);
     await userEvent.click(within(card).getByRole("button", { name: "Next module →" }));
     expect(await screen.findByRole("heading", { level: 2, name: second.steps[0]!.title })).toBeInTheDocument();
@@ -254,7 +256,7 @@ describe("App shell: module player", () => {
 
 describe("App shell: deep lesson steps", () => {
   const deepStep = first.steps[0]!;
-  const DEEP = {
+  const DEEP: DeepLesson = {
     why: ["w"],
     worked: [],
     concept: [{ heading: "H", paragraphs: ["p"] }],
@@ -264,28 +266,60 @@ describe("App shell: deep lesson steps", () => {
     checks: [],
     oneSentence: "s",
     deeper: [],
-  } satisfies NonNullable<typeof deepStep.deep>;
-  let saved: typeof deepStep.deep;
+  };
+  let saved: Pick<SubjectModule, "loadDeep">;
+  let savedFlag: boolean | undefined;
+  let loads = 0;
   beforeEach(() => {
-    saved = deepStep.deep;
-    deepStep.deep = DEEP;
+    saved = { loadDeep: first.loadDeep };
+    savedFlag = deepStep.deep;
+    loads = 0;
+    deepStep.deep = true;
+    first.loadDeep = async () => {
+      loads++;
+      return { lessons: { [deepStep.id]: DEEP }, data: {} };
+    };
+    resetDeepCache();
   });
   afterEach(() => {
-    deepStep.deep = saved;
+    first.loadDeep = saved.loadDeep;
+    deepStep.deep = savedFlag;
+    resetDeepCache();
   });
 
-  it("renders a scrolling lesson page instead of the split view, without Auto-Play", () => {
-    openFirst();
+  it("loads the lesson on demand, then renders a scrolling page instead of the split view, without Auto-Play", async () => {
     render(<App />);
-    expect(screen.getByRole("heading", { level: 3, name: "1 · Why it exists" })).toBeInTheDocument();
+    expect(loads).toBe(0); // nothing is fetched on the course page
+    act(() => {
+      window.location.hash = `#/${first.id}/1`;
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("Loading lesson…");
+    expect(await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" })).toBeInTheDocument();
+    expect(loads).toBe(1);
     expect(screen.queryByRole("main", { name: "Interactive stage" })).toBeNull();
     expect(screen.getByRole("region", { name: "Interactive stage" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start auto-play" })).toBeNull();
   });
 
-  it("leaves Space to the browser on a deep step, and arrows still step", () => {
+  it("offers a retry when the lesson fails to load", async () => {
+    let fail = true;
+    first.loadDeep = async () => {
+      if (fail) throw new Error("offline");
+      return { lessons: { [deepStep.id]: DEEP }, data: {} };
+    };
     openFirst();
     render(<App />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't load this lesson");
+    fail = false;
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" })).toBeInTheDocument();
+  });
+
+  it("leaves Space to the browser on a deep step, and arrows still step", async () => {
+    openFirst();
+    render(<App />);
+    await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" });
     const ev = new KeyboardEvent("keydown", { key: " ", code: "Space", cancelable: true });
     window.dispatchEvent(ev);
     expect(ev.defaultPrevented).toBe(false);
@@ -293,10 +327,11 @@ describe("App shell: deep lesson steps", () => {
     expect(screen.getByText(counter(2))).toBeInTheDocument();
   });
 
-  it("marks the step on the step bar once its exercise is passed", () => {
+  it("marks the step on the step bar once its exercise is passed", async () => {
     window.localStorage.setItem("conceptforge:exercises:v1", JSON.stringify({ "deep-test-ex": ["p1"] }));
     openFirst();
     render(<App />);
+    await screen.findByRole("heading", { level: 3, name: "1 · Why it exists" });
     expect(screen.getByRole("button", { name: `Go to step 1: ${deepStep.title}` })).toHaveAttribute("data-passed", "true");
   });
 });

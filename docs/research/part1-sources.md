@@ -36,6 +36,28 @@ Checked 2026-11-25 against the papers' own text (abstracts on arxiv.org, full te
 | Top-k sampling: "randomly sample from the k=10 most likely candidates". | Fan et al. 2018 §5.4 — https://ar5iv.labs.arxiv.org/html/1805.04833 |
 | Nucleus (top-p) sampling: sample "from the dynamic nucleus of the probability distribution", "truncating the less reliable tail". | Holtzman et al. 2020 — https://arxiv.org/abs/1904.09751 |
 
+## Deep lessons (Module 01)
+
+| Claim | Source |
+| --- | --- |
+| Language modelling as P(next token \| previous tokens); one model doing many tasks. | Radford et al. 2019, §2 — https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf |
+| N-gram models, smoothing and perplexity. | Jurafsky & Martin, SLP3 ch. 3 — https://web.stanford.edu/~jurafsky/slp3/3.pdf |
+| Term-document matrices, cosine, TF-IDF. | Jurafsky & Martin, SLP3 ch. 6 — https://web.stanford.edu/~jurafsky/slp3/6.pdf |
+| Scaled dot-product attention; encoder, decoder and encoder-decoder attention. | Vaswani et al. 2017, §3.1–3.2 — https://arxiv.org/abs/1706.03762 |
+| N ≈ 12·L·d² for the blocks; forward ≈ 2N and training ≈ 6N FLOPs per token. | Kaplan et al. 2020, §2.1 — https://arxiv.org/abs/2001.08361 |
+| Llama 3 8B: 32 layers, width 4,096, FFN 14,336, 32 heads, 8 KV heads; 15T+ training tokens. | Meta 2024, Table 3 and §3 — https://arxiv.org/abs/2407.21783 |
+| Compute-optimal training: most earlier models were too large for their data. | Hoffmann et al. 2022 (Chinchilla) — https://arxiv.org/abs/2203.15556 |
+| word2vec word vectors. | Mikolov et al. 2013 — https://arxiv.org/abs/1301.3781 |
+| Sentence embeddings trained on pairs with mean pooling. | Reimers & Gurevych 2019 — https://arxiv.org/abs/1908.10084 |
+| Contextual word vectors. | Peters et al. 2018 — https://arxiv.org/abs/1802.05365; Ethayarajh 2019 — https://arxiv.org/abs/1909.00512 |
+| Attention as soft alignment in translation. | Bahdanau et al. 2015 — https://arxiv.org/abs/1409.0473 |
+| InstructGPT: SFT ≈ 13k prompts, reward model ≈ 33k; 1.3B InstructGPT preferred to 175B GPT-3. | Ouyang et al. 2022 — https://arxiv.org/abs/2203.02155 |
+| LoRA: train small added matrices, freeze the original weights. | Hu et al. 2021 — https://arxiv.org/abs/2106.09685 |
+| T5-small ≈ 60M parameters; text-to-text with task prefixes. | Raffel et al. 2020 — https://arxiv.org/abs/1910.10683 (count printed by `deep/local/encdec.py`) |
+
+All numbers in worked examples are printed by `src/subjects/01-intro-llms/deep/worked/*.py`; MiniLM values come from
+the real model (`scripts/make-embedding-fixtures.mjs --deep-out`).
+
 ## Labelled as illustrative in the lessons
 
 - Attention patterns (hand-designed heads) and next-token logits: a generative model is too heavy for the browser.

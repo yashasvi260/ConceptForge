@@ -34,7 +34,7 @@ const DEEP: DeepLesson = {
 };
 
 const subject = SUBJECTS[0]!;
-const step: LessonStep = { id: "s", title: "Anatomy of an LLM", summary: "The short version.", body: [], view: "x", deep: DEEP };
+const step: LessonStep = { id: "s", title: "Anatomy of an LLM", summary: "The short version.", body: [], view: "x", deep: true };
 
 function renderPage() {
   return render(
@@ -42,6 +42,7 @@ function renderPage() {
       <DeepLessonPage
         subject={subject}
         step={step}
+        lesson={DEEP}
         stepIndex={1}
         total={12}
         isBuilt={() => true}

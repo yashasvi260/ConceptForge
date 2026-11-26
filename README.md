@@ -10,7 +10,7 @@ menu as "coming soon".
 
 | Part | Module | Status / what you can play with |
 | --- | --- | --- |
-| I · Understanding Language Models | **01 Introduction to Language Models** | The LLM loop and track map; anatomy of an LLM; what "large" means (exact parameter counts of GPT-2, Llama 3 8B, GPT-3); training vs using; Bag-of-Words vs real embeddings; encoder/decoder/encoder-decoder visibility; pre-training (next-token, BERT masking) vs fine-tuning |
+| I · Understanding Language Models | **01 Introduction to Language Models** | **Deep lessons**: 12 long-form steps (why → worked example → concept with the live view → **Build it** in Python in the page → check → one sentence), ending in a mini-project that builds a tiny language model end to end. Covers the LLM loop, anatomy, exact parameter counts (GPT-2, Llama 3 8B, GPT-3), training vs using, Bag-of-Words, real MiniLM embeddings, context, the three families, cross-attention, representation vs generative, pre-training vs fine-tuning |
 | | **02 Tokens and Embeddings** | Real GPT-4o/GPT-4 tokenizers, BPE trainer, real BERT WordPiece, SentencePiece, special tokens, token tax; embedding lookup, contextual "bank" shift, mean pooling, similarity matrix, semantic search |
 | | **03 Looking Inside LLMs** | Sinusoidal vs RoPE, Q/K/V and √d, attention arcs + heatmap + causal mask, multi-head, GQA, LayerNorm/RMSNorm, GELU/SwiGLU, logits, decoding, KV cache |
 | II · Using Pretrained Language Models | **04 Text Classification** | 60 bank tickets: a classifier head trained live on MiniLM vectors, zero-shot with editable label descriptions, gemma4 by prompting (recorded, with real token probabilities); 3-way comparator |
@@ -31,6 +31,22 @@ with their model, temperature and date. If you run Ollama yourself, **Connect my
 runs your own prompts live. The site never contacts Ollama until you click it; if the browser blocks the call, start
 Ollama with `OLLAMA_ORIGINS` set to the site's origin (e.g. `https://yashasvi260.github.io`).
 Every specific fact is checked against primary sources; see `docs/research/`.
+
+**Deep lessons: understand it, then build it (Module 01).** A step with a `deep` field renders as one scrolling page
+with six sections. Its **Build it** exercise is real Python, run in the page by [Pyodide](https://pyodide.org)
+(`314.0.7`, loaded from jsDelivr on the first press of Run, about 10 MB, in a Web Worker with a 10-second limit per
+run). The learner edits starter code with `TODO`s; private checks (which learner code cannot overwrite) say pass or
+fail; hints and the solution are a click away. Three rules keep it honest, and tests enforce all three:
+
+- every exercise's **solution passes** its checks and its **starter does not** (`deep/deep.test.ts` runs them in
+  Pyodide under Node);
+- every worked-example table equals what its script in `deep/worked/` prints;
+- every **Run it locally** listing (PyTorch, transformers, sentence-transformers, Ollama) shows the output of a real
+  run: `OLLAMA_URL=http://<host>:11434 node scripts/capture-local-outputs.mjs` reruns them in Docker
+  (`python:3.12-slim`, pinned packages) and the test fails if a listing's code changed without a new capture.
+
+`src/core/deep.ts` enforces the depth standard (why 150–450 words, concept 700–1,700, a common mistake, 2–3 checks,
+1–3 https sources). Content coverage is tracked in `docs/research/module01-coverage.md`.
 
 ## Running it
 

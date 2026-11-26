@@ -25,8 +25,9 @@ export interface LessonStep {
   section?: string;
   /** Formula or metric shown in a monospace callout (e.g. "softmax(QKᵀ/√d)·V"). */
   callout?: string;
-  /** Six-section deep lesson; when present the player renders a scrolling lesson page. */
-  deep?: DeepLesson;
+  /** True for a six-section deep lesson: the player renders a scrolling lesson page whose content
+   *  comes from the subject's `loadDeep()` (loaded on demand, so lesson text stays out of the main bundle). */
+  deep?: boolean;
 }
 
 export type WorkedBlock =
@@ -80,6 +81,13 @@ export interface SourceLink {
   label: string;
   url: string;
   adds: string;
+}
+
+/** What a subject's `loadDeep()` returns. */
+export interface DeepContent {
+  lessons: Record<string, DeepLesson>;
+  /** Data injected into Python as DATA, keyed by `Exercise.data`. */
+  data: Record<string, unknown>;
 }
 
 export interface DeepLesson {
@@ -142,8 +150,8 @@ export interface SubjectModule {
    * steps through the lesson, so control state (sliders, toggles) survives step changes.
    */
   Stage: ComponentType<StageProps>;
-  /** Precomputed data for deep-lesson exercises, keyed by `Exercise.data`. */
-  deepData?: Record<string, unknown>;
+  /** Loads the deep lessons (by step id) and their exercise data; required when any step has `deep: true`. */
+  loadDeep?: () => Promise<DeepContent>;
 }
 
 export type PlayerMode = "lesson" | "challenge";
