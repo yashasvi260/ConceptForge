@@ -7,6 +7,7 @@ import { ArchView } from "./views/ArchView";
 import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./views/BigPictureLabs";
 import { BridgeLab, CosineLab, KeywordWinsLab, TfIdfLab, WordOrderLab } from "./views/BowLabs";
 import { BowView } from "./views/BowView";
+import { BankMatrixLab, ContextMixLab, ContextReachLab, SenseByExampleLab, TokenSentenceLab } from "./views/ContextLabs";
 import { ContextView } from "./views/ContextView";
 import { ContrastiveLab, DenseSparseLab, EmbedVsLlmLab, NeighboursLab, PoolingLossLab } from "./views/DenseLabs";
 import { DenseView } from "./views/DenseView";
@@ -97,6 +98,16 @@ export function Stage({ step }: StageProps) {
         return <EmbedVsLlmLab />;
       case "context":
         return <ContextView />;
+      case "bank-matrix":
+        return <BankMatrixLab />;
+      case "context-mix":
+        return <ContextMixLab />;
+      case "context-reach":
+        return <ContextReachLab />;
+      case "token-sentence":
+        return <TokenSentenceLab />;
+      case "sense-by-example":
+        return <SenseByExampleLab />;
       case "arch":
         return <ArchView />;
       case "encdec":
