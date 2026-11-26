@@ -29,8 +29,8 @@ need full deep conversion as well).
 | 02 | vocabulary | yes | 4/4 (vocab, vocab-cost, vocab-buys, add-tokens) | (this commit) |
 | 02 | bpe-training | yes | 4/4 (bpe-train, bpe-compress, pretokenize, merges-curve) | (this commit) |
 | 02 | bpe-encoding | yes | 4/4 (bpe-encode, merge-order, fertility, variants) | (this commit) |
-| 02 | bytes | | | |
-| 02 | wordpiece | | | |
+| 02 | bytes | yes | 4/4 (bytes, byte-tax, byte-standins, stream-decode) | (this commit) |
+| 02 | wordpiece | yes | 4/4 (wordpiece, wp-unk, wp-score, wp-fertility) | (this commit) |
 | 02 | sentencepiece | | | |
 | 02 | special-tokens | | | |
 | 02 | playground | | | |

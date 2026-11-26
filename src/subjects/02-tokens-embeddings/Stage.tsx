@@ -16,6 +16,7 @@ import { QuirksView } from "./views/QuirksView";
 import { SpecialTokensView } from "./views/SpecialTokensView";
 import { UnigramView } from "./views/UnigramView";
 import { BpeCompressLab, FertilityLab, MergeOrderLab, MergesCurveLab, PretokenizeLab, VariantsLab } from "./views/labs/BpeLabs";
+import { ByteStandinsLab, ByteTaxLab, StreamDecodeLab, WpFertilityLab, WpScoreLab, WpUnkLab } from "./views/labs/BytesWordPieceLabs";
 import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
@@ -92,6 +93,18 @@ export function Stage({ step }: StageProps) {
         return <FertilityLab />;
       case "variants":
         return <VariantsLab />;
+      case "byte-tax":
+        return <ByteTaxLab />;
+      case "byte-standins":
+        return <ByteStandinsLab />;
+      case "stream-decode":
+        return <StreamDecodeLab />;
+      case "wp-unk":
+        return <WpUnkLab />;
+      case "wp-score":
+        return <WpScoreLab />;
+      case "wp-fertility":
+        return <WpFertilityLab />;
       default:
         return (
           <Panel>
