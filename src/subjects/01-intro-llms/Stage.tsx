@@ -12,6 +12,7 @@ import { BankMatrixLab, ContextMixLab, ContextReachLab, SenseByExampleLab, Token
 import { ContextView } from "./views/ContextView";
 import { ContrastiveLab, DenseSparseLab, EmbedVsLlmLab, NeighboursLab, PoolingLossLab } from "./views/DenseLabs";
 import { DenseView } from "./views/DenseView";
+import { CrossAttentionLab, DecoderOnlyLab, EncDecCostLab, T5RunLab, TeacherForcingLab, TwoStacksLab } from "./views/EncDecLabs";
 import { EncDecView } from "./views/EncDecView";
 import { GenerationLabView } from "./views/GenerationLabView";
 import { DataVsSizeLab, MemoryLab, NeuronLab, ParamCalcLab } from "./views/HowLargeLabs";
@@ -123,6 +124,18 @@ export function Stage({ step }: StageProps) {
         return <ModelCardLab />;
       case "encdec":
         return <EncDecView />;
+      case "two-stacks":
+        return <TwoStacksLab />;
+      case "cross-attention":
+        return <CrossAttentionLab />;
+      case "teacher-forcing":
+        return <TeacherForcingLab />;
+      case "encdec-cost":
+        return <EncDecCostLab />;
+      case "decoder-only":
+        return <DecoderOnlyLab />;
+      case "t5-run":
+        return <T5RunLab />;
       case "repgen":
         return <RepGenView />;
       case "training":
