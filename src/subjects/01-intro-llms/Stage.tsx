@@ -5,6 +5,7 @@ import { AttentionLab, LogitsLab, NormResidualLab, PositionLab, TokenLookupLab }
 import { AnatomyView } from "./views/AnatomyView";
 import { ArchView } from "./views/ArchView";
 import { BigramLab, GuessNextLab, NextTokenTasksLab, TemperatureLab } from "./views/BigPictureLabs";
+import { BridgeLab, CosineLab, KeywordWinsLab, TfIdfLab, WordOrderLab } from "./views/BowLabs";
 import { BowView } from "./views/BowView";
 import { ContextView } from "./views/ContextView";
 import { DenseView } from "./views/DenseView";
@@ -71,6 +72,16 @@ export function Stage({ step }: StageProps) {
         return <ComputeLab />;
       case "bow":
         return <BowView text={sentences} setText={setSentences} />;
+      case "cosine":
+        return <CosineLab />;
+      case "word-order":
+        return <WordOrderLab />;
+      case "tfidf":
+        return <TfIdfLab />;
+      case "keyword-wins":
+        return <KeywordWinsLab />;
+      case "bridge":
+        return <BridgeLab />;
       case "dense":
         return <DenseView text={sentences} setText={setSentences} />;
       case "context":
