@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
-/** Renders text with `inline code` and **bold** spans. */
+/** Renders text with `inline code`, **bold** and *italic* spans (italic needs no space just inside the stars). */
 export function RichText({ text }: { text: string }) {
-  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*\s](?:[^*]*[^*\s])?\*)/g);
   return (
     <>
       {parts.map((part, i) => {
@@ -19,6 +19,9 @@ export function RichText({ text }: { text: string }) {
               {part.slice(2, -2)}
             </strong>
           );
+        }
+        if (part.length > 2 && part.startsWith("*") && part.endsWith("*")) {
+          return <em key={i}>{part.slice(1, -1)}</em>;
         }
         return <span key={i}>{part}</span>;
       })}
