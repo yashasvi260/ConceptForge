@@ -241,6 +241,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "sentence-embeddings",
+    deep: true,
     title: "Sentence vectors and similarity",
     summary: "Average the token vectors and you get one vector for the whole sentence.",
     body: [

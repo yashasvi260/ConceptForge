@@ -6,6 +6,7 @@ import { deepData } from "./data";
 import { lookupTable } from "./lookup-table";
 import { playground } from "./playground";
 import { quirks } from "./quirks";
+import { sentenceEmbeddings } from "./sentence-embeddings";
 import { sentencepiece } from "./sentencepiece";
 import { specialTokens } from "./special-tokens";
 import { staticVsContextual } from "./static-vs-contextual";
@@ -28,6 +29,7 @@ export const content: DeepContent = {
     quirks,
     "lookup-table": lookupTable,
     "static-vs-contextual": staticVsContextual,
+    "sentence-embeddings": sentenceEmbeddings,
   },
   data: deepData,
 };
