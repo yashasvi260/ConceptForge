@@ -11,6 +11,8 @@ import { PYODIDE_CDN } from "../../../py/program";
 import { runInPyodide } from "../../../py/runCore";
 import { encodeBpe, trainBpe } from "../bpe";
 import { steps } from "../steps";
+import { encodeWordPiece, parseVocab } from "../wordpiece";
+import bertVocabText from "../data/bert-base-uncased-vocab.txt?raw";
 import { LANGUAGE_SAMPLES } from "../views/LanguagesView";
 import { content } from ".";
 
@@ -113,6 +115,19 @@ describe("wrong answers fail", () => {
 });
 
 describe("generated data matches the page", () => {
+  it("the WordPiece slice is exact: the exercise splits every word like the page does with BERT's full vocabulary", () => {
+    const full = parseVocab(bertVocabText);
+    const wp = deepData.wordpiece as { words: string[]; vocab: Record<string, number> };
+    const sol = content.lessons.wordpiece!.build.parts[0]!.solution.replace(/\nfor w in[\s\S]*$/, "");
+    const globals = py.toPy({});
+    globals.set("_wp", JSON.stringify(wp));
+    py.runPython(`import json\nDATA = json.loads(_wp)\n${sol}`, { globals });
+    for (const w of wp.words) {
+      const got = (py.runPython(`longest_match(${JSON.stringify(w)}, VOCAB)`, { globals }) as { toJs: () => string[] }).toJs();
+      expect(got, w).toEqual(encodeWordPiece(w, full).tokens.map((t) => t.text));
+    }
+  });
+
   it("the BPE encoding exercise splits words exactly like the page's encoder", () => {
     const parts = content.lessons["bpe-encoding"]!.build.parts.map((p) => p.solution.replace(/\n(for w in|toks = encode_text)[\s\S]*$/, "")).join("\n\n");
     const merges = trainBpe(String((deepData.bpe as { corpus: string }).corpus), 10).merges;

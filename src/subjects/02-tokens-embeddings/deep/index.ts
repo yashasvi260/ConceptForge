@@ -5,6 +5,7 @@ import { bytesLesson } from "./bytes";
 import { deepData } from "./data";
 import { vocabulary } from "./vocabulary";
 import { whyNumbers } from "./why-numbers";
+import { wordpiece } from "./wordpiece";
 
 /** Module 02's deep lessons by step id, loaded on demand (see index.ts loadDeep). */
 export const content: DeepContent = {
@@ -14,6 +15,7 @@ export const content: DeepContent = {
     "bpe-training": bpeTraining,
     "bpe-encoding": bpeEncoding,
     bytes: bytesLesson,
+    wordpiece,
   },
   data: deepData,
 };

@@ -22,6 +22,8 @@ export const deepData: Record<string, unknown> = {
   models,
   /** The BPE steps' corpus: the same Sennrich et al. (2016) example the BPE views start with. */
   bpe: { corpus: DEFAULT_CORPUS, merges: trainBpe(DEFAULT_CORPUS, 10).merges.map((m) => m.pair) },
+  /** Step 6's exercise data: a slice of BERT's vocabulary that is exact for its words, plus the BPE corpus. */
+  wordpiece: { ...tokens.wordpiece, corpus: DEFAULT_CORPUS },
   /** Step 2's exercise data: real vocabulary sizes, BERT ids and model sizes. */
   vocab: { sizes: tokens.vocab_sizes, bert_ids: tokens.bert_ids, models },
 };

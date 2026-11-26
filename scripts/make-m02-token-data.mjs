@@ -27,7 +27,20 @@ const BERT_WORDS = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", "the", "bank",
 /** Tokens as raw bytes: some tokens hold only part of a character (step 5). */
 const BYTE_TEXTS = ["é", "🤖", "आज मौसम"];
 const byteTokens = (e, text) => e.encode(text).map((id) => ({ id, bytes: [...e.textMap.get(id)] }));
+/** Every BERT entry greedy longest-match could try on these words, so a slice gives the same pieces as the full vocabulary. */
+const WP_WORDS = ["huggingface", "unaffable", "tokenization", "embeddings", "playing", "unbelievably", "cafe", "kubernetes", "transformers", "xylophone"];
+const bertIndex = new Map(bertVocab.map((t, i) => [t, i]));
+const wpSlice = {};
+for (const sp of ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"]) wpSlice[sp] = bertIndex.get(sp);
+for (const w of WP_WORDS) {
+  const ch = [...w];
+  for (let i = 0; i < ch.length; i++) for (let j = i + 1; j <= ch.length; j++) {
+    const sub = (i > 0 ? "##" : "") + ch.slice(i, j).join("");
+    if (bertIndex.has(sub)) wpSlice[sub] = bertIndex.get(sub);
+  }
+}
 const out = {
+  wordpiece: { words: WP_WORDS, vocab: wpSlice },
   byte_tokens: Object.fromEntries(BYTE_TEXTS.map((t) => [t, { cl100k_base: byteTokens(enc.cl100k_base, t), o200k_base: byteTokens(enc.o200k_base, t) }])),
   vocab_sizes: { cl100k_base: nVocab(cl100k), o200k_base: nVocab(o200k), bert_base_uncased: bertVocab.length },
   bert_ids: Object.fromEntries(BERT_WORDS.map((w) => [w, bertVocab.indexOf(w)])),

@@ -95,6 +95,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "wordpiece",
+    deep: true,
     title: "WordPiece (BERT)",
     summary: "BERT's tokenizer keeps only a vocabulary and always grabs the longest piece it knows, marking word continuations with `##`.",
     body: [
