@@ -23,6 +23,7 @@ const subject: SubjectModule = {
   accent: "sky",
   steps,
   challenges,
+  loadDeep: () => import("./deep").then((m) => m.content),
   Stage,
 };
 

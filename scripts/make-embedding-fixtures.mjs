@@ -55,6 +55,48 @@ if (opt("deep-out")) {
   process.exit(0);
 }
 
+// Module 02 deep-lesson mode: per-token vectors (with [CLS]/[SEP]) and the official sentence vector for two
+// sentences, the four "bank" token vectors, and a labelled search set. 4 decimals.
+//   node scripts/make-embedding-fixtures.mjs --m02-out src/subjects/02-tokens-embeddings/deep/data/minilm.json
+const POOL_SENTENCES = ["The bank approved the loan", "I forgot my login details"];
+const SEARCH_DOCS = [
+  "How do I reset my password?", "I forgot my login details", "My card was charged twice", "I see a payment I don't recognise",
+  "How do I send money abroad?", "What is the interest rate on my mortgage?", "How do I order a new debit card?",
+  "Can I increase my credit card limit?", "Where can I find my account number?", "How do I close my savings account?",
+  "What are your branch opening hours?", "How do I set up a direct debit?",
+];
+const SEARCH_QUERIES = [
+  ["I can't sign in to my account", 1], ["Somebody took money from me without asking", 3], ["transfer funds to another country", 4],
+  ["my debit card is lost, I need a replacement", 6], ["when is the branch open on Saturday", 10], ["I was billed two times for one purchase", 2],
+];
+if (opt("m02-out")) {
+  const r4 = (v) => v.map((x) => Math.round(x * 1e4) / 1e4);
+  const pool = {};
+  for (const t of POOL_SENTENCES) {
+    const all = (await pipe(t, { pooling: "none" })).tolist()[0];
+    const ids = pipe.tokenizer.encode(t);
+    const tokens = ["[CLS]", ...pipe.tokenizer.tokenize(t), "[SEP]"];
+    if (ids.length !== tokens.length || all.length !== tokens.length) throw new Error(`token count mismatch for ${t}`);
+    const sentence = (await pipe(t, { pooling: "mean", normalize: true })).tolist()[0];
+    pool[t] = { tokens, ids, vectors: all.map(r4), sentence: r4(sentence) };
+  }
+  const bank = {};
+  for (const t of BANK_SENTENCES) {
+    const rows = (await pipe(t, { pooling: "none" })).tolist()[0].slice(1, -1);
+    const i = pipe.tokenizer.tokenize(t).indexOf("bank");
+    bank[t] = r4(rows[i]);
+  }
+  const emb = async (texts) => (await pipe(texts, { pooling: "mean", normalize: true })).tolist().map(r4);
+  const search = {
+    docs: SEARCH_DOCS, doc_vectors: await emb(SEARCH_DOCS),
+    queries: SEARCH_QUERIES.map(([q]) => q), query_vectors: await emb(SEARCH_QUERIES.map(([q]) => q)),
+    answers: SEARCH_QUERIES.map(([, i]) => i),
+  };
+  writeFileSync(opt("m02-out"), JSON.stringify({ model: "Xenova/all-MiniLM-L6-v2 q8", pool, bank, search }));
+  console.log(`wrote pooling data for ${POOL_SENTENCES.length} sentences, ${BANK_SENTENCES.length} bank vectors, ${SEARCH_DOCS.length} docs / ${SEARCH_QUERIES.length} queries to ${opt("m02-out")}`);
+  process.exit(0);
+}
+
 const SENTENCES = [
   "The film was great", "The movie was excellent", "Interest rates rose today", "Dog bites man", "Man bites dog",
   "This is a positive review.", "This is a negative review.", "This movie was fantastic, I loved every minute!",

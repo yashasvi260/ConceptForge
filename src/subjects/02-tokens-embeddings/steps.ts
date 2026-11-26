@@ -7,6 +7,7 @@ import type { LessonStep } from "../../core/types";
 export const steps: LessonStep[] = [
   {
     id: "why-numbers",
+    deep: true,
     title: "Why tokens: three ways to chop text",
     summary: "A language model is a giant calculator, and calculators can't read. Text has to become numbers first.",
     body: [
