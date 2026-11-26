@@ -94,6 +94,10 @@ const WRONG: [step: string, part: string, code: string][] = [
   // Forgets biases, the position table and the final norm: must not match the published totals.
   ["forward-pass", "p2", 'M = {m["name"]: m for m in DATA["models"]}\ndef gpt2_block_params(d, f):\n    return 4 * d * d, 2 * d * f, 2 * d\ndef gpt2_total(cfg):\n    d = cfg["d_model"]\n    return cfg["vocab"] * d + cfg["layers"] * sum(gpt2_block_params(d, cfg["ffn"]))'],
   // Shifts instead of rotating: lengths change and scores depend on absolute position.
+  // Forgets the √d scaling.
+  ["qkv", "p2", "import numpy as np\ndef scores(Q, K):\n    return Q @ K.T\ndef softmax_rows(S):\n    e = np.exp(S - S.max(axis=1, keepdims=True))\n    return e / e.sum(axis=1, keepdims=True)"],
+  // Masks after the softmax by zeroing: rows no longer sum to 1.
+  ["self-attention", "p1", "import numpy as np\nATTN = np.array(DATA['gpt2']['sentences'][0]['attn'])\ndef causal_softmax(S):\n    S = np.array(S, dtype=float)\n    e = np.exp(S - S.max(axis=1, keepdims=True))\n    W = e / e.sum(axis=1, keepdims=True)\n    return np.tril(W)\ndef is_causal(W):\n    return bool(np.all(np.triu(np.asarray(W), k=1) == 0))"],
   ["positional", "p2", "import numpy as np\ndef rope(x, pos):\n    return np.asarray(x, dtype=float) + pos"],
 ];
 

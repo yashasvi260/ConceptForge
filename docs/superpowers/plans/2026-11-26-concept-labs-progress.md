@@ -66,10 +66,10 @@ first-token norm grows 10 â†’ ~3,100; position neighbours 0.997, distance 256 â†
 
 | module | lesson | deep | labs | commit |
 | --- | --- | --- | --- | --- |
-| 03 | forward-pass | yes | 3/3 (forward, shapes, block-params) | (this commit) |
-| 03 | positional | yes | 4/4 (shuffle, positional, learned-pos, rope-relative) | (this commit) |
-| 03 | qkv | | | |
-| 03 | self-attention | | | |
+| 03 | forward-pass | yes | 3/3 (forward, shapes, block-params) | 0292a7d |
+| 03 | positional | yes | 4/4 (shuffle, positional, learned-pos, rope-relative) | 0292a7d |
+| 03 | qkv | yes | 4/4 (qkv-project, qkv, sqrt-d, value-mix) | (this commit) |
+| 03 | self-attention | yes | 4/4 (real-heads, attention, head-finder, attn-cost) | (this commit) |
 | 03 | multi-head | | | |
 | 03 | gqa | | | |
 | 03 | residual-norm | | | |

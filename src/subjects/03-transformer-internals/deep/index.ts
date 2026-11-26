@@ -2,12 +2,16 @@ import type { DeepContent } from "../../../core/types";
 import { deepData } from "./data";
 import { forwardPass } from "./forward-pass";
 import { positional } from "./positional";
+import { qkv } from "./qkv";
+import { selfAttention } from "./self-attention";
 
 /** Module 03's deep lessons by step id, loaded on demand (see index.ts loadDeep). */
 export const content: DeepContent = {
   lessons: {
     "forward-pass": forwardPass,
     positional,
+    qkv,
+    "self-attention": selfAttention,
   },
   data: deepData,
 };

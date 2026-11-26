@@ -34,6 +34,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "qkv",
+    deep: true,
     title: "Queries, keys and values",
     summary: "Each token asks a question (query), advertises what it contains (key), and carries a message (value).",
     body: [
@@ -48,6 +49,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "self-attention",
+    deep: true,
     title: "Self-attention in action",
     summary: "Every token looks at the others and pulls in what it needs, and a decoder may only look backwards.",
     body: [

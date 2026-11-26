@@ -4,6 +4,7 @@ import type { StageProps } from "../../core/types";
 import { tokenizeWords } from "./attention";
 import { AttentionView, MultiHeadView, QkvView, type AttentionState } from "./views/AttentionViews";
 import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } from "./views/InternalsViews";
+import { AttnCostLab, HeadFinderLab, QkvProjectLab, RealHeadsLab, SqrtDLab, ValueMixLab } from "./views/labs/AttentionLabs";
 import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
@@ -45,6 +46,18 @@ export function Stage({ step }: StageProps) {
         return <LearnedPosLab />;
       case "rope-relative":
         return <RopeRelativeLab />;
+      case "qkv-project":
+        return <QkvProjectLab />;
+      case "sqrt-d":
+        return <SqrtDLab />;
+      case "value-mix":
+        return <ValueMixLab />;
+      case "real-heads":
+        return <RealHeadsLab />;
+      case "head-finder":
+        return <HeadFinderLab />;
+      case "attn-cost":
+        return <AttnCostLab />;
       case "recap":
         return <RecapView />;
       default:
