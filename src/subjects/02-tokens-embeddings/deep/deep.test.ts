@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { validateDeep } from "../../../core/deep";
 import { PYODIDE_CDN } from "../../../py/program";
 import { runInPyodide } from "../../../py/runCore";
-import { trainBpe } from "../bpe";
+import { encodeBpe, trainBpe } from "../bpe";
 import { steps } from "../steps";
 import { LANGUAGE_SAMPLES } from "../views/LanguagesView";
 import { content } from ".";
@@ -112,6 +112,18 @@ describe("wrong answers fail", () => {
 });
 
 describe("generated data matches the page", () => {
+  it("the BPE encoding exercise splits words exactly like the page's encoder", () => {
+    const parts = content.lessons["bpe-encoding"]!.build.parts.map((p) => p.solution.replace(/\n(for w in|toks = encode_text)[\s\S]*$/, "")).join("\n\n");
+    const merges = trainBpe(String((deepData.bpe as { corpus: string }).corpus), 10).merges;
+    const globals = py.toPy({});
+    globals.set("_merges", JSON.stringify(merges.map((m) => m.pair)));
+    py.runPython(`import json\nDATA = {"merges": json.loads(_merges)}\n${parts}`, { globals });
+    for (const w of ["lowest", "newer", "slowly", "wider", "newest", "lower", "widest", "flower", "lowlow"]) {
+      const got = (py.runPython(`encode_by_rank(${JSON.stringify(w)}, MERGES)`, { globals }) as { toJs: () => string[] }).toJs();
+      expect(got, w).toEqual(encodeBpe(w, merges).tokens);
+    }
+  });
+
   it("the BPE exercise's solution learns the same merges as the page's trainer, on another corpus too", () => {
     const parts = content.lessons["bpe-training"]!.build.parts.map((p) => p.solution.replace(/\nmerges = train_bpe[\s\S]*$|\nwords = start_words[\s\S]*$/, "")).join("\n\n");
     const corpus = "the quick brown fox jumps over the lazy dog the dog barks and the fox runs";

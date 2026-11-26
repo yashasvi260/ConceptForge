@@ -65,6 +65,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "bpe-encoding",
+    deep: true,
     title: "BPE: tokenizing new words",
     summary: "To tokenize text, BPE replays the merges it learned, in the same order it learned them.",
     body: [

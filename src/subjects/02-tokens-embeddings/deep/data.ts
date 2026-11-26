@@ -1,4 +1,5 @@
 import { MODEL_CONFIGS, paramBreakdown } from "../../01-intro-llms/modelConfigs";
+import { trainBpe } from "../bpe";
 import { DEFAULT_CORPUS } from "../Stage";
 import minilm from "./data/minilm.json";
 import tokens from "./data/tokens.json";
@@ -20,7 +21,7 @@ export const deepData: Record<string, unknown> = {
   tokens,
   models,
   /** The BPE steps' corpus: the same Sennrich et al. (2016) example the BPE views start with. */
-  bpe: { corpus: DEFAULT_CORPUS },
+  bpe: { corpus: DEFAULT_CORPUS, merges: trainBpe(DEFAULT_CORPUS, 10).merges.map((m) => m.pair) },
   /** Step 2's exercise data: real vocabulary sizes, BERT ids and model sizes. */
   vocab: { sizes: tokens.vocab_sizes, bert_ids: tokens.bert_ids, models },
 };

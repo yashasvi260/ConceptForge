@@ -1,4 +1,5 @@
 import type { DeepContent } from "../../../core/types";
+import { bpeEncoding } from "./bpe-encoding";
 import { bpeTraining } from "./bpe-training";
 import { deepData } from "./data";
 import { vocabulary } from "./vocabulary";
@@ -10,6 +11,7 @@ export const content: DeepContent = {
     "why-numbers": whyNumbers,
     vocabulary,
     "bpe-training": bpeTraining,
+    "bpe-encoding": bpeEncoding,
   },
   data: deepData,
 };
