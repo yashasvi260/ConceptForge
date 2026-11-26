@@ -166,4 +166,32 @@ describe("CodeExercise", () => {
     expect(within(part(1)).getByText("Passed")).toBeInTheDocument();
     expect(within(part(2)).queryByText("Passed")).toBeNull();
   });
+
+  it("lets keyboard users leave the code box with Esc then Tab, and says so", async () => {
+    setup();
+    const box = within(part(1)).getByLabelText("Code for part 1");
+    expect(box).toHaveAccessibleDescription(/Esc, then Tab/);
+    await userEvent.click(box);
+    await userEvent.keyboard("{Escape}");
+    await userEvent.tab();
+    expect(box).not.toHaveFocus();
+    expect(box).toHaveValue("x = None  # TODO");
+    await userEvent.click(box);
+    await userEvent.tab(); // without Esc, Tab indents again
+    expect(box).toHaveFocus();
+  });
+
+  it("clears the old result when the code is reset or replaced by the solution", async () => {
+    const { calls } = setup();
+    await userEvent.click(within(part(1)).getByRole("button", { name: "Run" }));
+    await act(async () => calls[0]!.resolve(result({ checks: [{ name: "x is two", ok: true, message: "" }] })));
+    expect(within(part(1)).getByText("All checks pass.")).toBeInTheDocument();
+    await userEvent.click(within(part(1)).getByRole("button", { name: "Reset" }));
+    expect(within(part(1)).queryByText("All checks pass.")).toBeNull();
+    await userEvent.click(within(part(1)).getByRole("button", { name: "Run" }));
+    await act(async () => calls[1]!.resolve(result({ status: "fail", checks: [{ name: "x is two", ok: false, message: "m" }] })));
+    vi.spyOn(window, "confirm").mockReturnValueOnce(true);
+    await userEvent.click(within(part(1)).getByRole("button", { name: "Show solution" }));
+    expect(within(part(1)).queryByText("✗ x is two")).toBeNull();
+  });
 });

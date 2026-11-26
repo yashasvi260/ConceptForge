@@ -7,6 +7,8 @@ const PASS: RunResult = { status: "pass", stdout: "", checks: [], error: null };
 
 class FakeWorker implements WorkerLike {
   onmessage: ((e: { data: WorkerReply }) => void) | null = null;
+  onerror: ((e: unknown) => void) | null = null;
+  onmessageerror: ((e: unknown) => void) | null = null;
   terminated = false;
   sent: { id: number; req: RunRequest }[] = [];
   postMessage(m: { id: number; req: RunRequest }) {
@@ -90,5 +92,15 @@ describe("createRunner", () => {
     w.reply({ id: 999, kind: "result", result: { ...PASS, status: "fail" } });
     w.reply({ id: w.sent[0]!.id, kind: "result", result: PASS });
     await expect(p).resolves.toEqual(PASS);
+  });
+
+  it("reports a load error at once if the worker script itself fails, and replaces the worker", async () => {
+    const run = createRunner(spawn, 10_000, 120_000);
+    const p = run(REQ, () => {});
+    workers[0]!.onerror?.(new Event("error"));
+    await expect(p).resolves.toMatchObject({ status: "load-error", error: LOAD_ERROR_MESSAGE });
+    expect(workers[0]!.terminated).toBe(true);
+    run(REQ, () => {});
+    expect(workers).toHaveLength(2);
   });
 });

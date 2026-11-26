@@ -50,6 +50,8 @@ function ExercisePartView({ exercise, part, index, prelude, data, passed, onPass
   const [result, setResult] = useState<RunResult | null>(null);
   const [hintsShown, setHintsShown] = useState(0);
   const boxRef = useRef<HTMLTextAreaElement>(null);
+  /** After Esc, the next Tab leaves the code box instead of indenting (keyboard users can't be trapped). */
+  const tabLeaves = useRef(false);
   const caretRef = useRef<number | null>(null);
   const mounted = useRef(true);
   const reqId = useRef(0);
@@ -86,8 +88,23 @@ function ExercisePartView({ exercise, part, index, prelude, data, passed, onPass
     if (r.status === "pass") onPassed();
   };
 
+  /** Replacing the code (Reset, Show solution) makes the last result meaningless. */
+  const replace = (next: string) => {
+    reqId.current++;
+    setStatus(null);
+    setResult(null);
+    update(next);
+  };
+
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key !== "Tab" || e.shiftKey) return;
+    if (e.key === "Escape") {
+      tabLeaves.current = true;
+      return;
+    }
+    if (e.key !== "Tab" || e.shiftKey || tabLeaves.current) {
+      tabLeaves.current = false;
+      return;
+    }
     e.preventDefault();
     const el = e.currentTarget;
     const { selectionStart: s, selectionEnd: end } = el;
@@ -118,6 +135,7 @@ function ExercisePartView({ exercise, part, index, prelude, data, passed, onPass
       <textarea
         ref={boxRef}
         aria-label={`Code for part ${n}`}
+        aria-describedby={`${key}-keys`}
         value={code}
         spellCheck={false}
         autoCapitalize="off"
@@ -125,14 +143,18 @@ function ExercisePartView({ exercise, part, index, prelude, data, passed, onPass
         onChange={(e) => update(e.target.value)}
         onKeyDown={onKeyDown}
         rows={Math.min(24, Math.max(6, code.split("\n").length + 1))}
+        onBlur={() => (tabLeaves.current = false)}
         className="mt-3 w-full resize-y rounded-lg border border-slate-800 bg-slate-950 p-3 font-mono text-[13px] leading-relaxed text-slate-100 focus:border-cyan-500 focus:outline-none"
       />
+      <p id={`${key}-keys`} className="mt-1 text-[11px] text-slate-500">
+        Tab indents. To leave the code box with the keyboard, press Esc, then Tab.
+      </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button type="button" onClick={onRun} disabled={busy} className={`${btn} border-cyan-600 bg-cyan-500/10 text-cyan-200`}>
           <Play size={12} aria-hidden="true" />
           Run
         </button>
-        <button type="button" onClick={() => update(part.starter)} className={btn}>
+        <button type="button" onClick={() => replace(part.starter)} className={btn}>
           <RotateCcw size={12} aria-hidden="true" />
           Reset
         </button>
@@ -143,7 +165,7 @@ function ExercisePartView({ exercise, part, index, prelude, data, passed, onPass
         <button
           type="button"
           onClick={() => {
-            if (window.confirm("Show the solution? Try a hint first.")) update(part.solution);
+            if (window.confirm("Show the solution? Try a hint first.")) replace(part.solution);
           }}
           className={btn}
         >

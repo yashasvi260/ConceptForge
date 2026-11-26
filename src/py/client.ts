@@ -11,6 +11,9 @@ export interface WorkerLike {
   postMessage(m: { id: number; req: RunRequest }): void;
   terminate(): void;
   onmessage: ((e: { data: WorkerReply }) => void) | null;
+  /** Fires if the worker script can't be fetched or evaluated (for example offline on first Run). */
+  onerror: ((e: unknown) => void) | null;
+  onmessageerror: ((e: unknown) => void) | null;
 }
 
 const LOAD_LIMIT_MS = 120_000;
@@ -34,7 +37,7 @@ export function createRunner(spawn: () => WorkerLike, timeoutMs = TIMEOUT_MS, lo
       let timer = setTimeout(() => finish(failed("load-error", LOAD_ERROR_MESSAGE), true), loadLimitMs);
       const finish = (r: RunResult, kill: boolean) => {
         clearTimeout(timer);
-        w.onmessage = null;
+        w.onmessage = w.onerror = w.onmessageerror = null;
         if (kill) {
           w.terminate();
           if (worker === w) worker = null;
@@ -53,6 +56,7 @@ export function createRunner(spawn: () => WorkerLike, timeoutMs = TIMEOUT_MS, lo
           finish(data.result, data.result.status === "load-error");
         }
       };
+      w.onerror = w.onmessageerror = () => finish(failed("load-error", LOAD_ERROR_MESSAGE), true);
       w.postMessage({ id, req });
     });
 

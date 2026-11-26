@@ -90,6 +90,28 @@ describe.each(deepSteps.map((s) => [s.id, s] as const))("deep lesson %s", (_id, 
 const LOCAL_SRC = import.meta.glob("./local/*.py", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const CAPTURED = import.meta.glob("./local-outputs.json", { import: "default", eager: true }) as Record<string, Record<string, { code: string; output: string; packages: Record<string, string> }>>;
 
+/** Plausible wrong answers that must NOT pass: checks have to test the concept, not just the shape. */
+const WRONG: [step: string, part: string, code: string][] = [
+  ["representation-vs-generative", "p3", "def forward_flops(n_params, n_tokens):\n    return n_params * n_tokens"],
+  ["train-vs-use", "p2", "def predict(w, x):\n    return w + x\n\ndef train_step(w, x, y, lr):\n    return w - lr * 2 * (w * x - y) * x"],
+];
+
+describe("wrong answers fail", () => {
+  it.each(WRONG)("%s %s", async (stepId, partId, code) => {
+    const ex = content.lessons[stepId]!.build;
+    const i = ex.parts.findIndex((p) => p.id === partId);
+    const part = ex.parts[i]!;
+    const r = await runInPyodide(py, {
+      learnerCode: code,
+      prelude: ex.parts.slice(0, i).map((p) => p.solution).join("\n\n"),
+      checks: part.checks,
+      data: ex.data ? deepData[ex.data] : null,
+      packages: ex.packages,
+    });
+    expect(r.status).toBe("fail");
+  });
+});
+
 describe("run-it-locally listings", () => {
   const captured = CAPTURED["./local-outputs.json"] ?? {};
   const listings = Object.entries(content.lessons).flatMap(([sid, d]) => d.local.map((l) => [sid, l] as const));

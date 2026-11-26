@@ -8,7 +8,6 @@ def check_training_approaches_w_3(ns):
         w = ns["train_step"](w, 2.0, 6.0, 0.05)
     assert abs(w - 3) < 1e-3, f"after 50 steps w should be close to 3 (since 3 × 2 = 6), got {w}"
 
-def check_inference_leaves_w_alone(ns):
-    w = 1.8
-    ns["predict"](w, 2.0)
-    assert w == 1.8 and ns["predict"](1.8, 2.0) == ns["predict"](1.8, 2.0), "predict must not change anything"
+def check_inference_just_uses_w(ns):
+    got = ns["predict"](1.8, 2.0)
+    assert abs(got - 3.6) < 1e-12, f"inference computes w × x = 1.8 × 2 = 3.6 and changes nothing; got {got}"

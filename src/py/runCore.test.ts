@@ -85,4 +85,37 @@ describe("runInPyodide", () => {
     const r = await runInPyodide(py, req("import numpy as np\nv = np.ones(3)", { checks, packages: ["numpy"] }));
     expect(r.status).toBe("pass");
   }, 60_000);
+
+  it("undoes learner changes to builtins and modules before the checks and the next run", async () => {
+    const absCheck = `def check_close(ns):\n    assert abs(ns["f"]() - 0.5) < 1e-9, "f() should be 0.5"\n`;
+    await runInPyodide(py, req("import builtins, json\nbuiltins.abs = lambda x: 0\nbuiltins.print = lambda *a, **k: None\njson.dumps = lambda *a, **k: 'x'\nx = 2"));
+    const r = await runInPyodide(py, req("def f():\n    return 123\nprint('visible')", { checks: absCheck }));
+    expect(r.status).toBe("fail");
+    expect(r.stdout).toBe("visible\n");
+    const same = await runInPyodide(py, req("import builtins\nbuiltins.abs = lambda x: 0\ndef f():\n    return 123", { checks: absCheck }));
+    expect(same.status).toBe("fail");
+  });
+
+  it("reports a KeyError inside learner code as an error in their code, not a missing name", async () => {
+    const checks = `def check_lookup(ns):\n    assert ns["f"]() == 1\n`;
+    const r = await runInPyodide(py, req("def f():\n    return {}['zzz']", { checks }));
+    expect(r.checks[0]!.ok).toBe(false);
+    expect(r.checks[0]!.message).toMatch(/^line 2: KeyError/);
+    const missing = await runInPyodide(py, req("y = 1", { checks }));
+    expect(missing.checks[0]!.message).toBe("f is not defined yet");
+  });
+
+  it("undoes a patched numpy function too", async () => {
+    const checks = `import numpy as np\ndef check_close(ns):\n    assert np.allclose(ns["v"], [1, 2]), "v should be [1, 2]"\n`;
+    const r = await runInPyodide(py, req("import numpy as np\nnp.allclose = lambda *a, **k: True\nv = np.array([9, 9])", { checks, packages: ["numpy"] }));
+    expect(r.status).toBe("fail");
+  }, 60_000);
+
+  it("keeps numpy's lazily imported submodules working across runs", async () => {
+    const checks = `import numpy as np\ndef check_rng(ns):\n    assert np.random.default_rng(0).normal(size=2).shape == (2,)\n`;
+    for (let k = 0; k < 2; k++) {
+      const r = await runInPyodide(py, req("import numpy as np\nv = np.random.default_rng(1).normal(size=3)\nw = np.linalg.norm(v)", { checks, packages: ["numpy"] }));
+      expect(r.status).toBe("pass");
+    }
+  }, 60_000);
 });
