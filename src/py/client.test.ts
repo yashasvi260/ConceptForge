@@ -39,8 +39,8 @@ describe("createRunner", () => {
     expect(workers).toHaveLength(0);
     const statuses: string[] = [];
     const p = run(REQ, (s) => statuses.push(s));
-    const w = workers[0];
-    const id = w.sent[0].id;
+    const w = workers[0]!;
+    const id = w.sent[0]!.id;
     w.reply({ id, kind: "status", status: "loading" });
     w.reply({ id, kind: "status", status: "running" });
     w.reply({ id, kind: "result", result: PASS });
@@ -51,26 +51,26 @@ describe("createRunner", () => {
   it("stops a run that exceeds the limit once Python is ready, then uses a fresh worker", async () => {
     const run = createRunner(spawn, 10_000);
     const p = run(REQ, () => {});
-    const w = workers[0];
-    w.reply({ id: w.sent[0].id, kind: "status", status: "running" });
+    const w = workers[0]!;
+    w.reply({ id: w.sent[0]!.id, kind: "status", status: "running" });
     vi.advanceTimersByTime(10_001);
     await expect(p).resolves.toEqual({ status: "timeout", stdout: "", checks: [], error: TIMEOUT_MESSAGE });
     expect(w.terminated).toBe(true);
 
     const p2 = run(REQ, () => {});
     expect(workers).toHaveLength(2);
-    const w2 = workers[1];
-    w2.reply({ id: w2.sent[0].id, kind: "result", result: PASS });
+    const w2 = workers[1]!;
+    w2.reply({ id: w2.sent[0]!.id, kind: "result", result: PASS });
     await expect(p2).resolves.toEqual(PASS);
   });
 
   it("does not count Python's first download against the limit", async () => {
     const run = createRunner(spawn, 10_000);
     const p = run(REQ, () => {});
-    const w = workers[0];
-    w.reply({ id: w.sent[0].id, kind: "status", status: "loading" });
+    const w = workers[0]!;
+    w.reply({ id: w.sent[0]!.id, kind: "status", status: "loading" });
     vi.advanceTimersByTime(30_000);
-    w.reply({ id: w.sent[0].id, kind: "result", result: PASS });
+    w.reply({ id: w.sent[0]!.id, kind: "result", result: PASS });
     await expect(p).resolves.toEqual(PASS);
   });
 
@@ -86,9 +86,9 @@ describe("createRunner", () => {
   it("ignores replies for an older request", async () => {
     const run = createRunner(spawn, 10_000);
     const p = run(REQ, () => {});
-    const w = workers[0];
+    const w = workers[0]!;
     w.reply({ id: 999, kind: "result", result: { ...PASS, status: "fail" } });
-    w.reply({ id: w.sent[0].id, kind: "result", result: PASS });
+    w.reply({ id: w.sent[0]!.id, kind: "result", result: PASS });
     await expect(p).resolves.toEqual(PASS);
   });
 });
