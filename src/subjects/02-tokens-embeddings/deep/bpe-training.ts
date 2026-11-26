@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const bpeTraining: DeepLesson = {
   why: [
@@ -90,6 +90,7 @@ export const bpeTraining: DeepLesson = {
       paragraphs: [
         "A production tokenizer is trained the same way on gigabytes of text and tens of thousands of merges. The naive loop recounts every pair after every merge, which is far too slow at that scale; real implementations update only the counts of pairs touching the merged symbol. Libraries such as Hugging Face `tokenizers` (written in Rust) do this efficiently, so training a 30,000-entry BPE vocabulary on a large corpus is practical on an ordinary laptop.",
         "How many merges? Early merges are cheap wins: in the worked example the first three each save 9 symbols. Later merges save less and less, because they glue together rarer and rarer pairs; by the tenth merge the saving is down to 3. At real scale the same curve holds, so beyond some point each extra vocabulary entry buys very few saved tokens while still costing a full row in the embedding table (step 2). The usual practice is to pick a round size that fits the model, such as 32,000, 50,000 or 128,000 entries, rather than to search for an optimum.",
+        "The \"Run it locally\" listing trains the same corpus with Hugging Face `tokenizers`. Its trainer attaches `</w>` to the last character (so `t</w>` is one starting symbol), which makes its merge list differ from the paper's. And because that toy model has no unknown token, the `y` of `slowly`, never seen in training, silently disappears from the output: exactly the hole that byte-level BPE closes (step 5).",
         "The training text shapes everything. A tokenizer trained mostly on English spends its merges on English; other languages get fewer, shorter pieces, which is the token tax from step 1. A tokenizer trained on code learns pieces for indentation and common keywords. When choosing or training a tokenizer, the corpus is the real design decision; the algorithm is the easy part.",
       ],
     },
@@ -116,7 +117,7 @@ export const bpeTraining: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("train-bpe", "Train BPE with Hugging Face tokenizers", ["tokenizers"])],
   checks: [
     {
       id: "m02-bpe-vocab-size",

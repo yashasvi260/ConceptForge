@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const cheatSheet: DeepLesson = {
   why: [
@@ -73,6 +73,7 @@ export const cheatSheet: DeepLesson = {
       paragraphs: [
         "The costs fall in different places. Indexing runs the embedding model once per chunk, which is the expensive part, but it happens ahead of time and can be batched. Each query costs one forward pass for the query plus a dot product per stored vector, which is cheap: a million 384-number vectors are about 1.5 GB in float32 (step 13) and a full scan is one large matrix-vector product. Storing the chunk text next to its vector lets you show or quote the source of every result.",
         "The index has to follow the data. When a document changes, re-embed its chunks; when a document is deleted, remove its vectors, or search will keep returning text that no longer exists. When you change the chunking rules or the embedding model, re-embed everything, because vectors made under different settings are not comparable. Keeping the model name and settings next to the stored vectors makes those mistakes easy to catch.",
+        "The \"Run it locally\" listing runs the same search with the full-precision model in Python. Its scores differ slightly from this page's (0.564 instead of 0.572 for the sign-in query), because the browser runs a quantized copy of MiniLM, but the rankings come out the same.",
       ],
     },
     {
@@ -121,7 +122,7 @@ export const cheatSheet: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("sentence-search", "Semantic search with sentence-transformers", ["sentence-transformers", "torch"])],
   checks: [
     {
       id: "m02-recap-same-model",

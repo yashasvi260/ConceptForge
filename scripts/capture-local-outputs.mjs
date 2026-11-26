@@ -1,21 +1,34 @@
 #!/usr/bin/env node
-// Runs every "Run it locally" listing for Module 01 in a clean python:3.12-slim container with pinned
-// packages and saves its real output next to the code, so the page never shows an output nobody ran.
-//   OLLAMA_URL=http://<host>:11434 node scripts/capture-local-outputs.mjs [id ...]
+// Runs a module's "Run it locally" listings in a clean python:3.12-slim container with pinned packages and
+// saves their real output next to the code, so the page never shows an output nobody ran.
+//   OLLAMA_URL=http://<host>:11434 node scripts/capture-local-outputs.mjs [--module 02] [id ...]
 // Needs Docker; repgen also needs Ollama with gemma4:12b. Hugging Face models are cached in .cache/hf.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
-const DIR = "src/subjects/01-intro-llms/deep/local";
-const OUT = "src/subjects/01-intro-llms/deep/local-outputs.json";
 const IMAGE = "python:3.12-slim";
 /** Exact versions; the page shows this same install line. */
-export const PACKAGES = { torch: "2.15.0", transformers: "5.22.2", "sentence-transformers": "6.2.0", sentencepiece: "0.2.3" };
-const IDS = ["dense", "context", "encdec", "repgen"];
+const BASE = { torch: "2.15.0", transformers: "5.22.2", "sentence-transformers": "6.2.0", sentencepiece: "0.2.3" };
+const MODULES = {
+  "01": { dir: "src/subjects/01-intro-llms/deep", packages: BASE, ids: ["dense", "context", "encdec", "repgen"] },
+  "02": {
+    dir: "src/subjects/02-tokens-embeddings/deep",
+    packages: { ...BASE, tokenizers: "0.23.3", tiktoken: "0.14.0" },
+    ids: ["train-bpe", "compare-tokenizers", "tiktoken-counts", "sentence-search"],
+  },
+};
+const args = process.argv.slice(2);
+const mi = args.indexOf("--module");
+const mod = MODULES[mi >= 0 ? args[mi + 1] : "01"];
+if (!mod) throw new Error(`unknown module; known: ${Object.keys(MODULES).join(", ")}`);
+const DIR = `${mod.dir}/local`;
+const OUT = `${mod.dir}/local-outputs.json`;
+export const PACKAGES = mod.packages;
+const IDS = mod.ids;
 
-const only = process.argv.slice(2);
+const only = args.filter((a, i) => i !== mi && i !== mi + 1);
 const ids = only.length ? only : IDS;
 const ollama = process.env.OLLAMA_URL;
 if (ids.includes("repgen") && !ollama) throw new Error("set OLLAMA_URL (e.g. http://172.30.208.1:11434) to capture repgen");

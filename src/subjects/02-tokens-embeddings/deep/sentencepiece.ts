@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const sentencepiece: DeepLesson = {
   why: [
@@ -59,7 +59,7 @@ export const sentencepiece: DeepLesson = {
       paragraphs: [
         "A Unigram tokenizer models text as a sequence of pieces drawn independently, each with its own probability p(piece). The probability of a whole split is the product of its pieces' probabilities, so in log space it is a sum. Different splits of the same text get different scores, and the tokenizer simply picks the highest.",
         "Two effects fall out of this. Fewer pieces usually win, because every extra factor is a probability below 1. And common pieces win over rare ones, because their probabilities are higher. In the worked example `▁hello ▁world` beats `▁hell o ▁world` by a factor of about 160, entirely from those two effects.",
-        "It helps to line up the three algorithms. **BPE** stores an ordered merge list and encodes by replaying it, so the first merges learned always take priority. **WordPiece** stores only a vocabulary and encodes by grabbing the longest known piece from the left. **Unigram** stores a probability for every piece and encodes by searching for the most probable split of the whole word. All three produce subwords from a fixed vocabulary; they differ in what is stored and in how a split is chosen, which is why the same word can come out differently in GPT, BERT and T5.",
+        "It helps to line up the three algorithms. **BPE** stores an ordered merge list and encodes by replaying it, so the first merges learned always take priority. **WordPiece** stores only a vocabulary and encodes by grabbing the longest known piece from the left. **Unigram** stores a probability for every piece and encodes by searching for the most probable split of the whole word. All three produce subwords from a fixed vocabulary; they differ in what is stored and in how a split is chosen, which is why the same word can come out differently in GPT, BERT and T5. The \"Run it locally\" listing shows it: `unaffable` is `un aff able` in GPT-2, `una ##ffa ##ble` in BERT and `▁un aff able` in T5.",
       ],
       formula: {
         expr: "log P(split) = Σ_i log p(piece_i)          best split = argmax over all splits of log P(split)",
@@ -116,7 +116,7 @@ export const sentencepiece: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("compare-tokenizers", "GPT-2, BERT and T5 on the same text", ["transformers", "sentencepiece", "tokenizers"])],
   checks: [
     {
       id: "m02-sp-space",

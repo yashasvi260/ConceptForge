@@ -1,0 +1,58 @@
+{
+  "train-bpe": {
+    "code": "# Train a real BPE tokenizer with Hugging Face `tokenizers` on the low/lower/newest/widest corpus,\n# then encode words it has never seen.\nfrom tokenizers import Tokenizer, models, pre_tokenizers, trainers\n\ncorpus = [\"low\"] * 5 + [\"lower\"] * 2 + [\"newest\"] * 6 + [\"widest\"] * 3\ntok = Tokenizer(models.BPE(end_of_word_suffix=\"</w>\"))\ntok.pre_tokenizer = pre_tokenizers.Whitespace()\ntrainer = trainers.BpeTrainer(vocab_size=21, end_of_word_suffix=\"</w>\", show_progress=False)\ntok.train_from_iterator(corpus, trainer)\n\nprint(\"vocabulary size:\", tok.get_vocab_size())\nmerges = tok.to_str()  # the trained model, as JSON\nimport json\nprint(\"first merges:\", json.loads(merges)[\"model\"][\"merges\"][:10])\nfor word in [\"lowest\", \"newer\", \"slowly\", \"newest\"]:\n    print(f\"{word:<8} → {tok.encode(word).tokens}\")\n",
+    "output": "vocabulary size: 21\nfirst merges: [['e', 's'], ['es', 't</w>'], ['l', 'o'], ['e', 'w'], ['n', 'ew'], ['new', 'est</w>'], ['lo', 'w</w>'], ['d', 'est</w>']]\nlowest   → ['lo', 'w', 'est</w>']\nnewer    → ['new', 'e', 'r</w>']\nslowly   → ['s', 'lo', 'w', 'l']\nnewest   → ['newest</w>']",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3",
+      "tokenizers": "0.23.3",
+      "tiktoken": "0.14.0"
+    }
+  },
+  "compare-tokenizers": {
+    "code": "# The same text through three real tokenizers: GPT-2 (byte-level BPE), BERT (WordPiece) and T5 (Unigram).\nfrom transformers import AutoTokenizer\n\ntexts = [\"unaffable\", \"Tokenization of HuggingFace\", \"The river bank flooded.\"]\nfor name in [\"openai-community/gpt2\", \"google-bert/bert-base-uncased\", \"google-t5/t5-small\"]:\n    tok = AutoTokenizer.from_pretrained(name)\n    print(f\"== {name} (vocabulary {tok.vocab_size:,})\")\n    for t in texts:\n        print(f\"  {t!r:<32} {tok.tokenize(t)}\")\n",
+    "output": "== openai-community/gpt2 (vocabulary 50,257)\n  'unaffable'                      ['un', 'aff', 'able']\n  'Tokenization of HuggingFace'    ['Token', 'ization', 'Ġof', 'ĠHug', 'ging', 'Face']\n  'The river bank flooded.'        ['The', 'Ġriver', 'Ġbank', 'Ġflooded', '.']\n== google-bert/bert-base-uncased (vocabulary 30,522)\n  'unaffable'                      ['una', '##ffa', '##ble']\n  'Tokenization of HuggingFace'    ['token', '##ization', 'of', 'hugging', '##face']\n  'The river bank flooded.'        ['the', 'river', 'bank', 'flooded', '.']\n== google-t5/t5-small (vocabulary 32,100)\n  'unaffable'                      ['▁un', 'aff', 'able']\n  'Tokenization of HuggingFace'    ['▁To', 'ken', 'ization', '▁of', '▁Hug', 'ging', 'F', 'ace']\n  'The river bank flooded.'        ['▁The', '▁river', '▁bank', '▁', 'flooded', '.']",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3",
+      "tokenizers": "0.23.3",
+      "tiktoken": "0.14.0"
+    }
+  },
+  "tiktoken-counts": {
+    "code": "# Count and inspect tokens with OpenAI's real tokenizers (GPT-4: cl100k_base, GPT-4o: o200k_base).\nimport tiktoken\n\ntexts = {\n    \"English\": \"The weather is beautiful today, let's go for a walk.\",\n    \"Hindi\": \"आज मौसम बहुत सुंदर है, चलो टहलने चलते हैं।\",\n    \"Numbers\": \"1234567 + 3.14159 = 1234570.14159\",\n}\nfor enc_name in [\"cl100k_base\", \"o200k_base\"]:\n    enc = tiktoken.get_encoding(enc_name)\n    print(f\"== {enc_name} (n_vocab {enc.n_vocab:,})\")\n    for label, text in texts.items():\n        print(f\"  {label:<8} {len(enc.encode(text)):>3} tokens\")\n    print(\"  pieces of 1234567:\", [enc.decode([t]) for t in enc.encode(\"1234567\")])\n\nenc = tiktoken.get_encoding(\"cl100k_base\")\ntry:\n    enc.encode(\"user text <|endoftext|>\")\nexcept ValueError as e:\n    print(\"refused by default:\", str(e).splitlines()[0][:70])\nprint(\"as plain text:\", enc.encode(\"<|endoftext|>\", disallowed_special=()))\n",
+    "output": "== cl100k_base (n_vocab 100,277)\n  English   13 tokens\n  Hindi     45 tokens\n  Numbers   17 tokens\n  pieces of 1234567: ['123', '456', '7']\n== o200k_base (n_vocab 200,019)\n  English   12 tokens\n  Hindi     14 tokens\n  Numbers   17 tokens\n  pieces of 1234567: ['123', '456', '7']\nrefused by default: Encountered text corresponding to disallowed special token '<|endoftex\nas plain text: [27, 91, 8862, 728, 428, 91, 29]",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3",
+      "tokenizers": "0.23.3",
+      "tiktoken": "0.14.0"
+    }
+  },
+  "sentence-search": {
+    "code": "# Semantic search with the full-precision all-MiniLM-L6-v2 (the page runs a quantized copy in the browser).\nfrom sentence_transformers import SentenceTransformer\n\ndocs = [\n    \"How do I reset my password?\", \"I forgot my login details\", \"My card was charged twice\",\n    \"I see a payment I don't recognise\", \"How do I send money abroad?\", \"What is the interest rate on my mortgage?\",\n    \"How do I order a new debit card?\", \"Can I increase my credit card limit?\", \"Where can I find my account number?\",\n    \"How do I close my savings account?\", \"What are your branch opening hours?\", \"How do I set up a direct debit?\",\n]\nqueries = [\"I can't sign in to my account\", \"transfer funds to another country\", \"I was billed two times for one purchase\"]\n\nmodel = SentenceTransformer(\"sentence-transformers/all-MiniLM-L6-v2\")\nD = model.encode(docs, normalize_embeddings=True)\nQ = model.encode(queries, normalize_embeddings=True)\nprint(\"vector size:\", D.shape[1])\nfor q, scores in zip(queries, Q @ D.T):\n    best = scores.argsort()[::-1][:2]\n    print(q, \"→\", [(docs[i], round(float(scores[i]), 3)) for i in best])\n",
+    "output": "vector size: 384\nI can't sign in to my account → [('How do I reset my password?', 0.564), ('I forgot my login details', 0.5)]\ntransfer funds to another country → [('How do I send money abroad?', 0.688), ('How do I close my savings account?', 0.257)]\nI was billed two times for one purchase → [('My card was charged twice', 0.656), (\"I see a payment I don't recognise\", 0.525)]",
+    "ranAt": "2026-11-26",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3",
+      "tokenizers": "0.23.3",
+      "tiktoken": "0.14.0"
+    }
+  }
+}

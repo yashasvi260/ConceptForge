@@ -1,5 +1,5 @@
 import type { DeepLesson } from "../../../core/types";
-import { part } from "./files";
+import { localListing, part } from "./files";
 
 export const playground: DeepLesson = {
   why: [
@@ -114,7 +114,7 @@ export const playground: DeepLesson = {
       ]),
     ],
   },
-  local: [],
+  local: [localListing("tiktoken-counts", "Count tokens with tiktoken", ["tiktoken"])],
   checks: [
     {
       id: "m02-play-tax",
