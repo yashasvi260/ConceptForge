@@ -21,7 +21,7 @@ need full deep conversion as well).
 | 01 | context | yes | 6/6 (bank-matrix, context-mix, context-reach, token-sentence, sense-by-example, map) | (this commit) |
 | 01 | architectures | yes | 6/6 (families, arch, objectives, task-framing, family-sizes, model-card) | (this commit) |
 | 01 | encoder-decoder | yes | 6/6 (two-stacks, cross-attention, teacher-forcing, encdec-cost, decoder-only, t5-run) | (this commit) |
-| 01 | representation-vs-generative | | | |
+| 01 | representation-vs-generative | yes | 6/6 (two-outputs, centroid, gen-classify, cost-gap, choose, combine) | (this commit) |
 | 01 | pretraining-finetuning | | | |
 | 01 | recap | | | |
 | 02 | 14 lessons | | | |

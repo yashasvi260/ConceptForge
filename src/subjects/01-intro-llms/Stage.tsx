@@ -18,6 +18,7 @@ import { GenerationLabView } from "./views/GenerationLabView";
 import { DataVsSizeLab, MemoryLab, NeuronLab, ParamCalcLab } from "./views/HowLargeLabs";
 import { MapView } from "./views/MapView";
 import { RecapView } from "./views/RecapView";
+import { CentroidLab, ChooseLab, CombineLab, CostGapLab, GenClassifyLab, TwoOutputsLab } from "./views/RepGenLabs";
 import { RepGenView } from "./views/RepGenView";
 import { ScaleView } from "./views/ScaleView";
 import { TrainingView } from "./views/TrainingView";
@@ -138,6 +139,18 @@ export function Stage({ step }: StageProps) {
         return <T5RunLab />;
       case "repgen":
         return <RepGenView />;
+      case "two-outputs":
+        return <TwoOutputsLab />;
+      case "centroid":
+        return <CentroidLab />;
+      case "gen-classify":
+        return <GenClassifyLab />;
+      case "cost-gap":
+        return <CostGapLab />;
+      case "choose":
+        return <ChooseLab />;
+      case "combine":
+        return <CombineLab />;
       case "training":
         return <TrainingView />;
       case "recap":
