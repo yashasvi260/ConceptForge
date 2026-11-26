@@ -3,14 +3,15 @@ import { part } from "./files";
 
 export const whyNumbers: DeepLesson = {
   why: [
-    "A language model is arithmetic: matrix multiplications over lists of numbers. It cannot read a letter any more than a calculator can. So before a model does anything, a separate program, the **tokenizer**, cuts your text into pieces called **tokens** and replaces each piece with its number in a fixed list, the **vocabulary**. The model only ever sees those numbers. Its answer comes back as numbers too, and the tokenizer turns them back into text.",
-    "How you cut the text is a real design decision, not a detail. Cut into whole words and the list of possible pieces never ends: every name, typo, plural and new product needs its own entry, and anything missing is lost. Cut into single characters and the list is short, but every sentence becomes several times longer, and a model's cost grows with length. Every modern LLM uses a compromise between the two, **subwords**: common words stay whole and rare words are spelled from smaller pieces.",
-    "This matters to you directly. Prices, context windows and output limits are all counted in tokens, not words. The same sentence can cost three times as many tokens in one language as in another. Odd failures, like a model miscounting the letters in a word, start here. This step compares the three ways of cutting text on real sentences, so the rest of the module (how subword vocabularies are learned and used) has a reason to exist.",
+    "Here's something you might never have thought about. A language model is arithmetic: matrix multiplications over lists of numbers. It can't read a single letter, any more than a calculator can. So how does your text get in?",
+    "Before the model does anything, a separate program, the **tokenizer**, cuts your text into pieces called **tokens** and swaps each piece for its number in a fixed list, the **vocabulary**. The model only ever sees those numbers. Its answer comes back as numbers too, and the tokenizer turns them back into text.",
+    "Now, how should you cut the text? That's a real design decision, and it's not obvious. Cut into whole words and the list of pieces never ends: every name, typo, plural and new product needs its own entry, and anything missing is lost. Cut into single characters and the list is short, but every sentence becomes several times longer, and a model's cost grows with length. Every modern LLM settles on a compromise in between: **subwords**. Common words stay whole; rare words are spelled from smaller pieces.",
+    "And this matters to you directly. Prices, context windows and output limits are all counted in tokens, not words. The same sentence can cost three times as many tokens in one language as in another. Odd failures, like a model miscounting the letters in a word, start right here. In this step you'll compare the three ways of cutting text on real sentences, with real tokenizers.",
   ],
   worked: [
     {
       kind: "text",
-      text: "Take one sentence with the same meaning in four languages (\"The weather is beautiful today, let's go for a walk.\") and cut it four ways: on spaces, into characters, into UTF-8 bytes (how computers store text), and with GPT-4o's real tokenizer.",
+      text: "Let's measure it. Take one sentence with the same meaning in four languages (\"The weather is beautiful today, let's go for a walk.\") and cut it four ways: on spaces, into characters, into UTF-8 bytes (how computers store text), and with GPT-4o's real tokenizer.",
     },
     {
       kind: "table",
@@ -26,7 +27,7 @@ export const whyNumbers: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Three things stand out. Japanese has no spaces, so \"split on spaces\" sees one giant word: word splitting depends on the writing system. Hindi and Japanese characters each take 2–4 bytes, so byte sequences are much longer than character sequences. And GPT-4o lands in between: 12 tokens for 52 English characters is about 4.3 characters per token.",
+      text: "What jumps out at you? Three things stand out. Japanese has no spaces, so \"split on spaces\" sees one giant word: word splitting depends on the writing system. Hindi and Japanese characters each take 2–4 bytes, so byte sequences are much longer than character sequences. And GPT-4o lands in between: 12 tokens for 52 English characters is about 4.3 characters per token.",
     },
     {
       kind: "math",
@@ -34,7 +35,7 @@ export const whyNumbers: DeepLesson = {
     },
     {
       kind: "text",
-      text: "Now the vocabulary problem. Build a word vocabulary and a character vocabulary from a tiny training text, `the cat sat on the mat the dog sat on the log`, and try them on a new sentence, `the cats sat on the rug`:",
+      text: "Now for the vocabulary problem. Build a word vocabulary and a character vocabulary from a tiny training text, `the cat sat on the mat the dog sat on the log`, and try them on a new sentence, `the cats sat on the rug`:",
     },
     {
       kind: "table",
@@ -55,9 +56,9 @@ export const whyNumbers: DeepLesson = {
     {
       heading: "Text in, numbers out",
       paragraphs: [
-        "A tokenizer does two jobs. **Encoding** turns text into a list of token IDs: cut the text into pieces, then look up each piece's position in the vocabulary. **Decoding** goes back: look up each ID's piece and join them. A good tokenizer is **lossless**: decoding the encoding gives back exactly the original text, spaces and punctuation included, so nothing the user wrote is silently changed.",
-        "The vocabulary is just an ordered list. In GPT-4's vocabulary ` the` (with its leading space) is entry 279, so its ID is 279; the number means nothing beyond \"position in this list\". That is why IDs from one model are useless in another: GPT-4o and Llama 3 have different lists, so the same ID points at different pieces. The model's first layer turns each ID into a vector by reading one row of a table (step 11). Everything after that works on vectors, never on text.",
-        "Tokenizers are fixed before the model is trained and never change afterwards. The model learns its weights for that exact vocabulary, so swapping the tokenizer means retraining the model.",
+        "A tokenizer has two jobs. **Encoding** turns text into a list of token IDs: cut the text into pieces, then look up each piece's position in the vocabulary. **Decoding** goes back the other way: look up each ID's piece and join them together. A good tokenizer is **lossless**: decode what you encoded and you get exactly the original text back, spaces and punctuation included.",
+        "So what is an ID, really? Just a position in a list. If ` the` is entry 279 in GPT-4's vocabulary, its ID is 279, and the number means nothing beyond that. That's why IDs from one model are useless in another: GPT-4o and Llama 3 have different lists, so the same ID points at a different piece. Inside the model, each ID picks out one row of a table (step 11), and from then on everything works on vectors, never text.",
+        "One more thing that surprises people: tokenizers are fixed before the model is trained, and never change afterwards. The model learns its weights for that exact vocabulary. Swap the tokenizer, and you'd have to retrain the model.",
       ],
       formula: {
         expr: "ids = encode(text)      text = decode(ids)      decode(encode(text)) == text",
@@ -68,20 +69,33 @@ export const whyNumbers: DeepLesson = {
         ],
         example: "GPT-2's tokenizer encodes \"The cat sat\" as [464, 3797, 3332]; decoding those three IDs gives back \"The cat sat\".",
       },
-      mistake: "Thinking the model sees words or letters. It sees only IDs; whether `strawberry` is one ID or three is decided by the tokenizer, and the model has to learn the spelling behind each ID from data.",
+      mistake:
+        "Thinking the model sees words or letters. It sees only IDs; whether `strawberry` is one ID or three is decided by the tokenizer, and the model has to learn the spelling behind each ID from data.",
+      lab: {
+        view: "intro",
+        label: "Text → IDs",
+        task: "Type anything and watch GPT-4o's real tokenizer turn it into pieces and IDs. Find a word that becomes one piece, and one that becomes three.",
+      },
     },
     {
       heading: "Words: short sequences, an endless vocabulary",
       paragraphs: [
-        "Splitting on spaces gives short sequences (one token per word), and each token carries a lot of meaning. The trouble is the vocabulary. English alone has hundreds of thousands of word forms once you count plurals, tenses, names, numbers and typos, and the list keeps growing. Any word missing from the vocabulary becomes a single **unknown** token (often written `[UNK]`), and its meaning is gone: the model cannot tell `zorbix` from `Kubernetes` if both are unknown.",
-        "Word splitting also assumes the language puts spaces between words. Chinese, Japanese and Thai do not, so the \"words\" would be whole sentences, as the Japanese row above shows. And word splitting treats related forms as unrelated: `run`, `runs` and `running` get three separate entries that share nothing, so what the model learns about one does not help the others.",
+        "Splitting on spaces is the obvious first idea. You get short sequences (one token per word), and each token carries a lot of meaning. So what's the catch?",
+        "The vocabulary. English alone has hundreds of thousands of word forms once you count plurals, tenses, names, numbers and typos, and the list keeps growing. Any word missing from the vocabulary becomes a single **unknown** token (often written `[UNK]`), and its meaning is gone: the model can't tell `zorbix` from `Kubernetes` if both are unknown.",
+        "Word splitting also assumes the language puts spaces between words. Chinese, Japanese and Thai don't, so a \"word\" becomes a whole sentence, as the Japanese row shows. And it treats related forms as strangers: `run`, `runs` and `running` get three separate entries that share nothing, so what the model learns about one doesn't help the others.",
       ],
+      lab: {
+        view: "oov",
+        label: "Unknown words",
+        task: "Cut the new text into words: which ones does the vocabulary not know? Now switch to characters, then bytes. Which scheme never meets an unknown token?",
+      },
     },
     {
       heading: "Characters and bytes: a tiny vocabulary, long sequences",
       paragraphs: [
-        "At the other extreme, cut into single characters. The vocabulary is small and nearly every word can be spelled, including words never seen before. The price is length: English text becomes about four times as many tokens as with GPT-4o's tokenizer (52 characters vs 12 tokens above). Length is expensive. A model reads its whole input at every step, and the attention computation inside a transformer grows with the square of the sequence length (Module 03). A 4× longer sequence means roughly 16× more attention work and four times less text fitting into the same context window.",
-        "\"Character\" is also less simple than it sounds. Unicode defines well over 100,000 characters, so a character vocabulary that covers every script is large after all, and any character missing from it is unknown again. **Bytes** solve this completely. UTF-8 stores every character as 1 to 4 bytes, and there are only 256 possible byte values. A vocabulary that includes all 256 can represent any text in any language, plus emoji and typos, with nothing ever unknown. The cost is even longer sequences: the Hindi sentence above is 42 characters but 108 bytes.",
+        "Now go to the other extreme: cut into single characters. The vocabulary is tiny, and almost any word can be spelled, even ones never seen before. Sounds perfect?",
+        "The price is length. English becomes about four times as many tokens as with GPT-4o's tokenizer (52 characters vs 12 tokens above). And length is expensive: a model reads its whole input at every step, and attention's work grows with the *square* of the sequence length (Module 03). Four times longer means roughly sixteen times more attention work, and a quarter as much text fitting in the same context window.",
+        "\"Character\" is also less simple than it sounds. Unicode defines well over 100,000 characters, so a vocabulary covering every script is large after all, and any character missing from it is unknown again. **Bytes** fix this for good. UTF-8 stores every character as 1 to 4 bytes, and there are only 256 possible byte values. Include all 256 and you can represent any text in any language, emoji and typos included, with nothing ever unknown. The cost? Even longer sequences: the Hindi sentence above is 42 characters but 108 bytes.",
       ],
       formula: {
         expr: "bytes per character (UTF-8) = 1 (ASCII) · 2 (é, ñ) · 3 (हि, 日) · 4 (🤖)",
@@ -91,19 +105,30 @@ export const whyNumbers: DeepLesson = {
         ],
         example: "\"é🤖\" is 2 characters but 6 bytes: [195, 169] for é and [240, 159, 164, 150] for the robot.",
       },
+      lab: {
+        view: "seq-length",
+        label: "Length",
+        task: "Compare the same sentence in words, characters, bytes and GPT-4o tokens, for English and then Hindi. Then type your own text: which way of cutting is longest?",
+      },
     },
     {
       heading: "Subwords: the compromise every LLM uses",
       paragraphs: [
-        "Subword tokenizers keep a fixed vocabulary, typically 30,000 to 200,000 pieces, learned from a large training text. Frequent words become a single piece (` the`, ` weather`); rarer words are spelled from a few pieces (GPT-4 splits `unbelievably` into `un` + `belie` + `vably`; GPT-4o into `un` + `bel` + `ievably`); and anything truly new falls back to characters or bytes. You get sequences only a little longer than word splitting, with no unknown tokens, and rare forms share pieces with related words instead of starting from nothing.",
-        "How the pieces are chosen is the subject of the next steps: **BPE** (used by GPT models and Llama) merges frequent pairs, **WordPiece** (BERT) is similar with a different scoring rule, and **Unigram** (T5, through SentencePiece) prunes a large vocabulary down. They differ in the details but share the idea: spend vocabulary entries on what is common, and spell what is rare.",
-        "A useful number for any tokenizer is its **fertility**: tokens per word, or its inverse, characters per token. Above, GPT-4o covers 4.3 English characters per token but only 3.0 Hindi characters per token. Lower efficiency means a language pays more for the same meaning, which step 9 measures as the \"token tax\".",
+        "So here's the compromise. Subword tokenizers keep a fixed vocabulary, typically 30,000 to 200,000 pieces, learned from a large training text. Frequent words become a single piece (` the`, ` weather`). Rarer words are spelled from a few pieces (GPT-4 splits `unbelievably` into `un` + `belie` + `vably`; GPT-4o into `un` + `bel` + `ievably`). And anything truly new falls back to characters or bytes. You get sequences only a little longer than word splitting, with no unknown tokens, and rare forms share pieces with related words instead of starting from nothing.",
+        "How are the pieces chosen? That's the next few steps. **BPE** (used by GPT models and Llama) merges frequent pairs; **WordPiece** (BERT) is similar with a different scoring rule; **Unigram** (T5, via SentencePiece) prunes a large vocabulary down. They differ in the details, but share one idea: spend vocabulary entries on what's common, and spell what's rare.",
+        "A handy number for any tokenizer is its **fertility**: tokens per word, or its flip side, characters per token. GPT-4o covers 4.3 English characters per token, but only 3.0 Hindi characters per token. Lower efficiency means a language pays more for the same meaning: the \"token tax\" that step 9 measures.",
       ],
-      mistake: "Using a word count to estimate cost or context. Billing and limits use tokens, and the ratio of tokens to words changes with language, topic and tokenizer; count with the real tokenizer of the model you will call.",
+      mistake:
+        "Using a word count to estimate cost or context. Billing and limits use tokens, and the ratio of tokens to words changes with language, topic and tokenizer; count with the real tokenizer of the model you will call.",
+      lab: {
+        view: "chop",
+        label: "Three ways",
+        task: "Type a made-up word like `flurbish` and compare words, characters and subwords. Which method copes, and which one gives up?",
+      },
     },
   ],
   guided:
-    "Predict how many GPT-4o tokens `Unbelievably` takes, then check it in the Overview. Switch to **Three ways**, type a made-up word such as `flurbish`, and explain why the word method marks it unknown while characters and subwords cope.",
+    "Before you look, guess how many GPT-4o tokens `Unbelievably` takes. Check in **Text → IDs**. Then open **Unknown words** and find out which way of cutting text never meets an unknown token.",
   build: {
     id: "m02-why-numbers",
     title: "Three ways to cut text, measured",

@@ -15,6 +15,7 @@ import { PracticeView } from "./views/PracticeView";
 import { QuirksView } from "./views/QuirksView";
 import { SpecialTokensView } from "./views/SpecialTokensView";
 import { UnigramView } from "./views/UnigramView";
+import { AddTokensLab, OovLab, SeqLengthLab, VocabBuysLab, VocabCostLab } from "./views/labs/TokenBasicsLabs";
 import { VocabView } from "./views/VocabView";
 import { WordPieceView } from "./views/WordPieceView";
 
@@ -68,6 +69,16 @@ export function Stage({ step }: StageProps) {
         return <SearchPreviewView />;
       case "cheatsheet":
         return <CheatSheetView />;
+      case "oov":
+        return <OovLab />;
+      case "seq-length":
+        return <SeqLengthLab />;
+      case "vocab-cost":
+        return <VocabCostLab />;
+      case "vocab-buys":
+        return <VocabBuysLab />;
+      case "add-tokens":
+        return <AddTokensLab />;
       default:
         return (
           <Panel>

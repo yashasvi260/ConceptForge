@@ -25,8 +25,8 @@ need full deep conversion as well).
 | 01 | pretraining-finetuning | yes | 6/6 (training, finetune-format, transfer, forgetting, data-per-stage, base-to-assistant) | (this commit) |
 | 01 | recap | yes | 6/6 (recap-tokenize, smoothing, recap-generate, perplexity, vs-real, map) | (this commit) |
 | 01 | (all) | Module 01 complete: 68 labs, browser pass 75 views 0 problems; Stage lazy (main bundle 203 KB gz) | | cfe6056 |
-| 02 | why-numbers | | | |
-| 02 | vocabulary | | | |
+| 02 | why-numbers | yes | 4/4 (intro, oov, seq-length, chop) | (this commit) |
+| 02 | vocabulary | yes | 4/4 (vocab, vocab-cost, vocab-buys, add-tokens) | (this commit) |
 | 02 | bpe-training | | | |
 | 02 | bpe-encoding | | | |
 | 02 | bytes | | | |
