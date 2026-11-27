@@ -91,6 +91,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "residual-norm",
+    deep: true,
     title: "Residual connections and normalisation",
     summary: "Each block adds its result to its input, and keeps the numbers in a healthy range with normalisation.",
     body: [
@@ -104,6 +105,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "ffn",
+    deep: true,
     title: "The feed-forward network",
     summary: "After attention mixes tokens together, a small neural network processes each token on its own.",
     body: [

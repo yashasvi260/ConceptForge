@@ -6,6 +6,7 @@ import { AttentionView, MultiHeadView, QkvView, type AttentionState } from "./vi
 import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } from "./views/InternalsViews";
 import { AttnCostLab, HeadFinderLab, QkvProjectLab, RealHeadsLab, SqrtDLab, ValueMixLab } from "./views/labs/AttentionLabs";
 import { HeadAblationLab, HeadGridLab, HeadSplitLab, KvBudgetLab, KvRepeatLab, KvSharingLab } from "./views/labs/HeadsGqaLabs";
+import { FfnActiveLab, FfnShapesLab, PrePostLab, ResidualDepthLab, StreamNormsLab, SwigluParamsLab } from "./views/labs/NormFfnLabs";
 import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
@@ -71,6 +72,18 @@ export function Stage({ step }: StageProps) {
         return <KvBudgetLab />;
       case "kv-repeat":
         return <KvRepeatLab />;
+      case "stream-norms":
+        return <StreamNormsLab />;
+      case "residual-depth":
+        return <ResidualDepthLab />;
+      case "pre-post":
+        return <PrePostLab />;
+      case "ffn-shapes":
+        return <FfnShapesLab />;
+      case "ffn-active":
+        return <FfnActiveLab />;
+      case "swiglu-params":
+        return <SwigluParamsLab />;
       case "recap":
         return <RecapView />;
       default:

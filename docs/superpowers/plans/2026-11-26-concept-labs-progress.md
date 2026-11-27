@@ -70,10 +70,10 @@ first-token norm grows 10 â†’ ~3,100; position neighbours 0.997, distance 256 â†
 | 03 | positional | yes | 4/4 (shuffle, positional, learned-pos, rope-relative) | 0292a7d |
 | 03 | qkv | yes | 4/4 (qkv-project, qkv, sqrt-d, value-mix) | f3265e7 |
 | 03 | self-attention | yes | 4/4 (real-heads, attention, head-finder, attn-cost) | f3265e7 |
-| 03 | multi-head | yes | 4/4 (multihead, head-split, head-grid, head-ablation) | (this commit) |
-| 03 | gqa | yes | 4/4 (gqa, kv-sharing, kv-budget, kv-repeat) | (this commit) |
-| 03 | residual-norm | | | |
-| 03 | ffn | | | |
+| 03 | multi-head | yes | 4/4 (multihead, head-split, head-grid, head-ablation) | 6b8d69d |
+| 03 | gqa | yes | 4/4 (gqa, kv-sharing, kv-budget, kv-repeat) | 6b8d69d |
+| 03 | residual-norm | yes | 4/4 (stream-norms, residual-depth, norm, pre-post) | (this commit) |
+| 03 | ffn | yes | 4/4 (ffn-shapes, ffn, ffn-active, swiglu-params) | (this commit) |
 | 03 | moe | | | |
 | 03 | recap | | | |
 

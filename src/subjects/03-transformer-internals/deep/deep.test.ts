@@ -100,6 +100,10 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["self-attention", "p1", "import numpy as np\nATTN = np.array(DATA['gpt2']['sentences'][0]['attn'])\ndef causal_softmax(S):\n    S = np.array(S, dtype=float)\n    e = np.exp(S - S.max(axis=1, keepdims=True))\n    W = e / e.sum(axis=1, keepdims=True)\n    return np.tril(W)\ndef is_causal(W):\n    return bool(np.all(np.triu(np.asarray(W), k=1) == 0))"],
   // Tiles the KV heads instead of repeating each one: query head 1 would read KV head 1, not 0.
   ["gqa", "p2", "import numpy as np\ndef repeat_kv(K, n_rep):\n    return np.tile(np.asarray(K), (n_rep, 1, 1))"],
+  // Normalises over the whole matrix instead of each token's own vector.
+  ["residual-norm", "p1", "import numpy as np\ndef layer_norm(x, gain, bias, eps=1e-5):\n    x = np.asarray(x, dtype=float)\n    return (x - x.mean()) / np.sqrt(x.var() + eps) * gain + bias\ndef rms_norm(x, gain, eps=1e-6):\n    x = np.asarray(x, dtype=float)\n    return x / np.sqrt((x ** 2).mean() + eps) * gain"],
+  // Swaps which half is gated: the content goes through SiLU instead of the gate.
+  ["ffn", "p2", "import numpy as np\ndef ffn_gelu(X, W1, b1, W2, b2):\n    return gelu(X @ W1 + b1) @ W2 + b2\ndef ffn_swiglu(X, Wg, Wu, Wd):\n    return ((X @ Wg) * silu(X @ Wu)) @ Wd"],
   ["positional", "p2", "import numpy as np\ndef rope(x, pos):\n    return np.asarray(x, dtype=float) + pos"],
 ];
 
