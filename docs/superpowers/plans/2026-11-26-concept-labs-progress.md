@@ -111,11 +111,13 @@ generation/utils.py: repetition penalty → temperature → top-k → top-p → 
 | 04 | decoding | yes | 4/4 (greedy-loop, temperature, temp-samples, beam) | 2e4e118 |
 | 04 | truncation | yes | 4/4 (tail-mass, topk-fixed, nucleus, sampler-chain) | 0d2d5bf |
 | 04 | generation-loop | yes | 4/4 (loop-steps, stop-rules, prefill-decode, repetition) | 0d2d5bf |
-| 04 | kv-cache | yes | 4/4 (kvcache, kv-shapes, kv-equal, kv-memory) | (this commit) |
-| 04 | long-context | yes | 4/4 (ctx-cost, loss-by-context, position-limit, sliding-window) | (this commit) |
+| 04 | kv-cache | yes | 4/4 (kvcache, kv-shapes, kv-equal, kv-memory) | 1fef781 |
+| 04 | long-context | yes | 4/4 (ctx-cost, loss-by-context, position-limit, sliding-window) | 1fef781 |
+| 04 | recap | yes | 4/4 (step-trace, sampler-chain [step 3], cache-twin, settings-map) | (this commit) |
 
-Steps 1–6 browser pass (1280 + 390): 24 lab views, 0 problems. Interim: only the recap is still short-format;
-old #/03-transformer-internals/11 lands on kv-cache at index 4. kvCost now counts G passes (P + G − 1 tokens fed with the
+Module 04 complete: 7 deep lessons, 28 lab views, browser pass (1280 + 390) 0 problems. Old #/03-transformer-internals/11
+lands on kv-cache at index 4. Recap listing gpt2-generate captured (torch 2.15.0, transformers 5.22.2): NumPy GPT-2 with a
+KV cache writes the same 20 tokens as without it and as HF generate(); 24 vs 290 tokens fed. kvCost now counts G passes (P + G − 1 tokens fed with the
 cache: 24 vs 290 for the real loop). Long context uses Kaplan et al.'s 2N + 2·L·n·d with N = paramBreakdown().layers:
 crossover GPT-2 9,229, Llama 3 8B 53,250, GPT-3 147,469 tokens. The illustrative SamplingView is gone (NEXT and
 applySampling stay for Module 01's map). Ollama defaults quoted from its Modelfile docs (temperature 0.8, top_k 40,

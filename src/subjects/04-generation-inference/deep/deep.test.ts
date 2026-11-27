@@ -40,8 +40,9 @@ function runScript(src: string): string {
 const deepSteps = steps.filter((s) => s.deep).map((s) => ({ ...s, lesson: content.lessons[s.id] }));
 
 describe("Module 04 deep lessons are wired", () => {
-  it("the converted steps are deep lessons", () => {
-    expect(steps.filter((s) => s.deep).map((s) => s.id)).toEqual(["logits", "decoding", "truncation", "generation-loop", "kv-cache", "long-context"]);
+  it("all 7 steps are deep lessons", () => {
+    expect(steps.map((s) => s.id)).toEqual(["logits", "decoding", "truncation", "generation-loop", "kv-cache", "long-context", "recap"]);
+    expect(steps.every((s) => s.deep === true)).toBe(true);
   });
 
   it("every step marked deep has a lesson, and every lesson's step is marked deep", () => {
@@ -126,6 +127,12 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["long-context", "p2", "import numpy as np\ndef sliding_window_mask(n, window):\n    i = np.arange(n)[:, None]; j = np.arange(n)[None, :]\n    return np.abs(i - j) < window"],
   // Stretches positions instead of squeezing them.
   ["long-context", "p3", "import numpy as np\ndef rope_angles(pos, d_head, base):\n    i = np.arange(d_head // 2)\n    return pos * base ** (-2 * i / d_head)\ndef interpolate(pos, train_len, target_len):\n    return pos * target_len / train_len"],
+  // Applies top-p to the probabilities BEFORE renormalising after top-k (and before the temperature).
+  ["recap", "p1", "import numpy as np\ndef final_distribution(z, temperature=1.0, top_k=0, top_p=1.0, min_p=0.0):\n    z = np.asarray(z, dtype=float)\n    p = np.exp(z - z.max()); p /= p.sum()\n    order = np.argsort(-p)\n    keep = np.zeros(len(z), dtype=bool)\n    cum = np.cumsum(p[order])\n    n = int(np.searchsorted(cum, top_p - 1e-12)) + 1\n    keep[order[:min(n, top_k or len(z))]] = True\n    if min_p > 0:\n        keep &= p >= min_p * p.max()\n    q = np.where(keep, np.exp(z / temperature - (z / temperature).max()), 0.0)\n    return q / q.sum()"],
+  // Always samples, even at temperature 0 (division by zero aside, it ignores greedy).
+  ["recap", "p2", "import numpy as np\ndef sample_next(z, rng, temperature=1.0, top_k=0, top_p=1.0, min_p=0.0):\n    p = final_distribution(z, max(temperature, 1.0), top_k, top_p, min_p)\n    return int(np.searchsorted(np.cumsum(p), rng.random(), side='right'))"],
+  // Feeds the newest token at position 0: the classic cache bug.
+  ["recap", "p3", "import numpy as np\nrng0 = np.random.default_rng(1)\nV, d = 12, 16\nE = rng0.normal(size=(V, d)); P = rng0.normal(size=(32, d)) * 0.5\nWq, Wk, Wv = (rng0.normal(size=(d, d)) / np.sqrt(d) for _ in range(3))\nWo = rng0.normal(size=(d, V))\ndef forward(new_ids, start, cache):\n    X = E[new_ids] + P[start:start + len(new_ids)]\n    cache['K'].extend(X @ Wk); cache['V'].extend(X @ Wv)\n    K, Vv = np.array(cache['K']), np.array(cache['V'])\n    n, T = len(new_ids), len(cache['K'])\n    S = np.where(np.arange(T)[None, :] <= (T - n + np.arange(n))[:, None], (X @ Wq) @ K.T / np.sqrt(d), -np.inf)\n    A = np.exp(S - S.max(1, keepdims=True)); A /= A.sum(1, keepdims=True)\n    return (X + A @ Vv) @ Wo\ndef generate(prompt, n_new, use_cache, pick):\n    ids, fed = list(prompt), 0\n    cache = {'K': [], 'V': []}\n    for step in range(n_new):\n        if use_cache and step > 0:\n            new, start = ids[-1:], 0\n        else:\n            new, start, cache = ids, 0, {'K': [], 'V': []}\n        fed += len(new)\n        ids.append(pick(forward(new, start, cache)[-1]))\n    return ids[len(prompt):], fed"],
 ];
 
 describe("wrong answers fail", () => {

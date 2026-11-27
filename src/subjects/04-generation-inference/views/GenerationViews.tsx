@@ -1,4 +1,4 @@
-/** Module 04 short-format views (the KV cache and the recap), plus NEXT: illustrative logits used by Module 01's map. */
+/** Module 04's KV cache on/off view (counted for Llama 3 8B's shape), plus NEXT: illustrative logits used by Module 01's map. */
 import { useState } from "react";
 import { Bar, Panel, Slider, Stat, Toggle } from "../../../components/ui";
 import { formatBytes, formatCount } from "../../03-transformer-internals/format";
@@ -41,25 +41,6 @@ export function KvCacheView() {
         <Bar label="compute OFF" value={off.attentionDots} max={off.attentionDots} display={formatCount(off.attentionDots)} color="var(--color-rose-400)" />
         <Bar label="compute ON" value={onC.attentionDots} max={off.attentionDots} display={formatCount(onC.attentionDots)} color="var(--color-emerald-400)" />
       </div>
-    </Panel>
-  );
-}
-
-export function RecapView() {
-  const items = [
-    "The last vector × the output matrix → one logit per vocabulary entry",
-    "Softmax → next-token probabilities",
-    "A decoding rule: greedy, temperature, top-k, top-p",
-    "Append the token and run the loop again",
-    "KV cache: each token's keys and values computed once and reused",
-  ];
-  return (
-    <Panel title="One generation step">
-      <ol className="list-decimal space-y-1.5 pl-5 text-sm text-slate-200">
-        {items.map((i) => (
-          <li key={i}>{i}</li>
-        ))}
-      </ol>
     </Panel>
   );
 }

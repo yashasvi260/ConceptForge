@@ -88,14 +88,16 @@ export const steps: LessonStep[] = [
   },
   {
     id: "recap",
-    title: "From a vector to the next token",
-    summary: "Logits, a decoding rule and a cache: what happens between the last block and the text you read.",
+    deep: true,
+    title: "Mini-project: a sampler and a cached generation loop",
+    summary: "Put it together: a sampler that applies every decoding rule, inside a loop whose KV cache gives exactly the same tokens as recomputing everything.",
     body: [
-      "Recap: the final vector is scored against every vocabulary entry (logits); softmax turns the scores into probabilities; a decoding rule (greedy, temperature, top-k, top-p) picks one token; the token is appended and the loop runs again, reusing every past token's keys and values from the KV cache.",
-      "Next, Module 05 shows how the weights behind those logits got their values: training. Then Part II puts these models to work, starting with classifying text (Module 06).",
+      "One step: the final vector becomes logits; temperature, top-k, top-p and min-p reshape them in a fixed order; one token is drawn (argmax at temperature 0). The loop appends it and repeats, feeding only the newest token because the cache keeps every past key and value.",
+      "Next, Module 05 shows how the weights behind those logits were learned. Then Part II puts these models to work, starting with classifying text (Module 06).",
     ],
-    tryIt: "Explain one generation step in your own words, from the last vector to the chosen token, then take the Challenge.",
-    keyTakeaway: "Generation = score, pick, append, repeat; the KV cache makes the repeat cheap.",
-    view: "recap",
+    tryIt: "Trace one real step at Ollama's defaults, then break a KV cache on purpose and watch the outputs diverge.",
+    keyTakeaway: "Generation = a sampler inside a loop; a correct KV cache changes the cost, never the tokens.",
+    callout: "token = sample(chain(h · Wᵀ / T)); append; repeat",
+    view: "step-trace",
   },
 ];

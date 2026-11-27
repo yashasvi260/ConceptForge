@@ -14,6 +14,7 @@ const BASE = { torch: "2.15.0", transformers: "5.22.2", "sentence-transformers":
 const MODULES = {
   "01": { dir: "src/subjects/01-intro-llms/deep", packages: BASE, ids: ["dense", "context", "encdec", "repgen"] },
   "03": { dir: "src/subjects/03-transformer-internals/deep", packages: BASE, ids: ["gpt2-block"] },
+  "04": { dir: "src/subjects/04-generation-inference/deep", packages: BASE, ids: ["gpt2-generate"] },
   "02": {
     dir: "src/subjects/02-tokens-embeddings/deep",
     packages: { ...BASE, tokenizers: "0.23.3", tiktoken: "0.14.0" },

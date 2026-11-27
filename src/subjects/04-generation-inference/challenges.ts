@@ -55,4 +55,27 @@ export const challenges: ChallengeItem[] = [
     explanation: "cache bytes = 2 · L · H_kv · d_head · T · b, which is linear in T: twice the tokens, twice the memory.",
     relatedStepId: "kv-cache",
   },
+  {
+    id: "stop-length",
+    prompt: "A reply stops mid-sentence and the API says finish_reason \"length\". What should you change?",
+    options: ["Lower the temperature", "Raise the token limit (max_new_tokens / num_predict / max_tokens)", "Add a stop sequence", "Turn off the KV cache"],
+    correctIndex: 1,
+    hint: "Which of the three stopping rules is called \"length\"?",
+    explanation: "\"length\" means the token limit ended the loop, not the model's end-of-sequence token or a stop sequence.",
+    relatedStepId: "generation-loop",
+  },
+  {
+    id: "rope-interpolation",
+    prompt: "A RoPE model trained on 8,192 tokens is run on 32,768 without changes. What goes wrong, and what's the standard fix?",
+    options: [
+      "Nothing; RoPE works at any length",
+      "Positions past 8,192 rotate further than anything seen in training; position interpolation scales positions by 8,192 / 32,768 (plus brief fine-tuning)",
+      "The vocabulary runs out",
+      "The KV cache can't hold that many tokens, so switch to greedy decoding",
+    ],
+    correctIndex: 1,
+    hint: "RoPE can compute any angle, but has the model seen it?",
+    explanation: "Chen et al. (2023) squeeze positions back into the trained range and fine-tune for about 1,000 steps.",
+    relatedStepId: "long-context",
+  },
 ];

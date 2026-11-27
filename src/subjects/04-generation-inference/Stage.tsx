@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { StageProps } from "../../core/types";
-import { KvCacheView, RecapView } from "./views/GenerationViews";
+import { KvCacheView } from "./views/GenerationViews";
 import { BeamLab, GreedyLoopLab, TempSamplesLab, TemperatureLab } from "./views/labs/DecodingLabs";
 import { KvEqualLab, KvMemoryLab, KvShapesLab } from "./views/labs/KvCacheLabs";
 import { CtxCostLab, LossByContextLab, PositionLimitLab, SlidingWindowLab } from "./views/labs/LongContextLabs";
 import { EveryPositionLab, LmHeadLab, RealNextLab, SoftmaxShiftLab } from "./views/labs/LogitsLabs";
 import { LoopStepsLab, PrefillDecodeLab, RepetitionLab, StopRulesLab } from "./views/labs/LoopLabs";
+import { CacheTwinLab, SettingsMapLab, StepTraceLab } from "./views/labs/RecapLabs";
 import { NucleusLab, SamplerChainLab, TailMassLab, TopKFixedLab } from "./views/labs/TruncationLabs";
 
 export function Stage({ step }: StageProps) {
@@ -59,8 +60,12 @@ export function Stage({ step }: StageProps) {
         return <PositionLimitLab />;
       case "sliding-window":
         return <SlidingWindowLab />;
-      case "recap":
-        return <RecapView />;
+      case "step-trace":
+        return <StepTraceLab />;
+      case "cache-twin":
+        return <CacheTwinLab />;
+      case "settings-map":
+        return <SettingsMapLab />;
       default:
         return null;
     }

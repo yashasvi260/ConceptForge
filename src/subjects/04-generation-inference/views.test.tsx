@@ -5,7 +5,7 @@ import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["lm-head", "greedy-loop", "tail-mass", "loop-steps", "kvcache", "ctx-cost", "recap"];
+const VIEWS = ["lm-head", "greedy-loop", "tail-mass", "loop-steps", "kvcache", "ctx-cost", "step-trace"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);
@@ -23,10 +23,10 @@ describe("Module 04 content", () => {
     expect(subject.challenges.every((c) => c.hint && c.relatedStepId && steps.some((s) => s.id === c.relatedStepId))).toBe(true);
   });
 
-  it("ends with an up-next card pointing to the next module", () => {
+  it("ends with an up-next card pointing to the next module", async () => {
     window.location.hash = `#/04-generation-inference/${steps.length}`;
     render(<App />);
-    expect(screen.getByRole("note", { name: "Up next" })).toHaveTextContent(/Module 0[56]/);
+    expect(await screen.findByRole("note", { name: "Up next" })).toHaveTextContent(/Module 0[56]/);
   });
 });
 

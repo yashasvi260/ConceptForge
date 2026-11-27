@@ -18,7 +18,7 @@ const subject: SubjectModule = {
     leadsTo: "Module 05 shows how the weights behind the logits were learned. Then Part II puts these models to work.",
   },
   difficulty: "intermediate",
-  estimatedMinutes: 20,
+  estimatedMinutes: 40,
   icon: Sparkles,
   accent: "violet",
   steps,
