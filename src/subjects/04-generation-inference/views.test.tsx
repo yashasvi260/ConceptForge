@@ -5,7 +5,7 @@ import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["lm-head", "greedy-loop", "tail-mass", "loop-steps", "kvcache", "recap"];
+const VIEWS = ["lm-head", "greedy-loop", "tail-mass", "loop-steps", "kvcache", "ctx-cost", "recap"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);

@@ -14,6 +14,7 @@ const models = MODEL_CONFIGS.map((c) => ({
   context: c.context,
   tied_embeddings: c.tiedEmbeddings,
   total_params: paramBreakdown(c).total,
+  nonembedding_params: paramBreakdown(c).layers,
 }));
 
 /** Data injected into Python as DATA, keyed by Exercise.data. Every number is recorded or computed, never typed. */

@@ -13,9 +13,17 @@ describe("KV cache", () => {
   });
 
   it("computes each token's K/V once with the cache, repeatedly without", () => {
-    expect(kvCost(base, true).kvProjections).toBe(150);
-    expect(kvCost(base, false).kvProjections).toBe(Array.from({ length: 51 }, (_, t) => 100 + t).reduce((a, b) => a + b));
+    expect(kvCost(base, true).kvProjections).toBe(149);
+    expect(kvCost(base, false).kvProjections).toBe(Array.from({ length: 50 }, (_, t) => 100 + t).reduce((a, b) => a + b));
     expect(kvCost(base, false).cacheBytes).toBe(0);
     expect(kvCost(base, false).attentionDots).toBeGreaterThan(kvCost(base, true).attentionDots * 10);
+  });
+
+  it("matches GPT-2's real loop: a 5-token prompt and 20 steps feed 24 tokens with the cache, 290 without", () => {
+    const real = { ...base, promptTokens: 5, generatedTokens: 20 };
+    expect(kvCost(real, true).kvProjections).toBe(24);
+    expect(kvCost(real, false).kvProjections).toBe(290);
+    expect(kvCost({ ...real, promptTokens: 3, generatedTokens: 3 }, true).attentionDots).toBe(6 + 4 + 5);
+    expect(kvCost({ ...real, promptTokens: 3, generatedTokens: 3 }, false).attentionDots).toBe(6 + 10 + 15);
   });
 });

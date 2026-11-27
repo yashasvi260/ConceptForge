@@ -41,7 +41,7 @@ const deepSteps = steps.filter((s) => s.deep).map((s) => ({ ...s, lesson: conten
 
 describe("Module 04 deep lessons are wired", () => {
   it("the converted steps are deep lessons", () => {
-    expect(steps.filter((s) => s.deep).map((s) => s.id)).toEqual(["logits", "decoding", "truncation", "generation-loop"]);
+    expect(steps.filter((s) => s.deep).map((s) => s.id)).toEqual(["logits", "decoding", "truncation", "generation-loop", "kv-cache", "long-context"]);
   });
 
   it("every step marked deep has a lesson, and every lesson's step is marked deep", () => {
@@ -116,6 +116,16 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["generation-loop", "p2", "def cut_at_stop(text, stops):\n    for s in stops:\n        if s in text:\n            return text[: text.find(s)], True\n    return text, False"],
   // Divides every seen logit by the penalty: negative logits become MORE likely.
   ["generation-loop", "p3", "import numpy as np\ndef repetition_penalty(logits, seen_ids, penalty):\n    out = np.array(logits, dtype=float)\n    for i in set(seen_ids):\n        out[i] = out[i] / penalty\n    return out"],
+  // Attends to the whole cache but forgets to append the new token's own key and value first.
+  ["kv-cache", "p1", "import numpy as np\nrng = np.random.default_rng(0)\nd = 8\nWq, Wk, Wv = (rng.normal(size=(d, d)) for _ in range(3))\ndef attend_all(X):\n    Q, K, V = X @ Wq, X @ Wk, X @ Wv\n    S = Q @ K.T / np.sqrt(d)\n    S = np.where(np.tril(np.ones_like(S)) == 1, S, -np.inf)\n    W = np.exp(S - S.max(axis=1, keepdims=True)); W /= W.sum(axis=1, keepdims=True)\n    return W @ V\ndef attend_step(x_new, cache):\n    q, k, v = x_new @ Wq, x_new @ Wk, x_new @ Wv\n    if not cache['K']:\n        cache['K'].append(k); cache['V'].append(v)\n        return v\n    K, V = np.stack(cache['K']), np.stack(cache['V'])\n    s = K @ q / np.sqrt(d)\n    w = np.exp(s - s.max()); w /= w.sum()\n    cache['K'].append(k); cache['V'].append(v)\n    return w @ V"],
+  // Counts one key-value vector per layer per KV head (forgets that keys AND values are stored).
+  ["kv-cache", "p2", "M = {m['name']: m for m in DATA['models']}\ndef kv_bytes_per_token(m, bytes_per_number=2):\n    return m['layers'] * m['kv_heads'] * (m['d_model'] // m['heads']) * bytes_per_number\ndef cache_numbers(shape, layers):\n    n = 1\n    for s in shape:\n        n *= s\n    return layers * n"],
+  // Forgets that every layer attends: counts attention for one layer only.
+  ["long-context", "p1", "def flops_per_token(n_params, layers, d_model, context):\n    return 2 * n_params + 2 * context * d_model\ndef attention_share(n_params, layers, d_model, context):\n    a = 2 * context * d_model\n    return a / (2 * n_params + a)\ndef crossover(n_params, layers, d_model):\n    return n_params / d_model"],
+  // Forgets causality: the window looks both ways.
+  ["long-context", "p2", "import numpy as np\ndef sliding_window_mask(n, window):\n    i = np.arange(n)[:, None]; j = np.arange(n)[None, :]\n    return np.abs(i - j) < window"],
+  // Stretches positions instead of squeezing them.
+  ["long-context", "p3", "import numpy as np\ndef rope_angles(pos, d_head, base):\n    i = np.arange(d_head // 2)\n    return pos * base ** (-2 * i / d_head)\ndef interpolate(pos, train_len, target_len):\n    return pos * target_len / train_len"],
 ];
 
 describe("wrong answers fail", () => {

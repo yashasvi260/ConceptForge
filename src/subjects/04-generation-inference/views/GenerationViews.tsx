@@ -24,7 +24,7 @@ export function KvCacheView() {
   const off = kvCost(cfg, false);
   const onC = kvCost(cfg, true);
   return (
-    <Panel title="KV cache ON vs OFF (example: 32 layers, 8 KV heads × 128, fp16)">
+    <Panel title="KV cache on vs off (Llama 3 8B's shape: 32 layers, 8 KV heads × 128, 16-bit)">
       <div className="grid gap-4 sm:grid-cols-3">
         <Toggle label="KV cache" checked={on} onChange={setOn} description="reuse past keys/values" />
         <Slider label="Prompt tokens" value={prompt} min={16} max={16384} step={16} onChange={setPrompt} format={formatCount} />
