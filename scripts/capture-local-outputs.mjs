@@ -13,6 +13,7 @@ const IMAGE = "python:3.12-slim";
 const BASE = { torch: "2.15.0", transformers: "5.22.2", "sentence-transformers": "6.2.0", sentencepiece: "0.2.3" };
 const MODULES = {
   "01": { dir: "src/subjects/01-intro-llms/deep", packages: BASE, ids: ["dense", "context", "encdec", "repgen"] },
+  "03": { dir: "src/subjects/03-transformer-internals/deep", packages: BASE, ids: ["gpt2-block"] },
   "02": {
     dir: "src/subjects/02-tokens-embeddings/deep",
     packages: { ...BASE, tokenizers: "0.23.3", tiktoken: "0.14.0" },

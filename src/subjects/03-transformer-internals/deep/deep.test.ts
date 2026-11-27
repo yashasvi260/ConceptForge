@@ -40,6 +40,11 @@ function runScript(src: string): string {
 const deepSteps = steps.filter((s) => s.deep).map((s) => ({ ...s, lesson: content.lessons[s.id] }));
 
 describe("Module 03 deep lessons are wired", () => {
+  it("all 10 steps are deep lessons", () => {
+    expect(steps).toHaveLength(10);
+    expect(steps.every((s) => s.deep === true)).toBe(true);
+  });
+
   it("every step marked deep has a lesson, and every lesson's step is marked deep", () => {
     expect(deepSteps.map((s) => s.id)).toEqual(steps.filter((s) => content.lessons[s.id]).map((s) => s.id));
     expect(deepSteps.length).toBe(Object.keys(content.lessons).length);
@@ -106,6 +111,8 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["ffn", "p2", "import numpy as np\ndef ffn_gelu(X, W1, b1, W2, b2):\n    return gelu(X @ W1 + b1) @ W2 + b2\ndef ffn_swiglu(X, Wg, Wu, Wd):\n    return ((X @ Wg) * silu(X @ Wu)) @ Wd"],
   // Uses the full softmax probabilities of the chosen experts without renormalising them.
   ["moe", "p2", "import numpy as np\ndef route(scores, k):\n    scores = np.asarray(scores, dtype=float)\n    p = np.exp(scores - scores.max()); p /= p.sum()\n    top = np.argsort(-scores)[:k]\n    return top, p[top]\ndef moe_layer(X, experts, W_router, k):\n    out = np.zeros_like(X, dtype=float)\n    for i, x in enumerate(X):\n        top, w = route(x @ W_router, k)\n        out[i] = sum(wj * experts[j](x) for j, wj in zip(top, w))\n    return out"],
+  // Forgets the causal mask: later tokens leak into earlier ones.
+  ["recap", "p1", "import numpy as np\ndef layer_norm(x, g, b, eps=1e-5):\n    m = x.mean(-1, keepdims=True)\n    return (x - m) / np.sqrt(x.var(-1, keepdims=True) + eps) * g + b\ndef gelu(x):\n    return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x ** 3)))\ndef gpt2_block(x, w, H):\n    n, d = x.shape\n    dh = d // H\n    qkv = layer_norm(x, w['ln1_g'], w['ln1_b']) @ w['attn_w'] + w['attn_b']\n    q, k, v = (t.reshape(n, H, dh).transpose(1, 0, 2) for t in np.split(qkv, 3, axis=-1))\n    s = q @ k.transpose(0, 2, 1) / np.sqrt(dh)\n    a = np.exp(s - s.max(-1, keepdims=True))\n    a /= a.sum(-1, keepdims=True)\n    x = x + (a @ v).transpose(1, 0, 2).reshape(n, d) @ w['proj_w'] + w['proj_b']\n    h = gelu(layer_norm(x, w['ln2_g'], w['ln2_b']) @ w['fc_w'] + w['fc_b'])\n    return x + h @ w['out_w'] + w['out_b']\ndef make_weights(d, H, rng):\n    f = 4 * d\n    s = lambda *shape: rng.normal(0, 0.1, size=shape)\n    return {'ln1_g': 1 + s(d), 'ln1_b': s(d), 'attn_w': s(d, 3 * d), 'attn_b': s(3 * d), 'proj_w': s(d, d), 'proj_b': s(d), 'ln2_g': 1 + s(d), 'ln2_b': s(d), 'fc_w': s(d, f), 'fc_b': s(f), 'out_w': s(f, d), 'out_b': s(d)}"],
   ["positional", "p2", "import numpy as np\ndef rope(x, pos):\n    return np.asarray(x, dtype=float) + pos"],
 ];
 

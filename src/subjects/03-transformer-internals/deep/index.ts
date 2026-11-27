@@ -7,6 +7,7 @@ import { moe } from "./moe";
 import { multiHead } from "./multi-head";
 import { positional } from "./positional";
 import { qkv } from "./qkv";
+import { recap } from "./recap";
 import { residualNorm } from "./residual-norm";
 import { selfAttention } from "./self-attention";
 
@@ -22,6 +23,7 @@ export const content: DeepContent = {
     "residual-norm": residualNorm,
     ffn,
     moe,
+    recap,
   },
   data: deepData,
 };

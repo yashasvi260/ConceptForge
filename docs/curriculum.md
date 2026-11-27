@@ -69,7 +69,7 @@ Standards are enforced by tests (`core/deep.ts`, each module's `deep.test.ts`):
   showing "bank" in "approved the loan" vs. "river bank".
 - **Build:** train BPE merges from scratch and encode new words with them. Look up embeddings and rank sentences by cosine similarity.
 
-### Module 3: Inside the Transformer Block (`03-transformer-internals`)
+### Module 3: Inside the Transformer Block (`03-transformer-internals`) — deep ✓
 - **Concepts:**
   - The forward pass, end to end.
   - Positional information (sinusoidal, RoPE).

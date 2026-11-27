@@ -133,6 +133,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "recap",
+    deep: true,
     title: "You've opened the box",
     summary: "From token IDs to the final vector: every piece of a transformer block, and how they fit together.",
     body: [

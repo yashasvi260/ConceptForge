@@ -8,6 +8,7 @@ import { AttnCostLab, HeadFinderLab, QkvProjectLab, RealHeadsLab, SqrtDLab, Valu
 import { HeadAblationLab, HeadGridLab, HeadSplitLab, KvBudgetLab, KvRepeatLab, KvSharingLab } from "./views/labs/HeadsGqaLabs";
 import { FfnActiveLab, FfnShapesLab, PrePostLab, ResidualDepthLab, StreamNormsLab, SwigluParamsLab } from "./views/labs/NormFfnLabs";
 import { MoeBalanceLab, MoeMemoryLab, MoeParamsLab, MoeRouterLab } from "./views/labs/MoeLabs";
+import { BlockCheckLab, BlockTraceLab, WeightNamesLab } from "./views/labs/RecapLabs";
 import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
@@ -93,6 +94,12 @@ export function Stage({ step }: StageProps) {
         return <MoeBalanceLab />;
       case "moe-memory":
         return <MoeMemoryLab />;
+      case "block-trace":
+        return <BlockTraceLab />;
+      case "weight-names":
+        return <WeightNamesLab />;
+      case "block-check":
+        return <BlockCheckLab />;
       case "recap":
         return <RecapView />;
       default:

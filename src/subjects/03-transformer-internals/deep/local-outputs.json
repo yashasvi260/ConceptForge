@@ -1,0 +1,14 @@
+{
+  "gpt2-block": {
+    "code": "# A complete GPT-2 forward pass in plain NumPy, using GPT-2 small's real weights, checked against Hugging Face.\nimport numpy as np\nimport torch\nfrom transformers import GPT2Model, GPT2TokenizerFast\n\ntok = GPT2TokenizerFast.from_pretrained(\"openai-community/gpt2\")\nmodel = GPT2Model.from_pretrained(\"openai-community/gpt2\").eval()\nW = {k: v.numpy().astype(np.float64) for k, v in model.state_dict().items()}\nH, dh = 12, 64\n\ndef layer_norm(x, g, b, eps=1e-5):\n    m = x.mean(-1, keepdims=True)\n    return (x - m) / np.sqrt(x.var(-1, keepdims=True) + eps) * g + b\n\ndef gelu(x):\n    return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x ** 3)))\n\ndef block(x, l):\n    p, n = f\"h.{l}.\", len(x)\n    qkv = layer_norm(x, W[p + \"ln_1.weight\"], W[p + \"ln_1.bias\"]) @ W[p + \"attn.c_attn.weight\"] + W[p + \"attn.c_attn.bias\"]\n    q, k, v = (t.reshape(n, H, dh).transpose(1, 0, 2) for t in np.split(qkv, 3, axis=-1))\n    s = q @ k.transpose(0, 2, 1) / np.sqrt(dh) + np.triu(np.full((n, n), -np.inf), 1)   # causal mask\n    a = np.exp(s - s.max(-1, keepdims=True))\n    a /= a.sum(-1, keepdims=True)\n    x = x + (a @ v).transpose(1, 0, 2).reshape(n, H * dh) @ W[p + \"attn.c_proj.weight\"] + W[p + \"attn.c_proj.bias\"]\n    h = gelu(layer_norm(x, W[p + \"ln_2.weight\"], W[p + \"ln_2.bias\"]) @ W[p + \"mlp.c_fc.weight\"] + W[p + \"mlp.c_fc.bias\"])\n    return x + h @ W[p + \"mlp.c_proj.weight\"] + W[p + \"mlp.c_proj.bias\"]\n\ntext = \"The bank approved the loan because the customer had a steady income\"\nids = tok(text, return_tensors=\"pt\")\nwith torch.no_grad():\n    ref = model(**ids, output_hidden_states=True).hidden_states\n\nx = W[\"wte.weight\"][ids[\"input_ids\"][0].numpy()] + W[\"wpe.weight\"][: ids[\"input_ids\"].shape[1]]\nx = block(x, 0)\nprint(\"block 1, largest difference:\", f\"{np.abs(x - ref[1][0].numpy()).max():.1e}\")\nfor l in range(1, 12):\n    x = block(x, l)\nx = layer_norm(x, W[\"ln_f.weight\"], W[\"ln_f.bias\"])\nprint(\"all 12 blocks + final norm, largest difference:\", f\"{np.abs(x - ref[12][0].numpy()).max():.1e}\")\nprint(\"output shape:\", x.shape)\n",
+    "output": "block 1, largest difference: 2.4e-05\nall 12 blocks + final norm, largest difference: 4.5e-05\noutput shape: (12, 768)",
+    "ranAt": "2026-11-27",
+    "image": "python:3.12-slim",
+    "packages": {
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "sentence-transformers": "6.2.0",
+      "sentencepiece": "0.2.3"
+    }
+  }
+}

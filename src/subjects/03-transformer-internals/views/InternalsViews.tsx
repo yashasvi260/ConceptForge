@@ -192,7 +192,7 @@ export function FfnView() {
 
 
 export function RecapView() {
-  const items = ["Embeddings + position (sinusoidal or RoPE)", "Multi-head attention (causal for decoders; GQA to save memory)", "Residual connections + LayerNorm/RMSNorm", "Feed-forward network (GELU / SwiGLU)", "The final vector, ready to become next-token scores (Module 04)"];
+  const items = ["Embeddings + position (sinusoidal or RoPE)", "Multi-head attention (causal for decoders; GQA to save memory)", "Residual connections + LayerNorm/RMSNorm", "Feed-forward network (GELU / SwiGLU), or a Mixture of Experts", "The final vector, ready to become next-token scores (Module 04)"];
   return (
     <Panel title="The whole forward pass">
       <ol className="list-decimal space-y-1.5 pl-5 text-sm text-slate-200">

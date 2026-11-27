@@ -120,6 +120,37 @@ off.update(layer=None, head=None)
 for h_ in hooks:
     h_.remove()
 
+# The mini-project's check: a plain-NumPy GPT-2 forward pass with the real weights, against Hugging Face's output.
+import numpy as np
+sd = {k: v.detach().numpy().astype(np.float64) for k, v in model.state_dict().items()}
+def np_ln(x, g, b, eps=1e-5):
+    m = x.mean(-1, keepdims=True)
+    return (x - m) / np.sqrt(x.var(-1, keepdims=True) + eps) * g + b
+def np_gelu(x):
+    return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x ** 3)))
+def np_block(x, l):
+    p = f"h.{l}."
+    n = len(x)
+    q, k, v = np.split(np_ln(x, sd[p + "ln_1.weight"], sd[p + "ln_1.bias"]) @ sd[p + "attn.c_attn.weight"] + sd[p + "attn.c_attn.bias"], 3, axis=-1)
+    q, k, v = (t.reshape(n, H, dh).transpose(1, 0, 2) for t in (q, k, v))
+    sc = q @ k.transpose(0, 2, 1) / np.sqrt(dh) + np.triu(np.full((n, n), -np.inf), 1)
+    w = np.exp(sc - sc.max(-1, keepdims=True))
+    w /= w.sum(-1, keepdims=True)
+    x = x + (w @ v).transpose(1, 0, 2).reshape(n, H * dh) @ sd[p + "attn.c_proj.weight"] + sd[p + "attn.c_proj.bias"]
+    h = np_gelu(np_ln(x, sd[p + "ln_2.weight"], sd[p + "ln_2.bias"]) @ sd[p + "mlp.c_fc.weight"] + sd[p + "mlp.c_fc.bias"])
+    return x + h @ sd[p + "mlp.c_proj.weight"] + sd[p + "mlp.c_proj.bias"]
+ids0, _, out0 = run(SENTENCES[0])
+idl = ids0["input_ids"][0].numpy()
+x = sd["wte.weight"][idl] + sd["wpe.weight"][: len(idl)]
+ref = [h[0].numpy().astype(np.float64) for h in out0.hidden_states]
+check = []
+x1 = np_block(x, 0)
+check.append(["block 1 output", r(np.abs(x1 - ref[1]).max(), 6), r(np.abs(ref[1]).max(), 1)])
+for l in range(1, L):
+    x1 = np_block(x1, l)
+final = np_ln(x1, sd["ln_f.weight"], sd["ln_f.bias"])
+check.append(["all 12 blocks + final LayerNorm", r(np.abs(final - ref[12]).max(), 6), r(np.abs(ref[12]).max(), 1)])
+
 json.dump({
     "model": NAME, "transformers": transformers.__version__, "torch": torch.__version__,
     "config": {"layers": L, "heads": H, "d_model": cfg.n_embd, "d_head": cfg.n_embd // H, "ffn": 4 * cfg.n_embd, "context": cfg.n_positions, "vocab": cfg.vocab_size},
@@ -127,5 +158,6 @@ json.dump({
     "residual_norms": {"text": SENTENCES[0], "tokens": pieces, "norms": norms},
     "layernorm": layernorm, "position_similarity": pos_sim,
     "ffn": {"text": SENTENCES[0], "active_share": ffn_active, "negative_share": ffn_negative},
+    "numpy_check": {"text": SENTENCES[0], "rows": check},
     "head_ablation": {"base_loss": r(base, 4), "loss_increase": ablation, "sentences": STATS},
 }, sys.stdout, separators=(",", ":"))
