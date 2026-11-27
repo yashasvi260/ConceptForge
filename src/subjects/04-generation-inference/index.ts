@@ -1,15 +1,15 @@
 import { Sparkles } from "lucide-react";
+import { lazyStage } from "../../core/lazyStage";
 import { PART_TITLES } from "../../core/track";
 import type { SubjectModule } from "../../core/types";
 import { challenges } from "./challenges";
-import { Stage } from "./Stage";
 import { steps } from "./steps";
 
 const subject: SubjectModule = {
   id: "04-generation-inference",
   title: "How LLMs Generate",
   shortTitle: "Generation",
-  tagline: "From the last vector to the next token: logits, decoding rules and the KV cache.",
+  tagline: "From the last vector to the next token: logits, decoding rules, the generation loop, the KV cache and long context.",
   category: PART_TITLES[1],
   part: 1,
   moduleNumber: 4,
@@ -23,7 +23,8 @@ const subject: SubjectModule = {
   accent: "violet",
   steps,
   challenges,
-  Stage,
+  loadDeep: () => import("./deep").then((m) => m.content),
+  Stage: lazyStage(() => import("./Stage")),
 };
 
 export default subject;

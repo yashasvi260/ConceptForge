@@ -84,3 +84,29 @@ MoE (new step 9): counts from Mixtral 8x7B config reproduce 46,702,792,704 total
 Redirect narrowed: Module 03 now has 10 steps, so only old /11 (KV cache) redirects to Module 04 (old /10 would have hijacked the new recap).
 
 Module 03 complete: 10 deep lessons, 39 lab views, browser pass (1280 + 390) 0 problems. Recap listing gpt2-block captured (torch 2.15.0, transformers 5.22.2): NumPy vs HF 2.4e-5 after block 1, 4.5e-5 after the stack (recorder, eager attention: 3.9e-5).
+
+## Module 04 deep conversion (How LLMs Generate)
+
+Plan: 7 deep lessons — logits, decoding (greedy, temperature, beam), truncation (top-k, top-p, min-p, order),
+generation-loop (stop rules, prefill vs decode), kv-cache, long-context, recap (mini-project: a sampler and a
+generation loop with a KV cache that matches the loop without one).
+Real data: scripts/record-m04-generation.mjs → data/generation.json (GPT-2 small, transformers 5.22.2 / torch 2.15.0
+CPU, 4 threads): full-vocabulary next-token stats for 4 prompts at 20 temperatures (exact log-sum-exp per T), top-40
+logits, the LM head on one real vector (tied to wte), per-position predictions, greedy / beam / 18 seeded samples
+with each token's rank, a manual loop with and without the cache, timings, loss by context length on Pride and
+Prejudice (Gutenberg mirror), and the 1,025-token IndexError.
+Findings to use: greedy loops on "I'm sorry." (cat prompt); beam −42.6 vs greedy −49.5 log-prob; pure sampling at
+T=1 picks tokens ranked up to 10,730 (4–6 of 30 outside the top 100), top-k 40 / top-p 0.9 keep max rank 36–612;
+nucleus 0.9 = 1,503 tokens for "The capital of France is" vs 77 for "My favourite thing about weekends is"; GPT-2
+ranks " Paris" 5th (3.2%); cache vs no cache: same 20 tokens, max logit diff 6.7e-4; at 512 tokens of context one
+decode step takes 26 ms with the cache and 477 ms without (64 tokens: 1.7 s vs 30.7 s); prefill of 512 tokens 460 ms;
+loss falls from 5.18 (2–4 tokens of context) to 3.48 (257–1,023). Sampler order verified in transformers 5.22.2
+generation/utils.py: repetition penalty → temperature → top-k → top-p → min-p.
+
+| module | lesson | deep | labs | commit |
+| --- | --- | --- | --- | --- |
+| 04 | logits | yes | 4/4 (lm-head, softmax-shift, real-next, every-position) | (this commit) |
+| 04 | decoding | yes | 4/4 (greedy-loop, temperature, temp-samples, beam) | (this commit) |
+
+Steps 1–2 browser pass (1280 + 390): 8 lab views, 0 problems. Interim: truncation, kv-cache and recap are still
+short-format (illustrative SamplingView); old #/03-transformer-internals/11 now lands on kv-cache at index 3.

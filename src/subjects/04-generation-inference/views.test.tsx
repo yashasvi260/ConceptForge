@@ -5,14 +5,14 @@ import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["logits", "sampling", "kvcache", "recap"];
+const VIEWS = ["lm-head", "greedy-loop", "sampling", "kvcache", "recap"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);
 };
 
 describe("Module 04 content", () => {
-  it("is Module 4 with the logits, decoding and KV-cache steps moved from Module 03, and hinted challenges", () => {
+  it("is Module 4, its steps in order, with hinted challenges tied to real steps", () => {
     expect(subject.moduleNumber).toBe(4);
     expect(steps.map((s) => s.view)).toEqual(VIEWS);
     for (const s of steps) {
@@ -49,8 +49,8 @@ describe("Module 04 views", () => {
     expect(total()).not.toBe(on);
   });
 
-  it("logits view is labelled illustrative", () => {
-    renderStep("logits");
+  it("the short-format sampling view is labelled illustrative", () => {
+    renderStep("sampling");
     expect(screen.getAllByText(/illustrative/i).length).toBeGreaterThan(0);
   });
 

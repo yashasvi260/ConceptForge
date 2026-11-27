@@ -1,4 +1,4 @@
-/** Module 04 views: logits, decoding controls and the KV cache. */
+/** Module 04 short-format views: decoding controls (illustrative logits), the KV cache and the recap. */
 import { Dices } from "lucide-react";
 import { useState } from "react";
 import { Bar, Panel, Slider, Stat, Toggle } from "../../../components/ui";
@@ -15,33 +15,6 @@ export const NEXT: Candidate[] = [
   { token: " keyboard", logit: 1.2 },
   { token: " moon", logit: -1.0 },
 ];
-
-export function LogitsView() {
-  const probs = applySampling(NEXT, { temperature: 1, topK: 0, topP: 1 });
-  return (
-    <Panel title="“The cat sat on the …” (illustrative logits)">
-      <table className="w-full text-sm">
-        <thead className="text-left text-xs uppercase tracking-wider text-slate-500">
-          <tr>
-            <th className="font-normal">Token</th>
-            <th className="text-right font-normal">Logit</th>
-            <th className="text-right font-normal">Probability</th>
-          </tr>
-        </thead>
-        <tbody>
-          {probs.map((c) => (
-            <tr key={c.token} className="border-t border-slate-800">
-              <td className="py-1 font-mono text-slate-200">{JSON.stringify(c.token)}</td>
-              <td className="py-1 text-right font-mono text-slate-400">{c.logit.toFixed(1)}</td>
-              <td className="py-1 text-right font-mono text-emerald-200">{(c.prob * 100).toFixed(1)}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="mt-2 text-xs text-slate-500">A real model scores every vocabulary entry (≈200k for GPT-4o); these 7 are illustrative.</p>
-    </Panel>
-  );
-}
 
 export function SamplingView() {
   const [temperature, setTemperature] = useState(1);

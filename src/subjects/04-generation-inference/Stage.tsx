@@ -1,12 +1,28 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { StageProps } from "../../core/types";
-import { KvCacheView, LogitsView, RecapView, SamplingView } from "./views/GenerationViews";
+import { KvCacheView, RecapView, SamplingView } from "./views/GenerationViews";
+import { BeamLab, GreedyLoopLab, TempSamplesLab, TemperatureLab } from "./views/labs/DecodingLabs";
+import { EveryPositionLab, LmHeadLab, RealNextLab, SoftmaxShiftLab } from "./views/labs/LogitsLabs";
 
 export function Stage({ step }: StageProps) {
   const view = (() => {
     switch (step.view) {
-      case "logits":
-        return <LogitsView />;
+      case "lm-head":
+        return <LmHeadLab />;
+      case "softmax-shift":
+        return <SoftmaxShiftLab />;
+      case "real-next":
+        return <RealNextLab />;
+      case "every-position":
+        return <EveryPositionLab />;
+      case "greedy-loop":
+        return <GreedyLoopLab />;
+      case "temperature":
+        return <TemperatureLab />;
+      case "temp-samples":
+        return <TempSamplesLab />;
+      case "beam":
+        return <BeamLab />;
       case "sampling":
         return <SamplingView />;
       case "kvcache":

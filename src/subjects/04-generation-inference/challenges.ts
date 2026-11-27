@@ -8,7 +8,7 @@ export const challenges: ChallengeItem[] = [
     correctIndex: 1,
     hint: "Nucleus sampling adapts to the shape of the distribution.",
     explanation: "Top-p keeps a dynamic nucleus and truncates the unreliable tail (Holtzman et al. 2020).",
-    relatedStepId: "decoding",
+    relatedStepId: "truncation",
   },
   {
     id: "kv-cache",

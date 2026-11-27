@@ -1,26 +1,40 @@
 import type { LessonStep } from "../../core/types";
 
-/** Moved from Module 03 (curriculum v2). Facts checked in docs/research/part1-sources.md; logits are illustrative (labelled). */
+/** Curriculum v2. Deep lessons use real GPT-2 small recordings (data/generation.json); short steps still use illustrative logits (labelled). */
 export const steps: LessonStep[] = [
   {
     id: "logits",
+    deep: true,
     title: "From the last vector to logits",
-    summary: "The final vector is compared with every entry in the vocabulary, giving one score per possible next token.",
+    summary: "The final vector is compared with every vocabulary entry, giving one score per possible next token; softmax turns the scores into probabilities.",
     body: [
-      "Module 03 followed the vectors through every block. Now the last block's vector for the last position is multiplied by an output matrix with one column per vocabulary entry. For GPT-4o that's about 200k scores, called **logits**.",
-      "Softmax turns the logits into probabilities that sum to 1. Nothing is decided yet: the next step chooses one token from this distribution.",
+      "Module 03 followed the vectors through every block. Now the last block's vector for the last position is multiplied by an output matrix with one row per vocabulary entry: 50,257 scores for GPT-2, called **logits**.",
+      "Softmax turns the logits into probabilities. Only the differences between logits matter, and the same predictions at every position give the training loss and perplexity.",
     ],
-    tryIt: "Read the top candidates for the prompt; notice how a small logit gap becomes a big probability gap.",
-    keyTakeaway: "Logits = one score per vocabulary entry; softmax turns them into next-token probabilities.",
-    callout: "p(token) = softmax(h · W_out)",
-    view: "logits",
+    tryIt: "Compute a real GPT-2 logit from its final vector, then compare the shapes of four real next-token distributions.",
+    keyTakeaway: "Logits = one score per vocabulary entry; softmax (after subtracting the max) turns them into next-token probabilities.",
+    callout: "p(token) = softmax(h · Wᵀ)",
+    view: "lm-head",
   },
   {
     id: "decoding",
-    title: "Decoding: greedy, temperature, top-k, top-p",
-    summary: "A decoding rule turns the probabilities into one choice, trading reliability for variety.",
+    deep: true,
+    title: "Greedy, temperature and beam search",
+    summary: "A decoding rule turns the probabilities into one choice: greedy takes the top token, sampling draws one after temperature reshapes the distribution, beam search keeps several candidates.",
     body: [
-      "**Greedy** always takes the most likely token: predictable, but repetitive. **Temperature** divides the logits before softmax: below 1 sharpens, above 1 flattens.",
+      "**Greedy** always takes the most likely token: predictable, but it loops. **Sampling** draws a token at random; **temperature** divides the logits first, below 1 sharpening and above 1 flattening the distribution.",
+      "**Beam search** keeps the k most likely partial sequences and finds a more likely whole, which suits tasks with one right answer.",
+    ],
+    tryIt: "Watch GPT-2's greedy output loop, then slide the temperature on a real distribution and compare seeded samples.",
+    keyTakeaway: "Greedy is safe but repetitive; temperature controls how adventurous sampling is; beam search looks further ahead.",
+    callout: "p_T(i) = exp(zᵢ / T) / Σⱼ exp(zⱼ / T)",
+    view: "greedy-loop",
+  },
+  {
+    id: "truncation",
+    title: "Cutting the tail: top-k and top-p",
+    summary: "Truncation rules drop the long tail of unlikely tokens before sampling, so the variety comes from plausible choices only.",
+    body: [
       "**Top-k** keeps only the k most likely tokens (Fan et al. 2018 used k = 10). **Top-p** (nucleus sampling, Holtzman et al. 2020) keeps the smallest set whose probabilities add up to p, cutting off the unreliable tail.",
       "These settings are the `temperature`, `top_k` and `top_p` parameters of LLM APIs and Ollama.",
     ],
