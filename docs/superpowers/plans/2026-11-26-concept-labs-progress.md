@@ -99,14 +99,21 @@ Findings to use: greedy loops on "I'm sorry." (cat prompt); beam −42.6 vs gree
 T=1 picks tokens ranked up to 10,730 (4–6 of 30 outside the top 100), top-k 40 / top-p 0.9 keep max rank 36–612;
 nucleus 0.9 = 1,503 tokens for "The capital of France is" vs 77 for "My favourite thing about weekends is"; GPT-2
 ranks " Paris" 5th (3.2%); cache vs no cache: same 20 tokens, max logit diff 6.7e-4; at 512 tokens of context one
-decode step takes 26 ms with the cache and 477 ms without (64 tokens: 1.7 s vs 30.7 s); prefill of 512 tokens 460 ms;
+decode step takes 25.7 ms with the cache and 479 ms without (64 tokens: 1.7 s vs 30.7 s); prefill 64 → 1,024 tokens:
+63 → 1,330 ms (512: 439 ms); repetition_penalty 1.2 breaks the greedy loop but bends grammar (log-prob −93.7),
+no_repeat_ngram_size 3 escapes it at −60.4;
 loss falls from 5.18 (2–4 tokens of context) to 3.48 (257–1,023). Sampler order verified in transformers 5.22.2
 generation/utils.py: repetition penalty → temperature → top-k → top-p → min-p.
 
 | module | lesson | deep | labs | commit |
 | --- | --- | --- | --- | --- |
-| 04 | logits | yes | 4/4 (lm-head, softmax-shift, real-next, every-position) | (this commit) |
-| 04 | decoding | yes | 4/4 (greedy-loop, temperature, temp-samples, beam) | (this commit) |
+| 04 | logits | yes | 4/4 (lm-head, softmax-shift, real-next, every-position) | 2e4e118 |
+| 04 | decoding | yes | 4/4 (greedy-loop, temperature, temp-samples, beam) | 2e4e118 |
+| 04 | truncation | yes | 4/4 (tail-mass, topk-fixed, nucleus, sampler-chain) | (this commit) |
+| 04 | generation-loop | yes | 4/4 (loop-steps, stop-rules, prefill-decode, repetition) | (this commit) |
 
-Steps 1–2 browser pass (1280 + 390): 8 lab views, 0 problems. Interim: truncation, kv-cache and recap are still
-short-format (illustrative SamplingView); old #/03-transformer-internals/11 now lands on kv-cache at index 3.
+Steps 1–4 browser pass (1280 + 390): 16 lab views, 0 problems. Interim: kv-cache and recap are still short-format;
+old #/03-transformer-internals/11 now lands on kv-cache at index 4. The illustrative SamplingView is gone (NEXT and
+applySampling stay for Module 01's map). Ollama defaults quoted from its Modelfile docs (temperature 0.8, top_k 40,
+top_p 0.9, min_p 0.0, repeat_penalty 1.0, num_predict −1); HF repetition penalty checked in logits_process.py
+(once per token, prompt included, negative × penalty / positive ÷ penalty).

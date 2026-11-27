@@ -29,12 +29,14 @@ export const GEN = raw as unknown as {
   positions: { text: string; rows: { prefix_end: string; actual: string; p_actual: number; guess: string; p_guess: number }[]; mean_loss: number };
   greedy: Record<string, Continuation>;
   beam: Continuation;
+  penalties: Record<string, Continuation>;
+  eos: { id: number; token: string };
   sample_prompt: string;
   samples: Sample[];
   kv: {
     prompt: string; same_tokens: boolean; max_logit_diff: number; text: string;
     steps_cache: LoopStep[]; steps_nocache: LoopStep[]; layer_shape: number[]; layers: number; bytes_per_number: number;
-    timing: { cpu_threads: number; prompt_tokens: number; new_tokens: number; prefill_ms: number; decode_ms_median_cache: number; decode_ms_median_nocache: number; decode_total_ms_cache: number; decode_total_ms_nocache: number };
+    timing: { cpu_threads: number; prompt_tokens: number; new_tokens: number; prefill_ms: number; prefill_by_length: { tokens: number; ms: number }[]; decode_ms_median_cache: number; decode_ms_median_nocache: number; decode_total_ms_cache: number; decode_total_ms_nocache: number };
   };
   long_context: { n_positions: number; text: string; windows: number; by_context: { from: number; to: number; loss: number; count: number }[]; over_limit_error: string };
 };

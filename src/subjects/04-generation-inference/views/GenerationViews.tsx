@@ -1,10 +1,9 @@
-/** Module 04 short-format views: decoding controls (illustrative logits), the KV cache and the recap. */
-import { Dices } from "lucide-react";
+/** Module 04 short-format views (the KV cache and the recap), plus NEXT: illustrative logits used by Module 01's map. */
 import { useState } from "react";
 import { Bar, Panel, Slider, Stat, Toggle } from "../../../components/ui";
 import { formatBytes, formatCount } from "../../03-transformer-internals/format";
 import { kvCost } from "../kvcache";
-import { applySampling, type Candidate } from "../sampling";
+import type { Candidate } from "../sampling";
 
 export const NEXT: Candidate[] = [
   { token: " mat", logit: 4.1 },
@@ -15,46 +14,6 @@ export const NEXT: Candidate[] = [
   { token: " keyboard", logit: 1.2 },
   { token: " moon", logit: -1.0 },
 ];
-
-export function SamplingView() {
-  const [temperature, setTemperature] = useState(1);
-  const [topK, setTopK] = useState(0);
-  const [topP, setTopP] = useState(1);
-  const [samples, setSamples] = useState<string[]>([]);
-  const r = applySampling(NEXT, { temperature, topK, topP });
-  const draw = () => {
-    let x = Math.random();
-    for (const c of r) {
-      x -= c.finalProb;
-      if (x < 0) return c.token;
-    }
-    return r.find((c) => c.kept)!.token;
-  };
-  return (
-    <Panel title="Decoding controls (illustrative logits)" icon={<Dices size={14} />}>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Slider label="Temperature" value={temperature} min={0.1} max={2} step={0.05} onChange={setTemperature} format={(v) => v.toFixed(2)} />
-        <Slider label="Top-K" value={topK} min={0} max={7} onChange={setTopK} format={(v) => (v === 0 ? "off" : String(v))} />
-        <Slider label="Top-P" value={topP} min={0.05} max={1} step={0.01} onChange={setTopP} format={(v) => v.toFixed(2)} />
-      </div>
-      <div className="mt-4 space-y-1.5" data-testid="sampling-bars">
-        {r.map((c) => (
-          <Bar key={c.token} label={JSON.stringify(c.token)} value={c.finalProb} display={c.kept ? `${(c.finalProb * 100).toFixed(1)}%` : "cut"} dim={!c.kept} color="var(--color-emerald-400)" />
-        ))}
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={() => setSamples((s) => [draw(), ...s].slice(0, 12))} className="rounded-md bg-emerald-500 px-2.5 py-1 text-xs font-medium text-slate-950 hover:bg-emerald-400">
-          Sample
-        </button>
-        {samples.map((t, i) => (
-          <span key={i} className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs text-slate-200">
-            {JSON.stringify(t)}
-          </span>
-        ))}
-      </div>
-    </Panel>
-  );
-}
 
 export function KvCacheView() {
   const [on, setOn] = useState(true);

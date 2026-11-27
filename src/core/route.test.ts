@@ -43,7 +43,7 @@ describe("route", () => {
 
 describe("steps moved between modules", () => {
   it("the old Module 03 KV-cache link opens that lesson in Module 04; steps 9 and 10 stay in Module 03", () => {
-    expect(parseHash("#/03-transformer-internals/11")).toEqual({ view: "module", subjectId: "04-generation-inference", stepIndex: 3, mode: "lesson" });
+    expect(parseHash("#/03-transformer-internals/11")).toEqual({ view: "module", subjectId: "04-generation-inference", stepIndex: 4, mode: "lesson" });
     expect(parseHash("#/03-transformer-internals/10")).toEqual({ view: "module", subjectId: "03-transformer-internals", stepIndex: 9, mode: "lesson" });
     expect(parseHash("#/03-transformer-internals/9")).toEqual({ view: "module", subjectId: "03-transformer-internals", stepIndex: 8, mode: "lesson" });
   });

@@ -21,7 +21,7 @@ export const HOME_HASH = "#/";
  * (the KV cache) is redirected: Module 03 now has 10 lessons, so steps 9 and 10 are its own again.
  */
 const MOVED_STEPS: Record<string, Record<number, [string, number]>> = {
-  "03-transformer-internals": { 11: ["04-generation-inference", 3] },
+  "03-transformer-internals": { 11: ["04-generation-inference", 4] },
 };
 
 export function parseHash(hash: string): Route {

@@ -117,6 +117,13 @@ def generate(prompt, n, **kw):
 
 greedy = {p: generate(p, 40, do_sample=False) for p in ["The cat sat on the", "Your loan application has been"]}
 beam = generate("The cat sat on the", 40, do_sample=False, num_beams=5)
+# Logit processors that look back at what was written (HF: repetition_penalty divides positive logits and
+# multiplies negative ones by the penalty for every token already in the sequence; no_repeat_ngram_size bans repeats).
+penalties = {
+    "none": greedy["The cat sat on the"],
+    "repetition_penalty 1.2": generate("The cat sat on the", 40, do_sample=False, repetition_penalty=1.2),
+    "no_repeat_ngram_size 3": generate("The cat sat on the", 40, do_sample=False, no_repeat_ngram_size=3),
+}
 SAMPLE_PROMPT = "My favourite thing about weekends is"
 samples = []
 for label, kw in [
@@ -202,6 +209,12 @@ with torch.no_grad():
         return per
     with_c = decode(True)
     without_c = decode(False)
+# Prefill time against prompt length (the whole prompt in one parallel pass).
+timing["prefill_by_length"] = []
+with torch.no_grad():
+    for n in [64, 128, 256, 512, 1024]:
+        x = torch.tensor([book_ids[:n]])
+        timing["prefill_by_length"].append({"tokens": n, "ms": r(timed(lambda: model(x, use_cache=True)), 1)})
 timing["decode_ms_median_cache"] = r(statistics.median(with_c), 2)
 timing["decode_ms_median_nocache"] = r(statistics.median(without_c), 2)
 timing["decode_total_ms_cache"] = r(sum(with_c), 1)
@@ -260,6 +273,8 @@ print(json.dumps({
     "positions": {"text": SENT, "rows": positions, "mean_loss": r(sum(nll) / len(nll))},
     "greedy": greedy,
     "beam": beam,
+    "penalties": penalties,
+    "eos": {"id": EOS, "token": piece(EOS)},
     "sample_prompt": SAMPLE_PROMPT,
     "samples": samples,
     "kv": kv,

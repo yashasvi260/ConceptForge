@@ -1,11 +1,11 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import App from "../../App";
 import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["lm-head", "greedy-loop", "sampling", "kvcache", "recap"];
+const VIEWS = ["lm-head", "greedy-loop", "tail-mass", "loop-steps", "kvcache", "recap"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);
@@ -31,16 +31,6 @@ describe("Module 04 content", () => {
 });
 
 describe("Module 04 views", () => {
-  it("sampling sliders change the probability bars", () => {
-    renderStep("sampling");
-    const bars = () => within(screen.getByTestId("sampling-bars")).getAllByText(/%|cut/).map((e) => e.textContent).join(",");
-    const before = bars();
-    fireEvent.change(screen.getByRole("slider", { name: "Temperature" }), { target: { value: "2" } });
-    expect(bars()).not.toBe(before);
-    fireEvent.change(screen.getByRole("slider", { name: "Top-K" }), { target: { value: "1" } });
-    expect(bars()).toMatch(/cut/);
-  });
-
   it("KV cache toggle changes the totals", () => {
     renderStep("kvcache");
     const total = () => screen.getByTestId("kv-dots").textContent;
@@ -49,9 +39,5 @@ describe("Module 04 views", () => {
     expect(total()).not.toBe(on);
   });
 
-  it("the short-format sampling view is labelled illustrative", () => {
-    renderStep("sampling");
-    expect(screen.getAllByText(/illustrative/i).length).toBeGreaterThan(0);
-  });
 
 });

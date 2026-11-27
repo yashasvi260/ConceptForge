@@ -41,7 +41,7 @@ const deepSteps = steps.filter((s) => s.deep).map((s) => ({ ...s, lesson: conten
 
 describe("Module 04 deep lessons are wired", () => {
   it("the converted steps are deep lessons", () => {
-    expect(steps.filter((s) => s.deep).map((s) => s.id)).toEqual(["logits", "decoding"]);
+    expect(steps.filter((s) => s.deep).map((s) => s.id)).toEqual(["logits", "decoding", "truncation", "generation-loop"]);
   });
 
   it("every step marked deep has a lesson, and every lesson's step is marked deep", () => {
@@ -104,6 +104,18 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["decoding", "p2", "import numpy as np\ndef sample(p, rng):\n    return int(rng.integers(len(p)))"],
   // Forgets to add up the log-probabilities: each beam is scored by its last token only.
   ["decoding", "p3", "def beam_search(next_logprobs, start, steps, width):\n    beams = [(list(start), 0.0)]\n    for _ in range(steps):\n        grown = [(seq + [t], lp) for seq, score in beams for t, lp in next_logprobs(seq).items()]\n        beams = sorted(grown, key=lambda b: -b[1])[:width]\n    return beams[0]"],
+  // Top-k that keeps the first k entries instead of the k largest.
+  ["truncation", "p1", "import numpy as np\ndef top_k_filter(z, k):\n    z = np.asarray(z, dtype=float)\n    out = np.full_like(z, -np.inf)\n    out[:k] = z[:k]\n    return out\ndef softmax(z):\n    z = np.asarray(z, dtype=float)\n    e = np.exp(z - z.max())\n    return e / e.sum()"],
+  // Top-p that stops just BEFORE the total reaches p: the nucleus is one token short.
+  ["truncation", "p2", "import numpy as np\ndef top_p_mask(p, top_p):\n    p = np.asarray(p, dtype=float)\n    order = np.argsort(-p)\n    cum = np.cumsum(p[order])\n    n = max(1, int((cum < top_p).sum()))\n    mask = np.zeros(len(p), dtype=bool)\n    mask[order[:n]] = True\n    return mask"],
+  // Truncates before applying the temperature.
+  ["truncation", "p3", "import numpy as np\ndef min_p_mask(p, min_p):\n    p = np.asarray(p, dtype=float)\n    return p >= min_p * p.max()\ndef sample_chain(z, rng, temperature=1.0, top_k=0, top_p=1.0, min_p=0.0):\n    z = np.asarray(z, dtype=float)\n    if top_k:\n        z = top_k_filter(z, top_k)\n    p = softmax(z)\n    if top_p < 1.0:\n        p = np.where(top_p_mask(p, top_p), p, 0.0); p /= p.sum()\n    if min_p > 0.0:\n        p = np.where(min_p_mask(p, min_p), p, 0.0); p /= p.sum()\n    p = p ** (1 / temperature); p /= p.sum()\n    return int(np.searchsorted(np.cumsum(p), rng.random(), side='right'))"],
+  // Includes the end-of-sequence token in the output.
+  ["generation-loop", "p1", "def generate(next_token, prompt_ids, max_new_tokens, eos_id):\n    ids = list(prompt_ids); new = []\n    for _ in range(max_new_tokens):\n        t = next_token(ids)\n        ids.append(t); new.append(t)\n        if t == eos_id:\n            break\n    return new"],
+  // Cuts at the first stop sequence in the LIST, not the earliest in the text.
+  ["generation-loop", "p2", "def cut_at_stop(text, stops):\n    for s in stops:\n        if s in text:\n            return text[: text.find(s)], True\n    return text, False"],
+  // Divides every seen logit by the penalty: negative logits become MORE likely.
+  ["generation-loop", "p3", "import numpy as np\ndef repetition_penalty(logits, seen_ids, penalty):\n    out = np.array(logits, dtype=float)\n    for i in set(seen_ids):\n        out[i] = out[i] / penalty\n    return out"],
 ];
 
 describe("wrong answers fail", () => {

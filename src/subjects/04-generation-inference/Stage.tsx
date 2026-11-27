@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { StageProps } from "../../core/types";
-import { KvCacheView, RecapView, SamplingView } from "./views/GenerationViews";
+import { KvCacheView, RecapView } from "./views/GenerationViews";
 import { BeamLab, GreedyLoopLab, TempSamplesLab, TemperatureLab } from "./views/labs/DecodingLabs";
 import { EveryPositionLab, LmHeadLab, RealNextLab, SoftmaxShiftLab } from "./views/labs/LogitsLabs";
+import { LoopStepsLab, PrefillDecodeLab, RepetitionLab, StopRulesLab } from "./views/labs/LoopLabs";
+import { NucleusLab, SamplerChainLab, TailMassLab, TopKFixedLab } from "./views/labs/TruncationLabs";
 
 export function Stage({ step }: StageProps) {
   const view = (() => {
@@ -23,8 +25,22 @@ export function Stage({ step }: StageProps) {
         return <TempSamplesLab />;
       case "beam":
         return <BeamLab />;
-      case "sampling":
-        return <SamplingView />;
+      case "tail-mass":
+        return <TailMassLab />;
+      case "topk-fixed":
+        return <TopKFixedLab />;
+      case "nucleus":
+        return <NucleusLab />;
+      case "sampler-chain":
+        return <SamplerChainLab />;
+      case "loop-steps":
+        return <LoopStepsLab />;
+      case "stop-rules":
+        return <StopRulesLab />;
+      case "prefill-decode":
+        return <PrefillDecodeLab />;
+      case "repetition":
+        return <RepetitionLab />;
       case "kvcache":
         return <KvCacheView />;
       case "recap":
