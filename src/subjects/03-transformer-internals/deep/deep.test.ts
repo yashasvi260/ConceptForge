@@ -104,6 +104,8 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["residual-norm", "p1", "import numpy as np\ndef layer_norm(x, gain, bias, eps=1e-5):\n    x = np.asarray(x, dtype=float)\n    return (x - x.mean()) / np.sqrt(x.var() + eps) * gain + bias\ndef rms_norm(x, gain, eps=1e-6):\n    x = np.asarray(x, dtype=float)\n    return x / np.sqrt((x ** 2).mean() + eps) * gain"],
   // Swaps which half is gated: the content goes through SiLU instead of the gate.
   ["ffn", "p2", "import numpy as np\ndef ffn_gelu(X, W1, b1, W2, b2):\n    return gelu(X @ W1 + b1) @ W2 + b2\ndef ffn_swiglu(X, Wg, Wu, Wd):\n    return ((X @ Wg) * silu(X @ Wu)) @ Wd"],
+  // Uses the full softmax probabilities of the chosen experts without renormalising them.
+  ["moe", "p2", "import numpy as np\ndef route(scores, k):\n    scores = np.asarray(scores, dtype=float)\n    p = np.exp(scores - scores.max()); p /= p.sum()\n    top = np.argsort(-scores)[:k]\n    return top, p[top]\ndef moe_layer(X, experts, W_router, k):\n    out = np.zeros_like(X, dtype=float)\n    for i, x in enumerate(X):\n        top, w = route(x @ W_router, k)\n        out[i] = sum(wj * experts[j](x) for j, wj in zip(top, w))\n    return out"],
   ["positional", "p2", "import numpy as np\ndef rope(x, pos):\n    return np.asarray(x, dtype=float) + pos"],
 ];
 

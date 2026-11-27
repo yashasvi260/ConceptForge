@@ -5,14 +5,14 @@ import subject from ".";
 import { Stage } from "./Stage";
 import { steps } from "./steps";
 
-const VIEWS = ["forward", "positional", "qkv", "attention", "multihead", "gqa", "norm", "ffn", "recap"];
+const VIEWS = ["forward", "positional", "qkv", "attention", "multihead", "gqa", "norm", "ffn", "moe-params", "recap"];
 const renderStep = (view: string) => {
   const i = steps.findIndex((s) => s.view === view);
   return render(<Stage step={steps[i]!} stepIndex={i} />);
 };
 
 describe("Module 03 content", () => {
-  it("has 9 steps in order, ≥ 6 hinted challenges and a bridge", () => {
+  it("has 10 steps in order, ≥ 6 hinted challenges and a bridge", () => {
     expect(subject.moduleNumber).toBe(3);
     expect(steps.map((s) => s.view)).toEqual(VIEWS);
     for (const s of steps) {
@@ -23,10 +23,10 @@ describe("Module 03 content", () => {
     expect(subject.challenges.every((c) => c.hint && c.relatedStepId)).toBe(true);
   });
 
-  it("ends with an up-next card pointing to Module 04, How LLMs Generate", () => {
+  it("ends with an up-next card pointing to Module 04, How LLMs Generate", async () => {
     window.location.hash = `#/03-transformer-internals/${steps.length}`;
     render(<App />);
-    expect(screen.getByRole("note", { name: "Up next" })).toHaveTextContent(/Module 04: How LLMs Generate/);
+    expect(await screen.findByRole("note", { name: "Up next" })).toHaveTextContent(/Module 04: How LLMs Generate/);
   });
 });
 

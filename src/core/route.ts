@@ -17,11 +17,11 @@ export const HOME_HASH = "#/";
 
 /**
  * Lessons that moved to another module: old 1-based step number → [new module, new 0-based index].
- * Module 03's decoding and KV-cache steps moved to Module 04 (curriculum v2). Old step 9 (logits) is not
- * redirected, because 9 is now Module 03's recap.
+ * Module 03's logits, decoding and KV-cache steps (old 9–11) moved to Module 04 (curriculum v2). Only old step 11
+ * (the KV cache) is redirected: Module 03 now has 10 lessons, so steps 9 and 10 are its own again.
  */
 const MOVED_STEPS: Record<string, Record<number, [string, number]>> = {
-  "03-transformer-internals": { 10: ["04-generation-inference", 1], 11: ["04-generation-inference", 2] },
+  "03-transformer-internals": { 11: ["04-generation-inference", 2] },
 };
 
 export function parseHash(hash: string): Route {

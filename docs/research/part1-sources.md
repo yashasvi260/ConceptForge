@@ -33,6 +33,8 @@ Checked 2026-11-25 against the papers' own text (abstracts on arxiv.org, full te
 | RMSNorm normalises by root mean square, drops LayerNorm's re-centering ("dispensable") and is "computationally simpler and thus more efficient". | Zhang & Sennrich 2019 — https://arxiv.org/abs/1910.07467 |
 | FFN_SwiGLU(x) = (Swish₁(xW) ⊗ xV)W₂, Swish_β(x) = x·σ(βx); GLU variants replace the first linear layer + activation in the FFN. | Shazeer 2020 §2 — https://ar5iv.labs.arxiv.org/html/2002.05202 |
 | GELU(x) = x·Φ(x), Φ = standard normal CDF (the lesson uses the common tanh approximation, labelled). | Hendrycks & Gimpel — https://arxiv.org/abs/1606.08415 |
+| Mixtral 8x7B: 8 experts per layer, 2 per token; "47B parameters" of which "13B active" per token; config d_model 4096, ffn 14336, 32 layers, 8 KV heads, vocab 32000 (computed exactly: 46,702,792,704 total, 12,879,925,248 active). | Jiang et al. 2024 — https://arxiv.org/abs/2401.04088; https://huggingface.co/mistralai/Mixtral-8x7B-v0.1/blob/main/config.json |
+| Sparsely-gated MoE with a trainable router; Switch Transformer routes each token to 1 expert and adds an auxiliary load-balancing loss α·N·Σ fᵢ·Pᵢ. | Shazeer et al. 2017 — https://arxiv.org/abs/1701.06538; Fedus et al. 2021 — https://arxiv.org/abs/2101.03961 |
 | Top-k sampling: "randomly sample from the k=10 most likely candidates". | Fan et al. 2018 §5.4 — https://ar5iv.labs.arxiv.org/html/1805.04833 |
 | Nucleus (top-p) sampling: sample "from the dynamic nucleus of the probability distribution", "truncating the less reliable tail". | Holtzman et al. 2020 — https://arxiv.org/abs/1904.09751 |
 

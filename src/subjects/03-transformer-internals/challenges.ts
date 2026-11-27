@@ -79,4 +79,18 @@ export const challenges: ChallengeItem[] = [
     explanation: "FFN_SwiGLU(x) = (Swish₁(xW) ⊙ xV)W₂ (Shazeer 2020).",
     relatedStepId: "ffn",
   },
+  {
+    id: "moe-active",
+    prompt: "In a Mixture-of-Experts model like Mixtral 8x7B, what does the router do?",
+    options: [
+      "It chooses which layer runs next",
+      "It scores the experts for each token and sends the token through only the top few (2 of 8 in Mixtral)",
+      "It splits the vocabulary between experts",
+      "It decides how long the answer should be",
+    ],
+    correctIndex: 1,
+    hint: "Each token uses only some of the feed-forward networks. Something has to pick them.",
+    explanation: "The router is a small d × E matrix; its top-k scores pick the experts, and their outputs are added with softmax weights.",
+    relatedStepId: "moe",
+  },
 ];

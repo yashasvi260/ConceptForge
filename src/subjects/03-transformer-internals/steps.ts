@@ -118,6 +118,20 @@ export const steps: LessonStep[] = [
     view: "ffn",
   },
   {
+    id: "moe",
+    deep: true,
+    title: "Mixture of Experts",
+    summary: "Replace one feed-forward network with many, and let a router send each token to only a few of them.",
+    body: [
+      "A **Mixture-of-Experts** (MoE) block keeps attention as it is but has several feed-forward networks (**experts**). A small **router** scores the experts for each token and only the top few run.",
+      "Mixtral 8x7B has 8 experts per block and uses 2 per token: about 46.7 billion parameters in total, but only about 12.9 billion are used for any one token.",
+    ],
+    tryIt: "Change the number of experts and how many each token uses, and compare total with active parameters.",
+    keyTakeaway: "MoE: many feed-forward experts, a router picks a few per token, so parameters grow faster than compute.",
+    callout: "y = Σ over the top-k experts of gate_i(x) · Expert_i(x)",
+    view: "moe-params",
+  },
+  {
     id: "recap",
     title: "You've opened the box",
     summary: "From token IDs to the final vector: every piece of a transformer block, and how they fit together.",

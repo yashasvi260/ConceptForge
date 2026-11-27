@@ -72,10 +72,13 @@ first-token norm grows 10 â†’ ~3,100; position neighbours 0.997, distance 256 â†
 | 03 | self-attention | yes | 4/4 (real-heads, attention, head-finder, attn-cost) | f3265e7 |
 | 03 | multi-head | yes | 4/4 (multihead, head-split, head-grid, head-ablation) | 6b8d69d |
 | 03 | gqa | yes | 4/4 (gqa, kv-sharing, kv-budget, kv-repeat) | 6b8d69d |
-| 03 | residual-norm | yes | 4/4 (stream-norms, residual-depth, norm, pre-post) | (this commit) |
-| 03 | ffn | yes | 4/4 (ffn-shapes, ffn, ffn-active, swiglu-params) | (this commit) |
-| 03 | moe | | | |
+| 03 | residual-norm | yes | 4/4 (stream-norms, residual-depth, norm, pre-post) | 6b5870b |
+| 03 | ffn | yes | 4/4 (ffn-shapes, ffn, ffn-active, swiglu-params) | 6b5870b |
+| 03 | moe | yes | 4/4 (moe-params, moe-router, moe-balance, moe-memory) | (this commit) |
 | 03 | recap | | | |
 
 Head ablation added to gpt2.json: base loss 4.0468 over 8 sentences; 78/144 heads < +0.01, 129 < +0.05, 8 > +0.1; most important L0H10 +0.486; L4H11 +0.005.
 Validator now rejects repeated column names in worked tables (React keys; caught by the smoke test in lesson 5).
+
+MoE (new step 9): counts from Mixtral 8x7B config reproduce 46,702,792,704 total / 12,879,925,248 active; router scores and batches are labelled made-up.
+Redirect narrowed: Module 03 now has 10 steps, so only old /11 (KV cache) redirects to Module 04 (old /10 would have hijacked the new recap).

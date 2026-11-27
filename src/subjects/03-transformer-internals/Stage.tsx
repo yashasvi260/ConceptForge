@@ -7,6 +7,7 @@ import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } fr
 import { AttnCostLab, HeadFinderLab, QkvProjectLab, RealHeadsLab, SqrtDLab, ValueMixLab } from "./views/labs/AttentionLabs";
 import { HeadAblationLab, HeadGridLab, HeadSplitLab, KvBudgetLab, KvRepeatLab, KvSharingLab } from "./views/labs/HeadsGqaLabs";
 import { FfnActiveLab, FfnShapesLab, PrePostLab, ResidualDepthLab, StreamNormsLab, SwigluParamsLab } from "./views/labs/NormFfnLabs";
+import { MoeBalanceLab, MoeMemoryLab, MoeParamsLab, MoeRouterLab } from "./views/labs/MoeLabs";
 import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
@@ -84,6 +85,14 @@ export function Stage({ step }: StageProps) {
         return <FfnActiveLab />;
       case "swiglu-params":
         return <SwigluParamsLab />;
+      case "moe-params":
+        return <MoeParamsLab />;
+      case "moe-router":
+        return <MoeRouterLab />;
+      case "moe-balance":
+        return <MoeBalanceLab />;
+      case "moe-memory":
+        return <MoeMemoryLab />;
       case "recap":
         return <RecapView />;
       default:

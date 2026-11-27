@@ -3,6 +3,7 @@ import { deepData } from "./data";
 import { ffn } from "./ffn";
 import { forwardPass } from "./forward-pass";
 import { gqa } from "./gqa";
+import { moe } from "./moe";
 import { multiHead } from "./multi-head";
 import { positional } from "./positional";
 import { qkv } from "./qkv";
@@ -20,6 +21,7 @@ export const content: DeepContent = {
     gqa,
     "residual-norm": residualNorm,
     ffn,
+    moe,
   },
   data: deepData,
 };
