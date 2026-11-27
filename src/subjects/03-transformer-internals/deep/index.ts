@@ -1,6 +1,8 @@
 import type { DeepContent } from "../../../core/types";
 import { deepData } from "./data";
 import { forwardPass } from "./forward-pass";
+import { gqa } from "./gqa";
+import { multiHead } from "./multi-head";
 import { positional } from "./positional";
 import { qkv } from "./qkv";
 import { selfAttention } from "./self-attention";
@@ -12,6 +14,8 @@ export const content: DeepContent = {
     positional,
     qkv,
     "self-attention": selfAttention,
+    "multi-head": multiHead,
+    gqa,
   },
   data: deepData,
 };

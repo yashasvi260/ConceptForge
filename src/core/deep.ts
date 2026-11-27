@@ -18,6 +18,14 @@ export function validateDeep(d: DeepLesson): string[] {
   range("concept", wordCount(conceptText), DEPTH.concept);
   if (!d.concept.some((c) => c.mistake?.trim())) out.push("concept: no common mistake");
   if (!d.worked.some((w) => w.kind === "table")) out.push("worked: no table");
+  for (const w of d.worked) {
+    if (w.kind !== "table") continue;
+    const seen = new Set<string>();
+    for (const c of w.columns) {
+      if (seen.has(c)) out.push(`worked "${w.caption}": repeated column "${c}"`);
+      seen.add(c);
+    }
+  }
   if (d.checks.length < 2 || d.checks.length > 3) out.push(`checks: ${d.checks.length} (want 2–3)`);
   if (!d.oneSentence.trim()) out.push("oneSentence: empty");
   if (!d.guided.trim()) out.push("guided: empty");

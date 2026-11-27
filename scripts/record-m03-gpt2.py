@@ -4,7 +4,7 @@
 import json, math, sys
 import torch
 import transformers
-from transformers import GPT2Model, GPT2TokenizerFast
+from transformers import GPT2LMHeadModel, GPT2Model, GPT2TokenizerFast
 
 torch.manual_seed(0)
 NAME = "openai-community/gpt2"
@@ -92,6 +92,34 @@ for h_ in hooks:
 ffn_active = [r((acts[l] > 0.1).float().mean(), 3) for l in range(L)]
 ffn_negative = [r((acts[l] < 0).float().mean(), 3) for l in range(L)]
 
+# Head ablation: switch off one head at a time (zero its slice of the input to the output projection c_proj)
+# and measure how much the average next-token loss over the STATS sentences rises.
+lm = GPT2LMHeadModel.from_pretrained(NAME).eval()
+enc = [tok(t, return_tensors="pt") for t in STATS]
+def avg_loss():
+    with torch.no_grad():
+        return sum(lm(**e, labels=e["input_ids"]).loss.item() for e in enc) / len(enc)
+dh = cfg.n_embd // H
+off = {"layer": None, "head": None}
+def pre(module, args, l):
+    if off["layer"] != l:
+        return None
+    x = args[0].clone()
+    x[..., off["head"] * dh:(off["head"] + 1) * dh] = 0
+    return (x,)
+hooks = [blk.attn.c_proj.register_forward_pre_hook(lambda m, a, l=l: pre(m, a, l)) for l, blk in enumerate(lm.transformer.h)]
+base = avg_loss()
+ablation = []
+for l in range(L):
+    row = []
+    for h in range(H):
+        off.update(layer=l, head=h)
+        row.append(r(avg_loss() - base, 4))
+    ablation.append(row)
+off.update(layer=None, head=None)
+for h_ in hooks:
+    h_.remove()
+
 json.dump({
     "model": NAME, "transformers": transformers.__version__, "torch": torch.__version__,
     "config": {"layers": L, "heads": H, "d_model": cfg.n_embd, "d_head": cfg.n_embd // H, "ffn": 4 * cfg.n_embd, "context": cfg.n_positions, "vocab": cfg.vocab_size},
@@ -99,4 +127,5 @@ json.dump({
     "residual_norms": {"text": SENTENCES[0], "tokens": pieces, "norms": norms},
     "layernorm": layernorm, "position_similarity": pos_sim,
     "ffn": {"text": SENTENCES[0], "active_share": ffn_active, "negative_share": ffn_negative},
+    "head_ablation": {"base_loss": r(base, 4), "loss_increase": ablation, "sentences": STATS},
 }, sys.stdout, separators=(",", ":"))

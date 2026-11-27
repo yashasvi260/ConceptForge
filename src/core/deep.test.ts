@@ -69,4 +69,10 @@ describe("validateDeep", () => {
     d.build = { ...d.build, parts: [{ id: "p1", prompt: "x", starter: "", solution: "", checks: "  ", hints: [] }] };
     expect(validateDeep(d)).toContain("part p1: no checks");
   });
+
+  it("reports worked tables with repeated column names (they are React keys)", () => {
+    const d = valid();
+    d.worked = [{ kind: "table", caption: "t", columns: ["head", "weight", "weight"], rows: [[0, 1, 2]], source: "worked/x.py" }];
+    expect(validateDeep(d)).toContain('worked "t": repeated column "weight"');
+  });
 });

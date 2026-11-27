@@ -5,6 +5,7 @@ import { tokenizeWords } from "./attention";
 import { AttentionView, MultiHeadView, QkvView, type AttentionState } from "./views/AttentionViews";
 import { FfnView, ForwardView, GqaView, NormView, PositionalView, RecapView } from "./views/InternalsViews";
 import { AttnCostLab, HeadFinderLab, QkvProjectLab, RealHeadsLab, SqrtDLab, ValueMixLab } from "./views/labs/AttentionLabs";
+import { HeadAblationLab, HeadGridLab, HeadSplitLab, KvBudgetLab, KvRepeatLab, KvSharingLab } from "./views/labs/HeadsGqaLabs";
 import { BlockParamsLab, LearnedPosLab, RopeRelativeLab, ShapesLab, ShuffleLab } from "./views/labs/ForwardPositionLabs";
 
 export function Stage({ step }: StageProps) {
@@ -58,6 +59,18 @@ export function Stage({ step }: StageProps) {
         return <HeadFinderLab />;
       case "attn-cost":
         return <AttnCostLab />;
+      case "head-split":
+        return <HeadSplitLab />;
+      case "head-grid":
+        return <HeadGridLab />;
+      case "head-ablation":
+        return <HeadAblationLab />;
+      case "kv-sharing":
+        return <KvSharingLab />;
+      case "kv-budget":
+        return <KvBudgetLab />;
+      case "kv-repeat":
+        return <KvRepeatLab />;
       case "recap":
         return <RecapView />;
       default:

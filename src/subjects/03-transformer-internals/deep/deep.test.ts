@@ -98,6 +98,8 @@ const WRONG: [step: string, part: string, code: string][] = [
   ["qkv", "p2", "import numpy as np\ndef scores(Q, K):\n    return Q @ K.T\ndef softmax_rows(S):\n    e = np.exp(S - S.max(axis=1, keepdims=True))\n    return e / e.sum(axis=1, keepdims=True)"],
   // Masks after the softmax by zeroing: rows no longer sum to 1.
   ["self-attention", "p1", "import numpy as np\nATTN = np.array(DATA['gpt2']['sentences'][0]['attn'])\ndef causal_softmax(S):\n    S = np.array(S, dtype=float)\n    e = np.exp(S - S.max(axis=1, keepdims=True))\n    W = e / e.sum(axis=1, keepdims=True)\n    return np.tril(W)\ndef is_causal(W):\n    return bool(np.all(np.triu(np.asarray(W), k=1) == 0))"],
+  // Tiles the KV heads instead of repeating each one: query head 1 would read KV head 1, not 0.
+  ["gqa", "p2", "import numpy as np\ndef repeat_kv(K, n_rep):\n    return np.tile(np.asarray(K), (n_rep, 1, 1))"],
   ["positional", "p2", "import numpy as np\ndef rope(x, pos):\n    return np.asarray(x, dtype=float) + pos"],
 ];
 

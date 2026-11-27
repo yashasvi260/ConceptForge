@@ -68,11 +68,14 @@ first-token norm grows 10 â†’ ~3,100; position neighbours 0.997, distance 256 â†
 | --- | --- | --- | --- | --- |
 | 03 | forward-pass | yes | 3/3 (forward, shapes, block-params) | 0292a7d |
 | 03 | positional | yes | 4/4 (shuffle, positional, learned-pos, rope-relative) | 0292a7d |
-| 03 | qkv | yes | 4/4 (qkv-project, qkv, sqrt-d, value-mix) | (this commit) |
-| 03 | self-attention | yes | 4/4 (real-heads, attention, head-finder, attn-cost) | (this commit) |
-| 03 | multi-head | | | |
-| 03 | gqa | | | |
+| 03 | qkv | yes | 4/4 (qkv-project, qkv, sqrt-d, value-mix) | f3265e7 |
+| 03 | self-attention | yes | 4/4 (real-heads, attention, head-finder, attn-cost) | f3265e7 |
+| 03 | multi-head | yes | 4/4 (multihead, head-split, head-grid, head-ablation) | (this commit) |
+| 03 | gqa | yes | 4/4 (gqa, kv-sharing, kv-budget, kv-repeat) | (this commit) |
 | 03 | residual-norm | | | |
 | 03 | ffn | | | |
 | 03 | moe | | | |
 | 03 | recap | | | |
+
+Head ablation added to gpt2.json: base loss 4.0468 over 8 sentences; 78/144 heads < +0.01, 129 < +0.05, 8 > +0.1; most important L0H10 +0.486; L4H11 +0.005.
+Validator now rejects repeated column names in worked tables (React keys; caught by the smoke test in lesson 5).

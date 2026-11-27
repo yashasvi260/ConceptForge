@@ -63,6 +63,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "multi-head",
+    deep: true,
     title: "Multi-head attention",
     summary: "Several attention heads run side by side, each free to track a different kind of relationship.",
     body: [
@@ -75,6 +76,7 @@ export const steps: LessonStep[] = [
   },
   {
     id: "gqa",
+    deep: true,
     title: "Grouped-query attention (GQA)",
     summary: "Let several query heads share one set of keys and values: nearly the same quality, much less memory.",
     body: [
